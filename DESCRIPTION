@@ -1,0 +1,23 @@
+Package: hawkesbow
+Title: Estimation of Hawkes processes from Binned Observations using Whittle likelihood
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Felix",
+           family = "Cheysson",
+           role = c("aut", "cre"),
+           email = "felix.cheysson@agroparistech.com",
+           comment = c(ORCID = "0000-0002-9095-2878"))
+Description: This package estimating Hawkes processes when count data are only observed in discrete time, using a spectral approach derived from the Bartlett spectrum. Some general use functions for Hawkes processes are also included: simulation of (in)homogeneous Hawkes process, maximum likelihood estimation, residual analysis, etc.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.1.1
+Imports: 
+    nloptr,
+    Rcpp
+Suggests: 
+    testthat (>= 2.1.0)
+LinkingTo: 
+    Rcpp,
+    RcppArmadillo
