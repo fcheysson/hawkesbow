@@ -19,8 +19,11 @@ BEGIN_RCPP
 END_RCPP
 }
 
+RcppExport SEXP _rcpp_module_boot_HawkesModule();
+
 static const R_CallMethodDef CallEntries[] = {
     {"_hawkesbow_matrix_mult_cpp", (DL_FUNC) &_hawkesbow_matrix_mult_cpp, 2},
+    {"_rcpp_module_boot_HawkesModule", (DL_FUNC) &_rcpp_module_boot_HawkesModule, 0},
     {NULL, NULL, 0}
 };
 

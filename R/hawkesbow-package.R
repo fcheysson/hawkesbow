@@ -9,6 +9,8 @@
 ## usethis namespace: end
 NULL
 
+loadModule("HawkesModule", TRUE)
+
 .onUnload <- function (libpath) {
   library.dynam.unload("mypkg", libpath)
 }
