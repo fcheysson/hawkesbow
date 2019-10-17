@@ -1,56 +1,79 @@
 #pragma once
 #include <RcppArmadillo.h>
 
+// [[Rcpp::depends(RcppArmadillo)]]
 
 //' @export DiscreteData
 class DiscreteData {
-    arma::vec counts;               // Vector of counts
-    double binsize;
-    int n_elem;
-    double timeBegin, timeEnd;      // Time bounds
 
-    // Default constructor
-    DiscreteData() {};
+private:
+    arma::Col<unsigned int> counts;                 // Vector of counts
+    double                  binsize;
+    double                  timeBegin, timeEnd;     // Time bounds
+
+public:
+    // // Default constructor           // Removed since there are no setter methods
+    // DiscreteData() {};
 
     // Constructor from vector of occurrences and binsize
-    DiscreteData( arma::vec counts, int binsize ) :
-        counts( counts ), binsize( binsize ), n_elem( counts.n_elem ), timeBegin( 0 ), timeEnd( binsize*n_elem ) {};
+    DiscreteData( arma::Col<unsigned int> counts, double binsize ) :
+        counts( counts ),
+        binsize( binsize ),
+        timeBegin( 0 ),
+        timeEnd( binsize*counts.n_elem )
+        {};
+
+    // Constructor from vector of occurrences, binsize and timeBegin
+    DiscreteData( arma::Col<unsigned int> counts, double binsize, double timeBegin ) :
+        counts( counts ),
+        binsize( binsize ),
+        timeBegin( timeBegin ),
+        timeEnd( timeBegin + binsize*counts.n_elem )
+        {};
+
+    // Getters
+    arma::Col<unsigned int> getCounts()     { return counts; };
+    double                  getBinsize()    { return binsize; };
+    double                  getTimeBegin()  { return timeBegin; };
+    double                  getTimeEnd()    { return timeEnd; };
+    arma::vec               getTimeRange()  { return { timeBegin, timeEnd }; };
+
 };
 
 //' @export ContinuousData
 class ContinuousData {
 
 private:
-    arma::vec events;               // Vector of occurrences
-    double timeBegin, timeEnd;      // Time bounds
+    arma::vec   events;               // Vector of occurrences
+    double      timeBegin, timeEnd;      // Time bounds
 
 public:
-    // Default constructor
-    ContinuousData() {};
+    // // Default constructor
+    // ContinuousData() {};
 
     // Constructor from vector of occurrences and time upper bound
     ContinuousData( arma::vec events, double timeEnd ) :
-        events( events ), timeBegin( 0 ), timeEnd( timeEnd ) {};
+        events( events ),
+        timeBegin( 0 ),
+        timeEnd( timeEnd )
+        {};
 
     // Constructor from vector of occurrences and time bounds
     ContinuousData( arma::vec events, double timeBegin, double timeEnd ) :
-        events( events ), timeBegin( timeBegin ), timeEnd( timeEnd ) {};
+        events( events ),
+        timeBegin( timeBegin ),
+        timeEnd( timeEnd )
+        {};
 
-    // Getters and setters
-    void setEvents( arma::vec events_ ) { events = events_; };
-    arma::vec getEvents() { return events; };
+    // Getters
+    arma::vec   getEvents()     { return events; };
+    double      getTimeBegin()  { return timeBegin; };
+    double      getTimeEnd()    { return timeEnd; };
+    arma::vec   getTimeRange()  { return { timeBegin, timeEnd }; };
 
-    void setTimeBegin( double timeBegin_ ) { timeBegin = timeBegin_; };
-    double getTimeBegin() { return timeBegin; };
-
-    void setTimeEnd( double timeEnd_ ) { timeEnd = timeEnd_; };
-    double getTimeEnd() { return timeEnd; };
-
-    void setTimeRange( arma::vec timeRange ) { timeBegin = timeRange(0); timeEnd = timeRange(1); };
-    arma::vec getTimeRange() { return { timeBegin, timeEnd }; };
-
-    // Discretize from length
-    struct DiscreteData toDiscrete( int length );
+    // Discretize from length or binsize
+    DiscreteData toDiscrete( unsigned int length );
+    DiscreteData toDiscrete( double binsize );
 
 };
 

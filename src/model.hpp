@@ -4,4 +4,13 @@
 //' @export Model
 class Model {
 
+
+
+};
+
+//' @export Exponential
+class Exponential : public Model {
+
+
+
 };

@@ -3,7 +3,7 @@
 double sinc( double x ) {
   if (x == 0.0) return 1.0;
   return sin(x) / x;
-};
+}
 
 arma::vec sinc_( arma::vec x ) {
   arma::vec y(x.n_elem);
@@ -14,13 +14,13 @@ arma::vec sinc_( arma::vec x ) {
       y(k) = sin(x(k)) / x(k);
   }
   return y;
-};
+}
 
 arma::uword modulus( arma::sword a, arma::sword b ) {
   return (arma::uword)( (a%b+b)%b );
-};
+}
 
 arma::uword modulus( arma::sword a, arma::uword b ) {
   arma::sword c = (arma::sword)b;
   return (arma::uword)( (a%c+c)%c );
-};
+}

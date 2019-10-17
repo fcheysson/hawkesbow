@@ -12,5 +12,5 @@ NULL
 loadModule("HawkesModule", TRUE)
 
 .onUnload <- function (libpath) {
-  library.dynam.unload("mypkg", libpath)
+  library.dynam.unload("hawkesbow", libpath)
 }
