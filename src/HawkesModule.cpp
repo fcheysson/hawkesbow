@@ -1,13 +1,13 @@
 #include "model.hpp"
 #include "data.hpp"
 
-// For overloaded methods: help disambiguate which one to use
-// Here: select method if argument is an integer
-bool get_int_valid(SEXP* args, int nargs){
-    if( nargs != 1 ) return false ;
-    if( TYPEOF(args[0]) != INTSXP ) return false ;
-    return ( LENGTH(args[0]) == 1 ) ;
-}
+// // For overloaded methods: help disambiguate which one to use
+// // Here: select method if argument is an integer
+// bool get_int_valid(SEXP* args, int nargs){
+//     if( nargs != 1 ) return false ;
+//     if( TYPEOF(args[0]) != INTSXP ) return false ;
+//     return ( LENGTH(args[0]) == 1 ) ;
+// }
 
 RCPP_EXPOSED_CLASS(DiscreteData);
 
@@ -15,6 +15,11 @@ RCPP_MODULE(HawkesModule) {
     using namespace Rcpp;
 
     class_<Model>("Model")
+        .default_constructor() // This exposes the default constructor
+    ;
+
+    class_<Exponential>("Exponential")
+        .derives<Model>("Model")
         .default_constructor() // This exposes the default constructor
     ;
 
@@ -41,7 +46,9 @@ RCPP_MODULE(HawkesModule) {
         .property("timeBegin", &ContinuousData::getTimeBegin)
         .property("timeEnd", &ContinuousData::getTimeEnd)
         .property("timeRange", &ContinuousData::getTimeRange)
-        .method("toDiscrete", ( DiscreteData (ContinuousData::*)(unsigned int) )(&ContinuousData::toDiscrete), "ContinuousData", &get_int_valid )
-        .method("toDiscrete", ( DiscreteData (ContinuousData::*)(double) )      (&ContinuousData::toDiscrete))
+        .method("toDiscrete_byLength", &ContinuousData::toDiscrete_byLength)
+        .method("toDiscrete_byBinsize", &ContinuousData::toDiscrete_byBinsize)
+        // .method("toDiscrete", ( DiscreteData (ContinuousData::*)(unsigned int) )(&ContinuousData::toDiscrete), "ContinuousData", &get_int_valid )
+        // .method("toDiscrete", ( DiscreteData (ContinuousData::*)(double) )      (&ContinuousData::toDiscrete))
     ;
 }

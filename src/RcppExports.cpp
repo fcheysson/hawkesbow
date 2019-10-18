@@ -6,23 +6,10 @@
 
 using namespace Rcpp;
 
-// matrix_mult_cpp
-arma::mat matrix_mult_cpp(arma::mat A, arma::mat B);
-RcppExport SEXP _hawkesbow_matrix_mult_cpp(SEXP ASEXP, SEXP BSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type B(BSEXP);
-    rcpp_result_gen = Rcpp::wrap(matrix_mult_cpp(A, B));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 RcppExport SEXP _rcpp_module_boot_HawkesModule();
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_hawkesbow_matrix_mult_cpp", (DL_FUNC) &_hawkesbow_matrix_mult_cpp, 2},
     {"_rcpp_module_boot_HawkesModule", (DL_FUNC) &_rcpp_module_boot_HawkesModule, 0},
     {NULL, NULL, 0}
 };

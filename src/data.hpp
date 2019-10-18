@@ -72,8 +72,8 @@ public:
     arma::vec   getTimeRange()  { return { timeBegin, timeEnd }; };
 
     // Discretize from length or binsize
-    DiscreteData toDiscrete( unsigned int length );
-    DiscreteData toDiscrete( double binsize );
+    DiscreteData toDiscrete_byLength( unsigned int length );
+    DiscreteData toDiscrete_byBinsize( double binsize );
 
 };
 
