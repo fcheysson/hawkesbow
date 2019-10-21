@@ -16,11 +16,28 @@ RCPP_MODULE(HawkesModule) {
 
     class_<Model>("Model")
         .default_constructor() // This exposes the default constructor
+        .method("mean", &Model::mean)
+        .method("dmean", &Model::dmean)
+        .method("ddmean", &Model::ddmean)
+        .method("G", &Model::G)
+        .method("dG", &Model::dG)
+        .method("ddG", &Model::ddG)
+        .method("f", &Model::f)
+        .method("df", &Model::df)
+        .method("ddf", &Model::ddf)
+        .method("f1", &Model::f1)
+        .method("df1", &Model::df1)
+        .method("ddf1", &Model::ddf1)
+        .property("param", &Model::getParam, &Model::setParam)
     ;
 
     class_<Exponential>("Exponential")
         .derives<Model>("Model")
         .default_constructor() // This exposes the default constructor
+        .method("h", &Exponential::h)
+        .method("H", &Exponential::H)
+        .method("dH", &Exponential::dH)
+        .method("ddH", &Exponential::ddH)
     ;
 
     class_<DiscreteData>("DiscreteData")

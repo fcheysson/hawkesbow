@@ -1,20 +1,26 @@
 #include "utils.hpp"
 
-double sinc( double x ) {
-  if (x == 0.0) return 1.0;
-  return sin(x) / x;
-}
-
-arma::vec sinc_( arma::vec x ) {
-  arma::vec y(x.n_elem);
-  for (arma::uword k = 0; k < x.n_elem; k++) {
-    if (x(k) == 0.0)
-      y(k) = 1.0;
-    else
-      y(k) = sin(x(k)) / x(k);
-  }
-  return y;
-}
+// // Sinus cardinal: sinc(x) = sin(x) / x
+// //' @export
+// // [[Rcpp::export]]
+// arma::vec sinc( arma::vec x ) {
+//     arma::vec y(x.n_elem);
+//
+//     // Iterators
+//     arma::vec::iterator it_x = x.begin();
+//     arma::vec::iterator it_x_end = x.end();
+//     arma::vec::iterator it_y = y.begin();
+//     Rcpp::Rcout << "just checking" << std::endl;
+//
+//     // Loop on x
+//     for (; it_x != it_x_end; ++it_x, ++it_y) {
+//         if (*it_x == 0.0)
+//             *it_y = 1.0;
+//         else
+//             *it_y = sin(*it_x) / *it_x;
+//     }
+//     return y;
+// };
 
 arma::uword modulus( arma::sword a, arma::sword b ) {
   return (arma::uword)( (a%b+b)%b );
