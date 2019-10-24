@@ -1,4 +1,4 @@
-test_that("XXXX", {
+test_that("Methods for spectral densities work", {
 
     # Create discrete sample
     T = runif(1, 50, 200)

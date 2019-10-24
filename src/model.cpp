@@ -68,14 +68,14 @@ arma::cube Model::ddG( arma::vec xi ) {
 
 // f(w) = m * binsize * sinc²(w/2) * G(w/binsize)
 
-arma::vec Model::f( arma::vec xi ) {                // sinc is now implemented into armadillo
-    arma::vec term1 = sinc( .5 * inv_pi * xi );     // don't know how it is seen by the compiler here...
-    return mean() * term1 % term1 % G(xi);};        // i didn't import the namespace arma
+arma::vec Model::f( arma::vec xi ) {
+    arma::vec term1 = _sinc( .5 * xi );
+    return mean() * term1 % term1 % G(xi);};
 
 arma::mat Model::df( arma::vec xi ) {
     arma::mat grad( xi.n_elem, param.n_elem );
 
-    arma::vec term0 = sinc( .5 * inv_pi * xi );
+    arma::vec term0 = _sinc( .5 * xi );
     arma::vec term1 = term0 % term0;
 
     double m = mean();
@@ -92,7 +92,7 @@ arma::mat Model::df( arma::vec xi ) {
 arma::cube Model::ddf( arma::vec xi ) {
     arma::cube hess( param.n_elem, param.n_elem, xi.n_elem );
 
-    arma::vec term0 = sinc( .5 * inv_pi * xi );
+    arma::vec term0 = _sinc( .5 * xi );
     arma::vec term1 = term0 % term0;
 
     double m = mean();
