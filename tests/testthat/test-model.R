@@ -1,11 +1,12 @@
 test_that("Methods for spectral densities work", {
 
-    # Create discrete sample
-    T = runif(1, 50, 200)
-    x = sort(runif(100, 0, T))
-    length = sample(x = 1:20, size = 1)
-    cdata = new(ContinuousData, x, T)
-    ddata = cdata$toDiscrete_byLength(length)
+    # Create exponential Hawkes model
+    model = new(Exponential)
+    model$param=c(1,.5,2)
+
+    # Excitation function
+    h0 =
+
 
     # Correct bins in R
     ti <- seq(0, T, length.out=length+1)

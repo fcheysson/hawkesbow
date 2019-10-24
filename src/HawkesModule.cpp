@@ -16,9 +16,6 @@ RCPP_MODULE(HawkesModule) {
 
     class_<Model>("Model")
         .default_constructor() // This exposes the default constructor
-        .method("mean", &Model::mean)
-        .method("dmean", &Model::dmean)
-        .method("ddmean", &Model::ddmean)
         .method("G", &Model::G)
         .method("dG", &Model::dG)
         .method("ddG", &Model::ddG)
@@ -34,6 +31,9 @@ RCPP_MODULE(HawkesModule) {
     class_<Exponential>("Exponential")
         .derives<Model>("Model")
         .default_constructor() // This exposes the default constructor
+        .method("mean", &Exponential::mean)
+        .method("dmean", &Exponential::dmean)
+        .method("ddmean", &Exponential::ddmean)
         .method("h", &Exponential::h)
         .method("H", &Exponential::H)
         .method("dH", &Exponential::dH)

@@ -13,9 +13,9 @@ public:
     virtual ~Model() {};
 
     // Methods for long term mean and its derivatives
-    double mean();
-    arma::vec dmean();
-    arma::mat ddmean();
+    virtual double mean() { return 0.0; };
+    virtual arma::vec dmean() { return arma::zeros<arma::vec>(param.n_elem); };
+    virtual arma::mat ddmean() { return arma::zeros<arma::mat>(param.n_elem, param.n_elem); };
 
     // Virtual methods for time- and frequency-domain excitation functions
     virtual arma::vec h( arma::vec x ) { return arma::zeros<arma::vec>(x.n_elem); };
@@ -49,6 +49,11 @@ private:
 
 
 public:
+    // Methods for long term mean and its derivatives
+    double mean();
+    arma::vec dmean();
+    arma::mat ddmean();
+
     // Methods for time- and frequency-domain excitation functions
     arma::vec h( arma::vec x );
     arma::cx_vec H( arma::vec xi );
