@@ -2,17 +2,28 @@
 % Please edit documentation in R/mle.R
 \name{mle}
 \alias{mle}
-\title{Title}
+\title{Fitting Hawkes processes from continuous data}
 \usage{
-mle(data, T, init = c(1, 1, 2), opts = NULL, ...)
+mle(model, data, opts = NULL, ...)
 }
 \arguments{
-\item{data}{}
+\item{model}{An object of class Model}
 
-\item{init}{}
+\item{data}{An object of class ContinuousData}
 
-\item{...}{}
+\item{opts}{(Optional) To be passed to \code{nloptr}}
+
+\item{...}{Additional arguments passed to \code{nloptr}}
+}
+\value{
+Returns the \code{optim} output
 }
 \description{
-Title
+This function fits a Hawkes process to continuous data by minimizing the likelihood.
+}
+\examples{
+x = hawkes(100,1,1,2)
+model = new(Exponential)
+data = new(ContinuousData, x$p, x$T)
+mle(model, data)
 }

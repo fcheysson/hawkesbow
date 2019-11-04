@@ -118,3 +118,11 @@ arma::cube Model::ddf1( arma::vec xi, int trunc ) {
     }
     return y;
 };
+
+// Whittle likelihood estimation methods
+double Model::whittle( arma::vec& periodogram, int trunc ) {
+    arma::uword n = periodogram.n_elem;
+    arma::vec omega = 2.0 * arma::datum::pi * arma::regspace<arma::vec>(0, n-1) / (double)n;
+    arma::vec spectrum = f1( omega, trunc );
+    return arma::sum( arma::log(spectrum) + periodogram / spectrum );
+};

@@ -1,63 +1,41 @@
-#' Title
+#' Fitting Hawkes processes from discrete data
 #'
-#' @param hawkes 
+#' This function fits a Hawkes process to discrete data by minimizing the Whittle contrast.
+#'
+#' @param model An object of class Model
+#' @param data An object of class DiscreteData
+#' @param trunc (Optional) The number of foldings taken into account due to aliasing
+#' @param ... Additional arguments passed to `optim`
 #'
 #' @return
+#' Returns the `optim` output
 #' @export
 #'
 #' @examples
-whittle <- function(data, binsize, init=c(1,.5,2), trunc=5, ...) {
-  model <- new(ExpHawkes)
-  model$ddata <- data
-  model$binsize <- binsize
-  
-  n <- length(data)
-  
-  # Periodogram
-  dft <- fft(data - mean(data))
-  I <- Mod(dft)^2 / n
+#' x = hawkes(100,1,1,2)
+#' y = discrete(x, 100)
+#' model = new(Exponential)
+#' model$param = c(1, .5, 2)
+#' data = new(DiscreteData, y, 1)
+#' whittle(model, data)
+whittle <- function(model, data, trunc=5, ...) {
 
-  # Whittle pseudo likelihood function (for optim)
-  wlik <- function(param_) {
-    model$param <- param_
-    return( model$wLik(I, trunc) )
-  }
-  
-  opt <- optim(par=init, fn = wlik, hessian = TRUE, 
-               lower = rep(.0001, 3), upper = c(Inf, .9999, Inf), method = "L-BFGS-B", ...)
-  
-  model$vcov <- solve(opt$hessian)
-  model$opt <- opt
+    counts <- data$counts
+    n <- length(counts)
 
-  return( model )
-}
+    # Periodogram
+    dft <- fft(counts - mean(counts))
+    I <- Mod(dft)^2 / n
 
-#' Title
-#'
-#' @param trunc 
-#' @param ... 
-#'
-#' @return
-#' @export
-#'
-#' @examples
-whittle_ <- function(model, trunc=5, ...) {
-  data <- model$ddata
-  n <- length(data)
-  
-  # Periodogram
-  dft <- fft(data - mean(data))
-  I <- Mod(dft)^2 / n
-  
-  # Whittle pseudo likelihood function (for optim)
-  wlik <- function(param_) {
-    model$param <- param_
-    return( model$wLik(I, trunc) )
-  }
-  
-  opt <- optim(par=model$param, fn = wlik, hessian = TRUE, 
-               lower = rep(.0001, 3), upper = c(Inf, .9999, Inf), method = "L-BFGS-B", ...)
-  
-  model$vcov <- solve(opt$hessian)
-  model$opt <- opt
+    # Whittle pseudo likelihood function (for optim)
+    wlik <- function(param) {
+        model$param <- param
+        return( model$whittle(I, trunc) )
+    }
+
+    opt <- optim(par=model$param, fn = wlik, hessian = TRUE,
+                 lower = rep(.0001, 3), upper = c(Inf, .9999, Inf), method = "L-BFGS-B", ...)
+
+    # model$param <- opt$
+    return(opt);
 }

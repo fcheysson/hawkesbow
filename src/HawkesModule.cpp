@@ -25,6 +25,7 @@ RCPP_MODULE(HawkesModule) {
         .method("f1", &Model::f1)
         .method("df1", &Model::df1)
         .method("ddf1", &Model::ddf1)
+        .method("whittle", &Model::whittle)
         .property("param", &Model::getParam, &Model::setParam)
     ;
 

@@ -2,17 +2,26 @@
 % Please edit documentation in R/discretize.R
 \name{discrete}
 \alias{discrete}
-\title{discrete}
+\title{Discretizes a Hawkes simulation}
 \usage{
 discrete(hawkes, length = NULL, binsize = NULL)
 }
 \arguments{
-\item{hawkes}{}
+\item{hawkes}{An object created by the function \code{hawkes}}
 
-\item{length}{}
+\item{length}{(Either) The length for the output vector}
 
-\item{binsize}{}
+\item{binsize}{(Either) The binsize for the discretization}
+}
+\value{
+The vector of counts
 }
 \description{
-discrete
+Discretizes a Hawkes simulation
+}
+\examples{
+x = hawkes(100,1,1,2)
+y = discrete(x, length=100)
+z = discrete(x, binsize=1)
+all(y == z)
 }

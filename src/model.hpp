@@ -2,6 +2,7 @@
 #include <RcppArmadillo.h>
 
 // [[Rcpp::depends(RcppArmadillo)]]
+using namespace Rcpp;
 
 //' @export Model
 class Model {
@@ -35,6 +36,9 @@ public:
     arma::vec f1( arma::vec xi, int trunc );  // f1(w) = sum_{k=-trunc}^{+trunc} f(w + 2*k*pi)
     arma::mat df1( arma::vec xi, int trunc );
     arma::cube ddf1( arma::vec xi, int trunc );
+
+    // Whittle likelihood estimation methods
+    double whittle( arma::vec& I, int trunc );
 
     // Property for param
     void setParam( arma::vec param_ ) { param = param_; };

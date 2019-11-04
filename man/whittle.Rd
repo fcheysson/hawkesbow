@@ -2,13 +2,29 @@
 % Please edit documentation in R/whittle.R
 \name{whittle}
 \alias{whittle}
-\title{Title}
+\title{Fitting Hawkes processes from discrete data}
 \usage{
-whittle(data, binsize, init = c(1, 0.5, 2), trunc = 5, ...)
+whittle(model, data, trunc = 5, ...)
 }
 \arguments{
-\item{hawkes}{}
+\item{model}{An object of class Model}
+
+\item{data}{An object of class DiscreteData}
+
+\item{trunc}{(Optional) The number of foldings taken into account due to aliasing}
+
+\item{...}{Additional arguments passed to \code{optim}}
+}
+\value{
+Returns the \code{optim} output
 }
 \description{
-Title
+This function fits a Hawkes process to discrete data by minimizing the Whittle contrast.
+}
+\examples{
+x = hawkes(100,1,1,2)
+y = discrete(x, 100)
+model = new(Exponential)
+data = new(DiscreteData, y, 1)
+whittle(model, data)
 }

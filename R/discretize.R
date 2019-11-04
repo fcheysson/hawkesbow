@@ -1,13 +1,18 @@
-#' discrete
+#' Discretizes a Hawkes simulation
 #'
-#' @param hawkes 
-#' @param length 
-#' @param binsize 
+#' @param hawkes An object created by the function `hawkes`
+#' @param length (Either) The length for the output vector
+#' @param binsize (Either) The binsize for the discretization
 #'
 #' @return
+#' The vector of counts
 #' @export
 #'
 #' @examples
+#' x = hawkes(100,1,1,2)
+#' y = discrete(x, length=100)
+#' z = discrete(x, binsize=1)
+#' all(y == z)
 discrete <- function(hawkes, length=NULL, binsize=NULL) {
   if (is.null(length) & is.null(binsize))
     stop("One of length or binsize must be specified.")
