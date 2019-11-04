@@ -1,11 +1,11 @@
-test_that("toDiscrete_byLength works", {
+test_that("binl works", {
 
     # Create discrete sample
     T = runif(1, 50, 200)
     x = sort(runif(100, 0, T))
     length = sample(x = 1:20, size = 1)
     cdata = new(ContinuousData, x, T)
-    ddata = cdata$toDiscrete_byLength(length)
+    ddata = cdata$binl(length)
 
     # Correct bins in R
     ti <- seq(0, T, length.out=length+1)
@@ -19,14 +19,14 @@ test_that("toDiscrete_byLength works", {
     expect_equal( ddata$binsize, T/length )
 })
 
-test_that("toDiscrete_byBinsize works", {
+test_that("bins works", {
 
     # Create discrete sample
     T = runif(1, 50, 200)
     x = sort(runif(100, 0, T))
     binsize = runif(1, 0, T)
     cdata = new(ContinuousData, x, T)
-    ddata = cdata$toDiscrete_byBinsize(binsize)
+    ddata = cdata$bins(binsize)
 
     # Correct bins in R
     ti <- seq(0, T, by=binsize)

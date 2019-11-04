@@ -25,6 +25,7 @@ This function fits a Hawkes process to discrete data by minimizing the Whittle c
 x = hawkes(100,1,1,2)
 y = discrete(x, 100)
 model = new(Exponential)
+model$param = c(1, .5, 2)
 data = new(DiscreteData, y, 1)
 whittle(model, data)
 }

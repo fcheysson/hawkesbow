@@ -1,7 +1,7 @@
 #include "data.hpp"
 
 // Discretize continuous data to discrete data
-DiscreteData ContinuousData::toDiscrete_byLength( unsigned int length ) {
+DiscreteData ContinuousData::binl( unsigned int length ) {
 
     // Bounds and counts of bins
     arma::vec               bounds = arma::linspace( timeBegin, timeEnd, length + 1 );
@@ -38,7 +38,7 @@ DiscreteData ContinuousData::toDiscrete_byLength( unsigned int length ) {
 }
 
 // Discretize continuous data to discrete data
-DiscreteData ContinuousData::toDiscrete_byBinsize( double binsize ) {
+DiscreteData ContinuousData::bins( double binsize ) {
 
     // Bounds and counts of bins
     arma::vec               bounds = arma::regspace( timeBegin, binsize, timeEnd );

@@ -9,6 +9,7 @@
 //     return ( LENGTH(args[0]) == 1 ) ;
 // }
 
+RCPP_EXPOSED_CLASS(Data);
 RCPP_EXPOSED_CLASS(DiscreteData);
 
 RCPP_MODULE(HawkesModule) {
@@ -26,7 +27,10 @@ RCPP_MODULE(HawkesModule) {
         .method("df1", &Model::df1)
         .method("ddf1", &Model::ddf1)
         .method("whittle", &Model::whittle)
+        .method("attach", &Model::attach)
+        .method("detach", &Model::detach)
         .property("param", &Model::getParam, &Model::setParam)
+        .property("data", &Model::getData)
     ;
 
     class_<Exponential>("Exponential")
@@ -41,15 +45,21 @@ RCPP_MODULE(HawkesModule) {
         .method("ddH", &Exponential::ddH)
     ;
 
+    class_<Data>("Data")
+        // .default_constructor()
+        .constructor<double,double>()
+        .property("timeBegin", &DiscreteData::getTimeBegin)
+        .property("timeEnd", &DiscreteData::getTimeEnd)
+        .property("timeRange", &DiscreteData::getTimeRange)
+    ;
+
     class_<DiscreteData>("DiscreteData")
+        .derives<Data>("Data")
         // .default_constructor()
         .constructor<arma::Col<unsigned int>,double>()
         .constructor<arma::Col<unsigned int>,double,double>()
         .property("counts", &DiscreteData::getCounts)
         .property("binsize", &DiscreteData::getBinsize)
-        .property("timeBegin", &DiscreteData::getTimeBegin)
-        .property("timeEnd", &DiscreteData::getTimeEnd)
-        .property("timeRange", &DiscreteData::getTimeRange)
     ;
 
     // // Help the compiler disambiguate things
@@ -57,15 +67,13 @@ RCPP_MODULE(HawkesModule) {
     // DiscreteData (ContinuousData::*toDiscrete_binsize)(double) = &ContinuousData::toDiscrete;
 
     class_<ContinuousData>("ContinuousData")
+        .derives<Data>("Data")
         // .default_constructor()
         .constructor<arma::vec,double>()
         .constructor<arma::vec,double,double>()
         .property("events", &ContinuousData::getEvents)
-        .property("timeBegin", &ContinuousData::getTimeBegin)
-        .property("timeEnd", &ContinuousData::getTimeEnd)
-        .property("timeRange", &ContinuousData::getTimeRange)
-        .method("toDiscrete_byLength", &ContinuousData::toDiscrete_byLength)
-        .method("toDiscrete_byBinsize", &ContinuousData::toDiscrete_byBinsize)
+        .method("binl", &ContinuousData::binl)
+        .method("bins", &ContinuousData::bins)
         // .method("toDiscrete", ( DiscreteData (ContinuousData::*)(unsigned int) )(&ContinuousData::toDiscrete), "ContinuousData", &get_int_valid )
         // .method("toDiscrete", ( DiscreteData (ContinuousData::*)(double) )      (&ContinuousData::toDiscrete))
     ;

@@ -1,5 +1,6 @@
 #pragma once
 #include <RcppArmadillo.h>
+#include "data.hpp"
 
 // [[Rcpp::depends(RcppArmadillo)]]
 using namespace Rcpp;
@@ -8,6 +9,7 @@ using namespace Rcpp;
 class Model {
 
 protected:
+    Data* data;
     arma::vec param;
 
 public:
@@ -43,6 +45,14 @@ public:
     // Property for param
     void setParam( arma::vec param_ ) { param = param_; };
     arma::vec getParam() { return param; };
+
+    // Property for data
+    void attach( Data* data_ ) { data = data_; };
+    void detach() { data = nullptr; };
+    Data getData() {
+        if (data) { return *data; }
+        else { return Data(0.0, 0.0); }
+    };
 
 };
 
