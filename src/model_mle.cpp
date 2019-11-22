@@ -33,7 +33,7 @@ arma::vec Exponential::dloglik() {
     const arma::uword n = events.n_elem;
     const double T = data->getTimeEnd() - data->getTimeBegin();
     const double eta = param(0);
-    const double alpha = param(1)*param(2);
+    const double mu = param(1);
     const double beta = param(2);
     const double inv_beta = 1.0/beta;
 
@@ -50,10 +50,10 @@ arma::vec Exponential::dloglik() {
         A = expint * (1.0 + A);
         C = expint * (events(i-1) + C);
         B = events(i) * A - C;
-        denom = 1.0 / (eta + alpha * A);
+        denom = 1.0 / (eta + mu * beta * A);
         grad(0) += 1.0 * denom;
-        grad(1) += A * denom;
-        grad(2) -= alpha * B * denom;
+        grad(1) += beta * A * denom;
+        grad(2) += (mu * A - mu * beta * B) * denom;
     }
 
     expint = exp(- beta * (T - events(n-1)));
@@ -61,8 +61,8 @@ arma::vec Exponential::dloglik() {
     C = expint * (events(n-1) + C);
     B = T * A - C;
     grad(0) -= T;
-    grad(1) -= inv_beta * ( (double)n - A );
-    grad(2) += alpha * inv_beta * ( inv_beta * ( (double)n - A ) - B );
+    grad(1) -= ( (double)n - A );
+    grad(2) += mu * ( inv_beta * ( (double)n - A ) - B ) - mu * inv_beta * ( (double)n - A );
 
     return grad;
 };
