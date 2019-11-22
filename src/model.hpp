@@ -26,6 +26,12 @@ public:
     virtual arma::cx_mat dH( arma::vec xi ) { return arma::zeros<arma::cx_mat>(param.n_elem, xi.n_elem); };
     virtual arma::cx_cube ddH( arma::vec xi ) { return arma::zeros<arma::cx_cube>(param.n_elem, param.n_elem, xi.n_elem); };
 
+    // Likelihood estimation methods
+    virtual double loglik() { return 0.0; };
+    virtual arma::vec dloglik() { return arma::zeros<arma::vec>(param.n_elem); };
+    virtual arma::mat ddloglik() { return arma::zeros<arma::mat>(param.n_elem, param.n_elem); };
+    virtual Rcpp::List loglikngrad() { return Rcpp::List::create(); };
+
     // Methods for continuous- and discretized-time spectral densities
     arma::vec G( arma::vec xi );    // G(w) = |1-H(w)|^{-2}
     arma::mat dG( arma::vec xi );
@@ -73,5 +79,11 @@ public:
     arma::cx_vec H( arma::vec xi );
     arma::cx_mat dH( arma::vec xi );
     arma::cx_cube ddH( arma::vec xi );
+
+    // Likelihood methods
+    double loglik();
+    arma::vec dloglik();
+    arma::mat ddloglik();
+    Rcpp::List loglikngrad();
 
 };

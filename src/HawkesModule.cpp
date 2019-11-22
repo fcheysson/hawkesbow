@@ -43,6 +43,10 @@ RCPP_MODULE(HawkesModule) {
         .method("H", &Exponential::H)
         .method("dH", &Exponential::dH)
         .method("ddH", &Exponential::ddH)
+        .method("loglik", &Exponential::loglik)
+        .method("dloglik", &Exponential::dloglik)
+        .method("ddloglik", &Exponential::ddloglik)
+        .method("loglikngrad", &Exponential::loglikngrad)
     ;
 
     class_<Data>("Data")

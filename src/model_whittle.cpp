@@ -47,10 +47,23 @@ arma::cube Model::ddG( arma::vec xi ) {
 // f(w) = m * binsize * sinc²(w/2) * G(w/binsize)
 
 arma::vec Model::f( arma::vec xi ) {
+    double binsize;
+    if (data)
+        binsize = data->getBinsize();
+    else
+        binsize = 1.0;
+
     arma::vec term1 = _sinc( .5 * xi );
-    return mean() * term1 % term1 % G(xi);};
+    return mean() * binsize * term1 % term1 % G(xi / binsize);
+};
 
 arma::mat Model::df( arma::vec xi ) {
+    double binsize;
+    if (data)
+        binsize = data->getBinsize();
+    else
+        binsize = 1.0;
+
     arma::mat grad( xi.n_elem, param.n_elem );
 
     arma::vec term0 = _sinc( .5 * xi );
@@ -58,16 +71,22 @@ arma::mat Model::df( arma::vec xi ) {
 
     double m = mean();
     arma::vec dm = dmean();
-    arma::vec Gxi = G( xi );
-    arma::mat dGxi = dG( xi );
+    arma::vec Gxi = G( xi / binsize );
+    arma::mat dGxi = dG( xi / binsize );
 
     for (arma::uword k = 0; k < param.n_elem; k++) {
-        grad.col(k) = term1 % ( dm(k) * Gxi + m * dGxi.col(k) );
+        grad.col(k) = binsize * term1 % ( dm(k) * Gxi + m * dGxi.col(k) );
     }
     return grad;
 };
 
 arma::cube Model::ddf( arma::vec xi ) {
+    double binsize;
+    if (data)
+        binsize = data->getBinsize();
+    else
+        binsize = 1.0;
+
     arma::cube hess( param.n_elem, param.n_elem, xi.n_elem );
 
     arma::vec term0 = _sinc( .5 * xi );
@@ -76,15 +95,15 @@ arma::cube Model::ddf( arma::vec xi ) {
     double m = mean();
     arma::vec dm = dmean();
     arma::mat ddm = ddmean();
-    arma::vec Gxi = G( xi );
-    arma::mat dGxi = dG( xi );
-    arma::cube ddGxi = ddG( xi );
+    arma::vec Gxi = G( xi / binsize );
+    arma::mat dGxi = dG( xi / binsize );
+    arma::cube ddGxi = ddG( xi / binsize );
 
     arma::vec tube(xi.n_elem);
     for (arma::uword i = 0; i < param.n_elem; i++) {
         for (arma::uword j = 0; j < param.n_elem; j++) {
             tube = ddGxi(arma::span(i),arma::span(j), arma::span::all);
-            hess.tube(i, j) = term1 % ( ddm(i, j) * Gxi + dm(i) * dGxi.col(j) + dm(j) * dGxi.col(i) + m * tube );
+            hess.tube(i, j) = binsize * term1 % ( ddm(i, j) * Gxi + dm(i) * dGxi.col(j) + dm(j) * dGxi.col(i) + m * tube );
         }
     }
     return hess;

@@ -18,6 +18,11 @@ public:
     double    getTimeEnd()    { return timeEnd; };
     arma::vec getTimeRange()  { return { timeBegin, timeEnd }; };
 
+    // Virtual methods to call a derived class member from a pointer to base class object
+    virtual arma::Col<unsigned int> getCounts()     { return arma::zeros<arma::Col<unsigned int>>(1); };
+    virtual double                  getBinsize()    { return 0.0; };
+    virtual arma::vec               getEvents()     { return arma::zeros<arma::vec>(1); };
+
 };
 
 //' @export DiscreteData
