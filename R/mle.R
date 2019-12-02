@@ -14,22 +14,25 @@
 #' @examples
 #' x = hawkes(100,1,1,2)
 #' model = new(Exponential)
+#' model$param = c(1, .5, 2)
 #' data = new(ContinuousData, x$p, x$T)
 #' mle(model, data)
 mle <- function(model, data, opts = NULL, ...) {
-  # Likelihood function (for nloptr)
-  nlopt_fn <- function(param) {
-    model$param <- param
-    return( lapply(X = model$likngrad(), FUN = "-") )
-  }
 
-  if (is.null(opts))
-    opts <- list("algorithm" = "NLOPT_LD_LBFGS") else
-      if (is.null(opts[["algorithm"]]))
+    model$attach(data)
+
+    # Likelihood function (for nloptr)
+    nlopt_fn <- function(param) {
+        model$param <- param
+        return( lapply(X = model$loglikngrad(), FUN = "-") )
+    }
+
+    if (is.null(opts))
+        opts <- list("algorithm" = "NLOPT_LD_LBFGS")
+    else if (is.null(opts[["algorithm"]]))
         opts <- c(opts, "algorithm" = "NLOPT_LD_LBFGS")
 
-  opt <- nloptr(x0 = model$param, eval_f = nlopt_fn, lb = rep(.0001, 3), ...)
+    opt <- nloptr(x0 = model$param, eval_f = nlopt_fn, lb = rep(.0001, 3), opts = opts, ...)
 
-  model$vcov <- solve(-model$hessian())
-  model$opt <- opt
+    return( opt )
 }

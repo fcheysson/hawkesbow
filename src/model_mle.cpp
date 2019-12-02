@@ -35,7 +35,6 @@ arma::vec Exponential::dloglik() {
     const double eta = param(0);
     const double mu = param(1);
     const double beta = param(2);
-    const double inv_beta = 1.0/beta;
 
     // Fill for i = 0
     arma::vec grad = { 1.0/eta, 0.0, 0.0 };
@@ -62,7 +61,7 @@ arma::vec Exponential::dloglik() {
     B = T * A - C;
     grad(0) -= T;
     grad(1) -= ( (double)n - A );
-    grad(2) += mu * ( inv_beta * ( (double)n - A ) - B ) - mu * inv_beta * ( (double)n - A );
+    grad(2) -= mu * B;
 
     return grad;
 };
@@ -74,9 +73,10 @@ arma::mat Exponential::ddloglik() {
     const arma::uword n = events.n_elem;
     const double T = data->getTimeEnd() - data->getTimeBegin();
     const double eta = param(0);
-    const double alpha = param(1)*param(2);
+    const double mu = param(1);
+    const double mu2 = mu * mu;
     const double beta = param(2);
-    const double inv_beta = 1.0/beta;
+    const double beta2 = beta * beta;
 
     // Fill for i = 0
     arma::mat hess = { {-1.0/eta, 0.0, 0.0},
@@ -97,14 +97,14 @@ arma::mat Exponential::ddloglik() {
         B = events(i) * A - C;
         E = expint * (events(i-1) * events(i-1) + E);
         D = events(i) * events(i) * A + E - 2.0 * events(i) * C;
-        denom = 1.0 / (eta + alpha * A);
+        denom = 1.0 / (eta + mu * beta * A);
         denom2 = denom * denom;
         hess(0,0) -= 1.0 * denom2;
-        hess(0,1) -= A * denom2;
-        hess(0,2) += alpha * B * denom2;
-        hess(1,1) -= A * A * denom2;
-        hess(1,2) -= eta * B * denom2;
-        hess(2,2) += alpha * denom * (D - alpha * denom * B * B);
+        hess(0,1) -= beta * A * denom2;
+        hess(0,2) -= mu * (A - beta * B) * denom2;
+        hess(1,1) -= beta2 * A * A * denom2;
+        hess(1,2) += eta * (A - beta * B) * denom2;
+        hess(2,2) += (eta * mu * (beta * D - 2 * B) + mu2 * (beta2 * (A * E - C * C) - A * A)) * denom2;
     }
 
     expint = exp(- beta * (T - events(n-1)));
@@ -113,8 +113,8 @@ arma::mat Exponential::ddloglik() {
     B = T * A - C;
     E = expint * (events(n-1) * events(n-1) + E);
     D = T * T * A + E - 2.0 * T * C;
-    hess(1,2) += inv_beta * (inv_beta * ((double)n - A) - B);
-    hess(2,2) += alpha * inv_beta * (D + 2.0 * inv_beta * (B - inv_beta * ((double)n  - A)));
+    hess(1,2) -= B;
+    hess(2,2) += mu * D;
 
     // Symm
     hess(1,0) = hess(0,1);
@@ -131,9 +131,8 @@ Rcpp::List Exponential::loglikngrad() {
     const arma::uword n = events.n_elem;
     const double T = data->getTimeEnd() - data->getTimeBegin();
     const double eta = param(0);
-    const double alpha = param(1)*param(2);
+    const double mu = param(1);
     const double beta = param(2);
-    const double inv_beta = 1.0/beta;
 
     // Fill for i = 0
     double lik = log(eta);
@@ -149,11 +148,11 @@ Rcpp::List Exponential::loglikngrad() {
         A = expint * (1.0 + A);
         C = expint * (events(i-1) + C);
         B = events(i) * A - C;
-        denom = 1.0 / (eta + alpha * A);
-        lik += log(eta + alpha * A);
+        denom = 1.0 / (eta + mu * beta * A);
+        lik += log(eta + mu * beta * A);
         grad(0) += 1.0 * denom;
-        grad(1) += A * denom;
-        grad(2) -= alpha * B * denom;
+        grad(1) += beta * A * denom;
+        grad(2) += (mu * A - mu * beta * B) * denom;
     }
 
     // Likelihood of non occurrence
@@ -161,10 +160,10 @@ Rcpp::List Exponential::loglikngrad() {
     A = expint * (1.0 + A);
     C = expint * (events(n-1) + C);
     B = T * A - C;
-    lik -= eta * T + (alpha / beta) * ((double)n - A);
+    lik -= eta * T + mu * ((double)n - A);
     grad(0) -= T;
-    grad(1) -= inv_beta * ( (double)n - A );
-    grad(2) += alpha * inv_beta * ( inv_beta * ( (double)n - A ) - B );
+    grad(1) -= ( (double)n - A );
+    grad(2) -= mu * B;
 
     return Rcpp::List::create(Rcpp::Named("objective") = lik, Rcpp::Named("gradient") = grad);
 };
