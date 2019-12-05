@@ -20,6 +20,7 @@
 #' whittle(model, data)
 whittle <- function(model, data, trunc=5, ...) {
 
+    model$attach(data)
     counts <- data$counts
     n <- length(counts)
 
