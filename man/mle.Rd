@@ -24,6 +24,7 @@ This function fits a Hawkes process to continuous data by minimizing the likelih
 \examples{
 x = hawkes(100,1,1,2)
 model = new(Exponential)
+model$param = c(1, .5, 2)
 data = new(ContinuousData, x$p, x$T)
 mle(model, data)
 }
