@@ -20,6 +20,6 @@ double padef( double x );
 double padeg( double x );
 double Ci( double x );
 double Si( double x );
-arma::cx_vec E1_imaginary( arma::vec x );
+arma::cx_double E1_imaginary( double x );
 
 #endif

@@ -45,10 +45,36 @@ arma::vec Pareto3::h( arma::vec x ) {
 }
 
 arma::cx_vec Pareto3::H( arma::vec xi ) {
-    arma::vec xia = xi * param(2),
-              xia2 = xia % xia,
-              xia3 = xia2 % xia;
-    arma::cx_vec term1 = param(1) * exp(- i * xia) % (1.0 - 0.5 * i * xia - 0.5 * xia2);
-    arma::cx_vec term2 = 0.5 * param(1) * i * xia3 % E1_imaginary(xia);
-    return term1 + term2;
+    arma::cx_vec y(xi.n_elem);
+
+    // Iterators
+    arma::vec::iterator it_xi = xi.begin();
+    arma::vec::iterator it_xi_end = xi.end();
+    arma::cx_vec::iterator it_y = y.begin();
+
+    // Temp variables
+    double xia, xia2, xia3;
+    arma::cx_double term1, term2;
+
+    // Loop on xi
+    for (; it_xi != it_xi_end; ++it_xi, ++it_y) {
+        if (*it_xi >= 0) {
+            xia = *it_xi * param(2);
+            xia2 = xia * xia;
+            xia3 = xia2 * xia;
+            term1 = param(1) * exp(- i * xia) * (1.0 - 0.5 * i * xia - 0.5 * xia2);
+            term2 = 0.5 * param(1) * i * xia3 * E1_imaginary(xia);
+            *it_y = term1 + term2;
+        }
+        if (*it_xi < 0) {   // take conjugate
+            xia = - *it_xi * param(2);
+            xia2 = xia * xia;
+            xia3 = xia2 * xia;
+            term1 = param(1) * exp(- i * xia) * (1.0 - 0.5 * i * xia - 0.5 * xia2);
+            term2 = 0.5 * param(1) * i * xia3 * E1_imaginary(xia);
+            *it_y = std::conj(term1 + term2);
+        }
+    }
+
+    return y;
 }

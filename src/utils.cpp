@@ -124,87 +124,79 @@ double padeg( double x ) {
 };
 
 double Ci( double x ) {
-    if (x < 0)
-        throw "ERROR in Ci: 'x' cannot be negative.";
-    if (x <= 4) {
-        double x2 = x * x,
-               x4 = x2 * x2,
-               x6 = x4 * x2,
-               x8 = x6 * x2,
-               x10 = x8 * x2,
-               x12 = x10 * x2,
-               x14 = x12 * x2;
-
-        double num = -0.25 + 7.51851524438898291 * quick_negpow10(3) * x2
-                           - 1.27528342240267686 * quick_negpow10(4) * x4
-                           + 1.05297363846239184 * quick_negpow10(6) * x6
-                           - 4.68889508144848019 * quick_negpow10(9) * x8
-                           + 1.06480802891189243 * quick_negpow10(11) * x10
-                           - 9.93728488857585407 * quick_negpow10(15) * x12;
-
-        double denom = 1 + 1.1592605689110735 * quick_negpow10(2) * x2
-                         + 6.72126800814254432 * quick_negpow10(5) * x4
-                         + 2.55533277086129636 * quick_negpow10(7) * x6
-                         + 6.97071295760958946 * quick_negpow10(10) * x8
-                         + 1.38536352772778619 * quick_negpow10(12) * x10
-                         + 1.89106054713059759 * quick_negpow10(15) * x12
-                         + 1.39759616731376855 * quick_negpow10(18) * x14;
-
-        return arma::datum::euler + log(x) + x2 * num / denom;
-    }
-
-    return padef(x) * sin(x) - padeg(x) * cos(x);
-};
-
-double Si( double x ) {
-    if (x < 0)
-        throw "ERROR in Si: 'x' cannot be negative.";
-    if (x <= 4) {
-        double x2 = x * x,
-            x4 = x2 * x2,
-            x6 = x4 * x2,
-            x8 = x6 * x2,
-            x10 = x8 * x2,
-            x12 = x10 * x2,
-            x14 = x12 * x2;
-
-        double num = 1 - 4.54393409816329991 * quick_negpow10(2) * x2
-            + 1.15457225751016682 * quick_negpow10(3) * x4
-            - 1.41018536821330254 * quick_negpow10(5) * x6
-            + 9.43280809438713025 * quick_negpow10(8) * x8
-            - 3.53201978997168357 * quick_negpow10(10) * x10
-            + 7.08240282274875911 * quick_negpow10(13) * x12
-            - 6.05338212010422477 * quick_negpow10(16) * x14;
-
-        double denom = 1 + 1.01162145739225565 * quick_negpow10(2) * x2
-            + 4.99175116169755106 * quick_negpow10(5) * x4
-            + 1.55654986308745614 * quick_negpow10(7) * x6
-            + 3.28067571055789734 * quick_negpow10(10) * x8
-            + 4.5049097575386581 * quick_negpow10(13) * x10
-            + 3.21107051193712168 * quick_negpow10(16) * x12;
-
-        return x * num / denom;
-    }
-
-    return 0.5 * arma::datum::pi - padef(x) * cos(x) - padeg(x) * sin(x);
-};
-
-arma::cx_vec E1_imaginary( arma::vec x ) {
-    arma::cx_vec y(x.n_elem);
-
-    // Iterators
-    arma::vec::iterator it_x = x.begin();
-    arma::vec::iterator it_x_end = x.end();
-    arma::cx_vec::iterator it_y = y.begin();
-
     try {
-        // Loop on x
-        for (; it_x != it_x_end; ++it_x, ++it_y) {
-            *it_y = i * (- 0.5 * arma::datum::pi + Si(*it_x)) - Ci(*it_x);
+        if (x < 0)
+            throw "ERROR in Ci: 'x' cannot be negative.";
+        if (x <= 4) {
+            double x2 = x * x,
+                   x4 = x2 * x2,
+                   x6 = x4 * x2,
+                   x8 = x6 * x2,
+                   x10 = x8 * x2,
+                   x12 = x10 * x2,
+                   x14 = x12 * x2;
+
+            double num = -0.25 + 7.51851524438898291 * quick_negpow10(3) * x2
+                               - 1.27528342240267686 * quick_negpow10(4) * x4
+                               + 1.05297363846239184 * quick_negpow10(6) * x6
+                               - 4.68889508144848019 * quick_negpow10(9) * x8
+                               + 1.06480802891189243 * quick_negpow10(11) * x10
+                               - 9.93728488857585407 * quick_negpow10(15) * x12;
+
+            double denom = 1 + 1.1592605689110735 * quick_negpow10(2) * x2
+                             + 6.72126800814254432 * quick_negpow10(5) * x4
+                             + 2.55533277086129636 * quick_negpow10(7) * x6
+                             + 6.97071295760958946 * quick_negpow10(10) * x8
+                             + 1.38536352772778619 * quick_negpow10(12) * x10
+                             + 1.89106054713059759 * quick_negpow10(15) * x12
+                             + 1.39759616731376855 * quick_negpow10(18) * x14;
+
+            return arma::datum::euler + log(x) + x2 * num / denom;
         }
+
+        return padef(x) * sin(x) - padeg(x) * cos(x);
     } catch (const char* msg) {
         std::cerr << msg << std::endl;
     }
+};
 
-    return y;
+double Si( double x ) {
+    try {
+        if (x < 0)
+            throw "ERROR in Si: 'x' cannot be negative.";
+        if (x <= 4) {
+            double x2 = x * x,
+                x4 = x2 * x2,
+                x6 = x4 * x2,
+                x8 = x6 * x2,
+                x10 = x8 * x2,
+                x12 = x10 * x2,
+                x14 = x12 * x2;
+
+            double num = 1 - 4.54393409816329991 * quick_negpow10(2) * x2
+                + 1.15457225751016682 * quick_negpow10(3) * x4
+                - 1.41018536821330254 * quick_negpow10(5) * x6
+                + 9.43280809438713025 * quick_negpow10(8) * x8
+                - 3.53201978997168357 * quick_negpow10(10) * x10
+                + 7.08240282274875911 * quick_negpow10(13) * x12
+                - 6.05338212010422477 * quick_negpow10(16) * x14;
+
+            double denom = 1 + 1.01162145739225565 * quick_negpow10(2) * x2
+                + 4.99175116169755106 * quick_negpow10(5) * x4
+                + 1.55654986308745614 * quick_negpow10(7) * x6
+                + 3.28067571055789734 * quick_negpow10(10) * x8
+                + 4.5049097575386581 * quick_negpow10(13) * x10
+                + 3.21107051193712168 * quick_negpow10(16) * x12;
+
+            return x * num / denom;
+        }
+
+        return 0.5 * arma::datum::pi - padef(x) * cos(x) - padeg(x) * sin(x);
+    } catch (const char* msg) {
+        std::cerr << msg << std::endl;
+    }
+};
+
+arma::cx_double E1_imaginary( double x ) {
+    return i * (- 0.5 * arma::datum::pi + Si(x)) - Ci(x);
 };
