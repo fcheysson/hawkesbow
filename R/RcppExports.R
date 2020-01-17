@@ -13,3 +13,6 @@ NULL
 #' @export Exponential
 NULL
 
+#' @export Pareto3
+NULL
+

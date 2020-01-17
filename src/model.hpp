@@ -87,3 +87,29 @@ public:
     Rcpp::List loglikngrad();
 
 };
+
+//' @export Pareto3
+class Pareto3: public Model {
+
+private:
+
+
+public:
+    // Methods for long term mean and its derivatives
+    double mean();
+    // arma::vec dmean();
+    // arma::mat ddmean();
+
+    // Methods for time- and frequency-domain excitation functions
+    arma::vec h( arma::vec x );
+    arma::cx_vec H( arma::vec xi );
+    // arma::cx_mat dH( arma::vec xi );
+    // arma::cx_cube ddH( arma::vec xi );
+
+    // Likelihood methods
+    // double loglik();
+    // arma::vec dloglik();
+    // arma::mat ddloglik();
+    // Rcpp::List loglikngrad();
+
+};

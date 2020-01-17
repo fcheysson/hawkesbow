@@ -49,6 +49,15 @@ RCPP_MODULE(HawkesModule) {
         .method("loglikngrad", &Exponential::loglikngrad)
     ;
 
+    class_<Pareto3>("Pareto3")
+        .derives<Model>("Model")
+        .default_constructor() // This exposes the default constructor
+        .method("mean", &Pareto3::mean)
+        .method("h", &Pareto3::h)
+        .method("H", &Pareto3::H)
+    ;
+
+
     class_<Data>("Data")
         // .default_constructor()
         .constructor<double,double>()

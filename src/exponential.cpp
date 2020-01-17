@@ -2,8 +2,8 @@
 #include "utils.hpp"
 
 // Model is given by its intensity :
-// Intensity = param(0) + param(1) * int h(t-u) dN(u)
-// where h(t) = param(2) * exp( -param(2) * t )
+// Intensity = param(0) + int h(t-u) dN(u)
+// where h(t) = param(1) * param(2) * exp( -param(2) * t )
 // Then:
 // param(0): baseline intensity of the Hawkes process
 // param(1): reproduction rate /in [0,1]
