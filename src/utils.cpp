@@ -1,4 +1,6 @@
 #include "utils.hpp"
+#include <string>
+#include <iostream>
 
 // Sinus cardinal: sinc(x) = sin(x) / x
 arma::vec _sinc( arma::vec x ) {
@@ -122,6 +124,8 @@ double padeg( double x ) {
 };
 
 double Ci( double x ) {
+    if (x < 0)
+        throw "ERROR in Ci: 'x' cannot be negative.";
     if (x <= 4) {
         double x2 = x * x,
                x4 = x2 * x2,
@@ -153,6 +157,8 @@ double Ci( double x ) {
 };
 
 double Si( double x ) {
+    if (x < 0)
+        throw "ERROR in Si: 'x' cannot be negative.";
     if (x <= 4) {
         double x2 = x * x,
             x4 = x2 * x2,
@@ -183,11 +189,22 @@ double Si( double x ) {
     return 0.5 * arma::datum::pi - padef(x) * cos(x) - padeg(x) * sin(x);
 };
 
-// arma::uword modulus( arma::sword a, arma::sword b ) {
-//   return (arma::uword)( (a%b+b)%b );
-// }
-//
-// arma::uword modulus( arma::sword a, arma::uword b ) {
-//   arma::sword c = (arma::sword)b;
-//   return (arma::uword)( (a%c+c)%c );
-// }
+arma::cx_vec E1_imaginary( arma::vec x ) {
+    arma::cx_vec y(x.n_elem);
+
+    // Iterators
+    arma::vec::iterator it_x = x.begin();
+    arma::vec::iterator it_x_end = x.end();
+    arma::cx_vec::iterator it_y = y.begin();
+
+    try {
+        // Loop on x
+        for (; it_x != it_x_end; ++it_x, ++it_y) {
+            *it_y = i * (- 0.5 * arma::datum::pi + Si(*it_x)) - Ci(*it_x);
+        }
+    } catch (const char* msg) {
+        std::cerr << msg << std::endl;
+    }
+
+    return y;
+};

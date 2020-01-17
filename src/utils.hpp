@@ -20,8 +20,6 @@ double padef( double x );
 double padeg( double x );
 double Ci( double x );
 double Si( double x );
-
-// arma::uword modulus( arma::sword a, arma::sword b );
-// arma::uword modulus( arma::sword a, arma::uword b );
+arma::cx_vec E1_imaginary( arma::vec x );
 
 #endif

@@ -27,6 +27,7 @@ whittle <- function(model, data, trunc=5, ...) {
     # Periodogram
     dft <- fft(counts - mean(counts))
     I <- Mod(dft)^2 / n
+    I <- I[-1]      # remove value corresponding to density in 0 (not well defined for centered processes)
 
     # Whittle pseudo likelihood function (for optim)
     wlik <- function(param) {

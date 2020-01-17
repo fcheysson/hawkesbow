@@ -45,7 +45,10 @@ arma::vec Pareto3::h( arma::vec x ) {
 }
 
 arma::cx_vec Pareto3::H( arma::vec xi ) {
-    arma::vec factor = param(1) * param(2) / ( param(2)*param(2) + xi%xi );
-    arma::cx_vec zeta = arma::cx_vec( factor * param(2), - factor % xi );
-    return zeta;
+    arma::vec xia = xi * param(2),
+              xia2 = xia % xia,
+              xia3 = xia2 % xia;
+    arma::cx_vec term1 = param(1) * exp(- i * xia) % (1.0 - 0.5 * i * xia - 0.5 * xia2);
+    arma::cx_vec term2 = 0.5 * param(1) * i * xia3 % E1_imaginary(xia);
+    return term1 + term2;
 }

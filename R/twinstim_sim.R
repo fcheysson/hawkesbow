@@ -5,7 +5,7 @@
 # Inhomonogeous Poisson by thinning (Ogata's modified thinning algorithm)
 #' @export
 inhpois <- function(T, fun, M, ...) UseMethod("inhpois")
-	
+
 #' @export
 inhpois.default <- function(T, fun, M, ...) {
 
@@ -32,21 +32,21 @@ inhpois.default <- function(T, fun, M, ...) {
 #' @export
 plot.inhpois <- function(inhpois, precision=1e3, ...) {
 	# Conditional intensity
-	matplot(z <- seq(0, inhpois$T, by=inhpois$T / precision), sapply(z, inhpois$fun), 
+	matplot(z <- seq(0, inhpois$T, by=inhpois$T / precision), sapply(z, inhpois$fun),
 		type="l", ylim=c(0, max(inhpois$M)),
 		xlab=expression(italic(t)), ylab=expression(italic(U)), ...)
 	# Upper bound M of Ogata's modified thinning algorithm
-	segments(x0=0, x1=inhpois$T, 
-		y0=inhpois$M, 
+	segments(x0=0, x1=inhpois$T,
+		y0=inhpois$M,
 		lwd=4, col="blue")
 	# All points considered and the corresponding value for U
-	points(x=inhpois$x, y=inhpois$y, 
+	points(x=inhpois$x, y=inhpois$y,
 		pch=ifelse(inhpois$accepted, 1, 3),
 		col=ifelse(inhpois$accepted, "green4", "firebrick1"))
 	# The resulting points of the Hawkes process
 	points(x=inhpois$p, y=rep(0, inhpois$n), col="green4", pch=15)
 	# Nice lines showing which point considered resulted in which point of the Hawkes process
-	segments(x0=inhpois$x[inhpois$accepted], y0=rep(0, inhpois$n), 
+	segments(x0=inhpois$x[inhpois$accepted], y0=rep(0, inhpois$n),
 		y1=inhpois$y[inhpois$accepted],
 		col="green4", lty=2)
 	# Legends
@@ -58,9 +58,9 @@ plot.inhpois <- function(inhpois, precision=1e3, ...) {
 twinstim <- function(T, fun, M, alpha, beta, ...) UseMethod("twinstim")
 
 #' @export
-twinstim.default <- function(T, fun, M, alpha, beta, ...) {
-	
-	# Get immigrants distributed as inhpois 
+twinstim.default <- function(T, fun, M, alpha, beta, family="exponential", ...) {
+
+	# Get immigrants distributed as inhpois
 	# and number of descendants for each distributed as Pois(alpha/beta)
 	immigrants <- inhpois(T, fun, M, ...)
 
@@ -74,22 +74,25 @@ twinstim.default <- function(T, fun, M, alpha, beta, ...) {
 		for (Ci in gen[[paste0("gen", it)]]) {
 			Di <- rpois(1, lambda=alpha/beta)
 			if (Di > 0) {
-				Ei <- rexp(Di, rate=beta)
+			    if (family == "exponential")
+				    Ei <- rexp(Di, rate=beta)
+			    if (family == "pareto3")
+			        Ei <- PtProcess::rpareto(Di, lambda=3, a=beta)
 				gen[[paste0("gen", it+1)]] <- c(gen[[paste0("gen", it+1)]], (Ci + Ei)[(Ci + Ei) < T])
-				ancestors[[paste0("gen", it+1)]] <- 
+				ancestors[[paste0("gen", it+1)]] <-
 					c(ancestors[[paste0("gen", it+1)]], rep(which(gen[[paste0("gen", it)]] == Ci), Di)[(Ci + Ei) < T])
 			}
 		}
 		it <- it + 1
 	}
 
-	# Remove last generation if empty 
+	# Remove last generation if empty
 	# (happens when candidates are further than T)
 	if (length(gen[[paste0("gen", it-1)]]) == 0) {
 		gen[[paste0("gen", it-1)]] <- NULL
 		ancestors[[paste0("gen", it-1)]] <- NULL
 	}
-	
+
 	# Add immigrants and sort
 	if (length(gen) > 0) p <- sort(unlist(gen, use.names=FALSE))
 	else p <- numeric(0)
@@ -97,12 +100,12 @@ twinstim.default <- function(T, fun, M, alpha, beta, ...) {
 	# Compute A
 	if (length(p)== 0) A <- numeric(0)
 	if (length(p) > 0) A <- 0
-	if (length(p) > 1) 
+	if (length(p) > 1)
 		for (i in 2:length(p)) A[i] <- exp(-beta * (p[i] - p[i-1])) * (1 + A[i-1])
 
 	# Return object
 	sim <- list(p=p, T=T, alpha=alpha, beta=beta, n=length(p), A=A,
-		immigrants=immigrants, gen=gen, ancestors=ancestors, call=match.call())
+		immigrants=immigrants, gen=gen, ancestors=ancestors, family=family, call=match.call())
 	class(sim) <- "twinstim"
 	return( sim )
 
@@ -112,7 +115,7 @@ twinstim.default <- function(T, fun, M, alpha, beta, ...) {
 plot.twinstim <- function(twinstim, intensity=FALSE, precision=1e3, ...) {
 	if (intensity==FALSE) {
 		# Draw a convenient empty plot
-		plot(x=NULL, xlim=c(0, twinstim$T), ylim=c(-1, length(twinstim$gen)-.5), yaxt="n", 
+		plot(x=NULL, xlim=c(0, twinstim$T), ylim=c(-1, length(twinstim$gen)-.5), yaxt="n",
 			ylab="Generations", xlab="Time")
 		axis(2, at=1:length(twinstim$gen)-1)
 		# Add generation 0 (i.e. immigrants)
@@ -131,8 +134,8 @@ plot.twinstim <- function(twinstim, intensity=FALSE, precision=1e3, ...) {
 	}
 	if (intensity==TRUE) {
 		# Conditional intensity
-		matplot(z <- seq(0, twinstim$T, by=twinstim$T / precision), 
-			zt <- sapply(z, function(i) {intensity(twinstim, i)}), 
+		matplot(z <- seq(0, twinstim$T, by=twinstim$T / precision),
+			zt <- sapply(z, function(i) {intensity(twinstim, i)}),
 			type="l", ylim=c(0, max(zt)),
 			xlab=expression(italic(t)), ylab=expression("Conditionnal intensity"), ...)
 		# Hawkes process
@@ -147,7 +150,7 @@ intensity <- function(object, t) UseMethod("intensity")
 #' @export
 intensity.twinstim <- function(twinstim, t) {
 	# If outside of bounds, return error
-	if (any(t < 0) || any(t > twinstim$T)) 
+	if (any(t < 0) || any(t > twinstim$T))
 		stop("t is out of bound.")
 	# Create vector of past closest points of twinstim
 	index <- sapply(t, function(j) {
@@ -157,8 +160,8 @@ intensity.twinstim <- function(twinstim, t) {
 	int <- twinstim$immigrants$fun(t)
 	# Epidemic part
 	pind <- which(index > 0)
-	int[pind] <- int[pind] + 
-		twinstim$alpha * (twinstim$A[index[pind]]+1) * 
+	int[pind] <- int[pind] +
+		twinstim$alpha * (twinstim$A[index[pind]]+1) *
 		exp(- twinstim$beta * (t[pind] - twinstim$p[index[pind]]))
 	return( int )
 }
@@ -169,7 +172,7 @@ compensator <- function(object, t, ...) UseMethod("compensator")
 #' @export
 compensator.twinstim <- function(twinstim, t, ...) {
 	# If outside of bounds, return error
-	if (any(t < 0) || any(t > twinstim$T)) 
+	if (any(t < 0) || any(t > twinstim$T))
 		stop("t is out of bound.")
 	# Create vector of past closest points of twinstim
 	index <- sapply(t, function(j) {
@@ -179,9 +182,9 @@ compensator.twinstim <- function(twinstim, t, ...) {
 		integrate(twinstim$immigrants$fun, 0, s, ...)$value
 	})
 	pind <- which(index > 0)
-	int[pind] <- int[pind] + 
-		twinstim$alpha / twinstim$beta * 
-		(index[pind] - 
+	int[pind] <- int[pind] +
+		twinstim$alpha / twinstim$beta *
+		(index[pind] -
 		exp(-twinstim$beta * (t[pind] - twinstim$p[index[pind]])) * (twinstim$A[index[pind]] + 1))
 	return( int )
 
