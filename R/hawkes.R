@@ -33,7 +33,7 @@ inhpois.default <- function(T, fun, M=NULL) {
         p <- sort(runif(m, min = 0, max = T))
 
         # Object to return
-        sim = list(p = p, T = T, fun = fun, n = m)
+        sim = list(p = p, T = T, fun = fun, n = m, call=match.call())
         return(sim)
     }
 
@@ -55,7 +55,7 @@ inhpois.default <- function(T, fun, M=NULL) {
 
     # Object to return
     sim <- list(p=p, T=T, fun=fun, M=M, n=length(p),
-                x=x, y=y, accepted=accepted, m=m)
+                x=x, y=y, accepted=accepted, m=m, call=match.call())
     class(sim) <- "inhpois"
     return(sim)
 
@@ -110,9 +110,9 @@ plot.inhpois <- function(inhpois, precision=1e3) {
 #'
 #' @param T A non-negative numeric value - right bound of the interval [0,T].
 #' @param fun A non-negative function or numeric value - intensity (function) of the immigrant process.
-#' @param M (default = NULL) A non-negative numeric value - upper bound on `fun`(ignored if `fun` is a numeric value).
 #' @param repr A non-negative numeric value - mean number of offsprings.
 #' @param family A character string "name" naming a distribution with corresponding random generation function `rname`, or directly the random generation function.
+#' @param M (default = NULL) A non-negative numeric value - upper bound on `fun`(ignored if `fun` is a numeric value).
 #' @param ... Additional arguments passed on to the random generation function.
 #'
 #' @return A S3 object of class Hawkes containing a vector ($p) of simulated values,
@@ -125,10 +125,10 @@ plot.inhpois <- function(inhpois, precision=1e3) {
 #' x <- hawkes(10, fun=1, repr=0.5, family="exp", rate=2)
 #' # Simulate a Hawkes process with baseline intensity function 1 + sin(x), reproduction mean 0.5 and custom [0,1]-triangular fertility function.
 #' x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5, family=function(n) {1 - sqrt(1 - runif(n))})
-hawkes <- function(T, fun, M=NULL, repr, family, ...) UseMethod("hawkes")
+hawkes <- function(T, fun, repr, family, M=NULL, ...) UseMethod("hawkes")
 
 #' @export
-hawkes.default <- function(T, fun, M=NULL, repr, family, ...) {
+hawkes.default <- function(T, fun, repr, family, M=NULL, ...) {
 
     # Check if fertility distribution function is user specified or chosen amongst R "r___" functions
     if (is.character(family))
@@ -146,24 +146,23 @@ hawkes.default <- function(T, fun, M=NULL, repr, family, ...) {
     it <- 0
 
     # Generate offsprings
-    while (!is.null(gen[[paste0("gen", it)]])) {
-        for (Ci in gen[[paste0("gen", it)]]) {
-            Di <- rpois(1, lambda=repr)
-            if (Di > 0) {
-                Ei <- distfun(Di, ...)
-                gen[[paste0("gen", it+1)]] <- c(gen[[paste0("gen", it+1)]], (Ci + Ei)[(Ci + Ei) < T])
-                ancestors[[paste0("gen", it+1)]] <-
-                    c(ancestors[[paste0("gen", it+1)]], rep(which(gen[[paste0("gen", it)]] == Ci), Di)[(Ci + Ei) < T])
-            }
-        }
+    while (length(gen[[paste0("gen", it)]])) {
+        Ci <- gen[[paste0("gen", it)]]
+        Di <- rpois(length(Ci), lambda=repr)
+        Ei <- lapply(Di, distfun, ...)
+        Fi <- lapply(1:length(Ci), function(i) {
+            offsprings <- Ci[i] + Ei[[i]]
+            offsprings[offsprings < T]
+        })
+        gen[[paste0("gen", it+1)]] <- unlist(Fi)
+        ancestors[[paste0("gen", it+1)]] <- rep.int(1:length(Ci), times=sapply(Fi, length))
         it <- it + 1
     }
 
-    # Remove last generation if empty
-    # (happens when candidates are further than T)
-    if (length(gen[[paste0("gen", it-1)]]) == 0) {
-        gen[[paste0("gen", it-1)]] <- NULL
-        ancestors[[paste0("gen", it-1)]] <- NULL
+    # Remove last generation that is always empty (stopping criterion for while loop)
+    if (length(gen[[paste0("gen", it)]]) == 0) {
+        gen[[paste0("gen", it)]] <- NULL
+        ancestors[[paste0("gen", it)]] <- NULL
     }
 
     # Add immigrants and sort
@@ -186,9 +185,9 @@ hawkes.default <- function(T, fun, M=NULL, repr, family, ...) {
 #' @param intensity (default = FALSE) A boolean - whether to represent the cluster representation (`FALSE`) or the intensity function (`TRUE`).
 #' @param precision (default = 1e3) Number of points to plot.
 #' @param fun (default = NULL) A numeric function - intensity (function) of the immigrant process.
-#' @param M (default = NULL) A non-negative numeric value - upper bound on `fun`(ignored if `fun` is a numeric value).
 #' @param repr (default = NULL) A non-negative numeric value - mean number of offsprings.
 #' @param family (default = NULL) A character string "name" naming a distribution with corresponding distribution function `dname`, or directly the distribution function.
+#' @param M (default = NULL) A non-negative numeric value - upper bound on `fun`(ignored if `fun` is a numeric value).
 #' @param ... Additional arguments passed on to the random generation function `dname`.
 #'
 #' @return None
@@ -202,7 +201,7 @@ hawkes.default <- function(T, fun, M=NULL, repr, family, ...) {
 #' # Simulate a Hawkes process with baseline intensity function 1 + sin(x), reproduction mean 0.5 and custom [0,1]-triangular fertility function.
 #' x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5, family=function(n) {1 - sqrt(1 - runif(n))})
 #' plot(x, intensity=TRUE, family=function(y) ifelse(y>0 & y<1, 2-2*y, 0))
-plot.hawkes <- function(hawkes, intensity = FALSE, precision = 1e3, fun = NULL, M = NULL, repr = NULL, family = NULL, ...) {
+plot.hawkes <- function(hawkes, intensity = FALSE, precision = 1e3, fun = NULL, repr = NULL, family = NULL, M = NULL, ...) {
     if (intensity==FALSE) {
         if (!is(hawkes, "hawkes")) stop("'intensity==FALSE' is only compatible with Hawkes processes simulated from function 'hawkes'.")
         # Draw a convenient empty plot
@@ -254,9 +253,9 @@ plot.hawkes <- function(hawkes, intensity = FALSE, precision = 1e3, fun = NULL, 
 #' @param x A non-negative numeric vector, sorted in ascending order; or an object of class "hawkes" output by function `hawkes`.
 #' @param t A non-negative numeric value or vector, at which the intensity should be computed.
 #' @param fun (default = TRUE) A non-negative numeric function or value - intensity (function) of the immigrant process.
-#' @param M (default = NULL) A non-negative numeric value - upper bound on `fun`(ignored if `fun` is a numeric value).
 #' @param repr (default = NULL) A non-negative numeric value - mean number of offsprings.
 #' @param family (default = NULL) A character string "name" naming a distribution with corresponding distribution function `dname`, or directly the distribution function.
+#' @param M (default = NULL) A non-negative numeric value - upper bound on `fun`(ignored if `fun` is a numeric value).
 #' @param ... Additional arguments passed on to the random generation function `dname`.
 #'
 #' @return The intensity at time t.
@@ -274,7 +273,7 @@ plot.hawkes <- function(hawkes, intensity = FALSE, precision = 1e3, fun = NULL, 
 #' # Simulate a Hawkes process with baseline intensity function 1 + sin(x), reproduction mean 0.5 and custom [0,1]-triangular fertility function.
 #' x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5, family=function(n) {1 - sqrt(1 - runif(n))})
 #' intensity(x, 0:10, family=function(y) ifelse(y>0 & y<1, 2-2*y, 0))
-intensity <- function(x, t, fun = NULL, M = NULL, repr = NULL, family = NULL, ...) {
+intensity <- function(x, t, fun = NULL, repr = NULL, family = NULL, M = NULL, ...) {
 
     # Define pattern
     if (is.numeric(x)) p = x
@@ -381,9 +380,9 @@ intensity <- function(x, t, fun = NULL, M = NULL, repr = NULL, family = NULL, ..
 #' @param x A non-negative numeric vector, sorted in ascending order; or an object of class "hawkes" output by function `hawkes`.
 #' @param t A non-negative numeric value or vector, at which the intensity should be computed.
 #' @param fun (default = TRUE) A non-negative numeric function or value - intensity (function) of the immigrant process.
-#' @param M (default = NULL) A non-negative numeric value - upper bound on `fun`(ignored if `fun` is a numeric value).
 #' @param repr (default = NULL) A non-negative numeric value - mean number of offsprings.
 #' @param family (default = NULL) A character string "name" naming a distribution with corresponding distribution function `dname`, or directly the distribution function.
+#' @param M (default = NULL) A non-negative numeric value - upper bound on `fun`(ignored if `fun` is a numeric value).
 #' @param ... Additional arguments passed on to the random generation function `dname`.
 #'
 #' @return The compensator at time t.
@@ -401,7 +400,7 @@ intensity <- function(x, t, fun = NULL, M = NULL, repr = NULL, family = NULL, ..
 #' # Simulate a Hawkes process with baseline intensity function 1 + sin(x), reproduction mean 0.5 and custom [0,1]-triangular fertility function.
 #' x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5, family=function(n) {1 - sqrt(1 - runif(n))})
 #' compensator(x, 0:10, family=function(y) ifelse(y>0 & y<1, 2-2*y, 0))
-compensator <- function(x, t, fun = NULL, M = NULL, repr = NULL, family = NULL, ...) {
+compensator <- function(x, t, fun = NULL, repr = NULL, family = NULL, M = NULL, ...) {
 
     # Check if family should be inherited from x
     if (!is.null(family)) family_ = family
@@ -483,9 +482,9 @@ compensator <- function(x, t, fun = NULL, M = NULL, repr = NULL, family = NULL, 
 #'
 #' @param x A non-negative numeric vector, sorted in ascending order; or an object of class "hawkes" output by function `hawkes`.
 #' @param fun (default = TRUE) A non-negative numeric function or value - intensity (function) of the immigrant process.
-#' @param M (default = NULL) A non-negative numeric value - upper bound on `fun`(ignored if `fun` is a numeric value).
 #' @param repr (default = NULL) A non-negative numeric value - mean number of offsprings.
 #' @param family (default = NULL) A character string "name" naming a distribution with corresponding distribution function `dname`, or directly the distribution function.
+#' @param M (default = NULL) A non-negative numeric value - upper bound on `fun`(ignored if `fun` is a numeric value).
 #' @param ... Additional arguments passed on to the random generation function `dname`.
 #'
 #' @return The residuals of the process.
@@ -508,7 +507,7 @@ compensator <- function(x, t, fun = NULL, M = NULL, repr = NULL, family = NULL, 
 #' resid = residuals(x, family=function(y) ifelse(y>0 & y<1, 2-2*y, 0))
 #' plot(resid)
 #' abline(0, 1, col="red", lty="dashed")
-residuals <- function(x, fun = NULL, M = NULL, repr = NULL, family = NULL, ...) {
+residuals <- function(x, fun = NULL, repr = NULL, family = NULL, M = NULL, ...) {
 
     # Check if family should be inherited from x
     if (!is.null(family)) family_ = family
