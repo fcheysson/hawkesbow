@@ -234,7 +234,7 @@ plot.hawkes <- function(hawkes, intensity = FALSE, precision = 1e3, fun = NULL, 
 
         # Conditional intensity
         matplot(z <- seq(0, T, by=T / precision),
-                zt <- intensity(hawkes, z, fun, M, repr, family, ...),
+                zt <- intensity(x = hawkes, t = z, fun = fun, M = M, repr = repr, family = family, ...),
                 type="l", ylim=c(0, max(zt)),
                 xlab=expression(italic(t)), ylab=expression("Conditionnal intensity"))
         # Hawkes process

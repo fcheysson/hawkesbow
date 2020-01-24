@@ -32,7 +32,7 @@ mle <- function(model, data, opts = NULL, ...) {
     else if (is.null(opts[["algorithm"]]))
         opts <- c(opts, "algorithm" = "NLOPT_LD_LBFGS")
 
-    opt <- nloptr(x0 = model$param, eval_f = nlopt_fn, lb = rep(.0001, 3), opts = opts, ...)
+    opt <- nloptr::nloptr(x0 = model$param, eval_f = nlopt_fn, lb = rep(.0001, 3), opts = opts, ...)
 
     return( opt )
 }
