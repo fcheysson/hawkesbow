@@ -12,9 +12,8 @@
 #' @export
 #'
 #' @examples
-#' x = hawkes(100,1,1,2)
+#' x = hawkes(100, fun = 1, repr = .5, family = "exp", rate = 1)
 #' model = new(Exponential)
-#' model$param = c(1, .5, 2)
 #' data = new(ContinuousData, x$p, x$T)
 #' mle(model, data)
 mle <- function(model, data, opts = NULL, ...) {
@@ -32,7 +31,11 @@ mle <- function(model, data, opts = NULL, ...) {
     else if (is.null(opts[["algorithm"]]))
         opts <- c(opts, "algorithm" = "NLOPT_LD_LBFGS")
 
-    opt <- nloptr::nloptr(x0 = model$param, eval_f = nlopt_fn, lb = rep(.0001, 3), opts = opts, ...)
+    optargs = list(lb = rep(.0001, length(model$param)),
+                   ub = c(Inf, .9999, rep(Inf, length(model$param)-2)),
+                   opts = opts)
+    optargs = modifyList(optargs, list(...))
+    opt <- do.call(nloptr::nloptr, c(list(x0 = model$param, eval_f = nlopt_fn), optargs))
 
     return( opt )
 }

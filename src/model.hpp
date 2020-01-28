@@ -13,6 +13,9 @@ protected:
     arma::vec param;
 
 public:
+    Model() {};
+    Model( arma::vec param ) : param(param) {};
+    Model( Data* data , arma::vec param ) : data(data), param(param) {};
     virtual ~Model() {};
 
     // Methods for long term mean and its derivatives
@@ -69,6 +72,12 @@ private:
 
 
 public:
+    Exponential() : Model(arma::vec({1.0, 0.5, 1.0})) {};
+    Exponential( arma::vec param ) : Model(param) {};
+    Exponential( Data* data ) : Model(data, arma::vec({1.0, 0.5, 1.0})) {};
+    Exponential( Data* data, arma::vec param ) : Model(data, param) {};
+    Exponential( arma::vec param, Data* data ) : Model(data, param) {};
+
     // Methods for long term mean and its derivatives
     double mean();
     arma::vec dmean();
@@ -95,6 +104,12 @@ private:
 
 
 public:
+    Pareto3() : Model(arma::vec({1.0, 0.5, 1.0})) {};
+    Pareto3( arma::vec param ) : Model(param) {};
+    Pareto3( Data* data ) : Model(data, arma::vec({1.0, 0.5, 1.0})) {};
+    Pareto3( Data* data, arma::vec param ) : Model(data, param) {};
+    Pareto3( arma::vec param, Data* data ) : Model(data, param) {};
+
     // Methods for long term mean and its derivatives
     double mean();
     // arma::vec dmean();

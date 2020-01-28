@@ -12,13 +12,12 @@
 #' @export
 #'
 #' @examples
-#' x = hawkes(100,1,1,2)
-#' y = discrete(x, 100)
+#' x = hawkes(100, fun = 1, repr = .5, family = "exp", rate = 1)
+#' y = discrete(x, length = 100)
 #' model = new(Exponential)
-#' model$param = c(1, .5, 2)
 #' data = new(DiscreteData, y, 1)
 #' whittle(model, data)
-whittle <- function(model, data, trunc=5, ...) {
+whittle <- function(model, data, trunc=5L, ...) {
 
     model$attach(data)
     counts <- data$counts
@@ -35,8 +34,12 @@ whittle <- function(model, data, trunc=5, ...) {
         return( model$whittle(I, trunc) )
     }
 
-    opt <- optim(par=model$param, fn = wlik, hessian = TRUE,
-                 lower = rep(.0001, 3), upper = c(Inf, .9999, Inf), method = "L-BFGS-B", ...)
+    optargs = list(hessian = TRUE,
+                   lower = rep(.0001, length(model$param)),
+                   upper = c(Inf, .9999, rep(Inf, length(model$param)-2)),
+                   method = "L-BFGS-B")
+    optargs = modifyList(optargs, list(...))
+    opt <- do.call(optim, c(list(par = model$param, fn = wlik), optargs))
 
     # model$param <- opt$
     return(opt);

@@ -158,6 +158,8 @@ double Ci( double x ) {
     } catch (const char* msg) {
         std::cerr << msg << std::endl;
     }
+
+    return 0.0;
 };
 
 double Si( double x ) {
@@ -195,6 +197,8 @@ double Si( double x ) {
     } catch (const char* msg) {
         std::cerr << msg << std::endl;
     }
+
+    return 0.0;
 };
 
 arma::cx_double E1_imaginary( double x ) {
