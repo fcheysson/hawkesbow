@@ -4,7 +4,7 @@
 \alias{whittle}
 \title{Fitting Hawkes processes from discrete data}
 \usage{
-whittle(model, data, trunc = 5, ...)
+whittle(model, data, trunc = 5L, ...)
 }
 \arguments{
 \item{model}{An object of class Model}
@@ -22,10 +22,9 @@ Returns the \code{optim} output
 This function fits a Hawkes process to discrete data by minimizing the Whittle contrast.
 }
 \examples{
-x = hawkes(100,1,1,2)
-y = discrete(x, 100)
+x = hawkes(100, fun = 1, repr = .5, family = "exp", rate = 1)
+y = discrete(x, length = 100)
 model = new(Exponential)
-model$param = c(1, .5, 2)
 data = new(DiscreteData, y, 1)
 whittle(model, data)
 }

@@ -22,9 +22,8 @@ Returns the \code{optim} output
 This function fits a Hawkes process to continuous data by minimizing the likelihood.
 }
 \examples{
-x = hawkes(100,1,1,2)
+x = hawkes(100, fun = 1, repr = .5, family = "exp", rate = 1)
 model = new(Exponential)
-model$param = c(1, .5, 2)
 data = new(ContinuousData, x$p, x$T)
 mle(model, data)
 }
