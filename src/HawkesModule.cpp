@@ -57,6 +57,22 @@ RCPP_MODULE(HawkesModule) {
         .method("H", &Pareto3::H)
     ;
 
+    class_<Pareto2>("Pareto2")
+        .derives<Model>("Model")
+        .default_constructor() // This exposes the default constructor
+        .method("mean", &Pareto2::mean)
+        .method("h", &Pareto2::h)
+        .method("H", &Pareto2::H)
+    ;
+
+    class_<Pareto1>("Pareto1")
+        .derives<Model>("Model")
+        .default_constructor() // This exposes the default constructor
+        .method("mean", &Pareto1::mean)
+        .method("h", &Pareto1::h)
+        .method("H", &Pareto1::H)
+    ;
+
 
     class_<Data>("Data")
         // .default_constructor()

@@ -128,3 +128,67 @@ public:
     // Rcpp::List loglikngrad();
 
 };
+
+//' @export Pareto2
+class Pareto2: public Model {
+
+private:
+
+
+public:
+    Pareto2() : Model(arma::vec({1.0, 0.5, 1.0})) {};
+    Pareto2( arma::vec param ) : Model(param) {};
+    Pareto2( Data* data ) : Model(data, arma::vec({1.0, 0.5, 1.0})) {};
+    Pareto2( Data* data, arma::vec param ) : Model(data, param) {};
+    Pareto2( arma::vec param, Data* data ) : Model(data, param) {};
+
+    // Methods for long term mean and its derivatives
+    double mean();
+    // arma::vec dmean();
+    // arma::mat ddmean();
+
+    // Methods for time- and frequency-domain excitation functions
+    arma::vec h( arma::vec x );
+    arma::cx_vec H( arma::vec xi );
+    // arma::cx_mat dH( arma::vec xi );
+    // arma::cx_cube ddH( arma::vec xi );
+
+    // Likelihood methods
+    // double loglik();
+    // arma::vec dloglik();
+    // arma::mat ddloglik();
+    // Rcpp::List loglikngrad();
+
+};
+
+//' @export Pareto1
+class Pareto1: public Model {
+
+private:
+
+
+public:
+    Pareto1() : Model(arma::vec({1.0, 0.5, 1.0})) {};
+    Pareto1( arma::vec param ) : Model(param) {};
+    Pareto1( Data* data ) : Model(data, arma::vec({1.0, 0.5, 1.0})) {};
+    Pareto1( Data* data, arma::vec param ) : Model(data, param) {};
+    Pareto1( arma::vec param, Data* data ) : Model(data, param) {};
+
+    // Methods for long term mean and its derivatives
+    double mean();
+    // arma::vec dmean();
+    // arma::mat ddmean();
+
+    // Methods for time- and frequency-domain excitation functions
+    arma::vec h( arma::vec x );
+    arma::cx_vec H( arma::vec xi );
+    // arma::cx_mat dH( arma::vec xi );
+    // arma::cx_cube ddH( arma::vec xi );
+
+    // Likelihood methods
+    // double loglik();
+    // arma::vec dloglik();
+    // arma::mat ddloglik();
+    // Rcpp::List loglikngrad();
+
+};

@@ -16,3 +16,9 @@ NULL
 #' @export Pareto3
 NULL
 
+#' @export Pareto2
+NULL
+
+#' @export Pareto1
+NULL
+
