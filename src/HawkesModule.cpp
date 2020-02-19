@@ -49,6 +49,14 @@ RCPP_MODULE(HawkesModule) {
         .method("loglikngrad", &Exponential::loglikngrad)
     ;
 
+    class_<SymmetricExponential>("SymmetricExponential")
+        .derives<Model>("Model")
+        .default_constructor() // This exposes the default constructor
+        .method("mean", &SymmetricExponential::mean)
+        .method("h", &SymmetricExponential::h)
+        .method("H", &SymmetricExponential::H)
+    ;
+
     class_<Pareto3>("Pareto3")
         .derives<Model>("Model")
         .default_constructor() // This exposes the default constructor

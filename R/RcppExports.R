@@ -13,6 +13,9 @@ NULL
 #' @export Exponential
 NULL
 
+#' @export SymmetricExponential
+NULL
+
 #' @export Pareto3
 NULL
 

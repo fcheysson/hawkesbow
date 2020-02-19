@@ -97,6 +97,38 @@ public:
 
 };
 
+//' @export SymmetricExponential
+class SymmetricExponential: public Model {
+
+private:
+
+
+public:
+    SymmetricExponential() : Model(arma::vec({1.0, 0.5, 1.0})) {};
+    SymmetricExponential( arma::vec param ) : Model(param) {};
+    SymmetricExponential( Data* data ) : Model(data, arma::vec({1.0, 0.5, 1.0})) {};
+    SymmetricExponential( Data* data, arma::vec param ) : Model(data, param) {};
+    SymmetricExponential( arma::vec param, Data* data ) : Model(data, param) {};
+
+    // Methods for long term mean and its derivatives
+    double mean();
+    // arma::vec dmean();
+    // arma::mat ddmean();
+
+    // Methods for time- and frequency-domain excitation functions
+    arma::vec h( arma::vec x );
+    arma::cx_vec H( arma::vec xi );
+    // arma::cx_mat dH( arma::vec xi );
+    // arma::cx_cube ddH( arma::vec xi );
+
+    // Likelihood methods
+    // double loglik();
+    // arma::vec dloglik();
+    // arma::mat ddloglik();
+    // Rcpp::List loglikngrad();
+
+};
+
 //' @export Pareto3
 class Pareto3: public Model {
 

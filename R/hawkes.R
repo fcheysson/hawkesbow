@@ -152,7 +152,7 @@ hawkes.default <- function(T, fun, repr, family, M=NULL, ...) {
         Ei <- lapply(Di, distfun, ...)
         Fi <- lapply(1:length(Ci), function(i) {
             offsprings <- Ci[i] + Ei[[i]]
-            offsprings[offsprings < T]
+            offsprings[offsprings < T & offsprings > 0]
         })
         gen[[paste0("gen", it+1)]] <- unlist(Fi)
         ancestors[[paste0("gen", it+1)]] <- rep.int(1:length(Ci), times=sapply(Fi, length))
