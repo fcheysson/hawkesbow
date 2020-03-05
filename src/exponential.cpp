@@ -230,3 +230,21 @@ Rcpp::List Exponential::loglikngrad() {
 
     return Rcpp::List::create(Rcpp::Named("objective") = lik, Rcpp::Named("gradient") = grad);
 };
+
+
+////////////////////////////////////////////////
+// SymmetricExponential
+
+double SymmetricExponential::mean() {
+    return param(0) / ( 1.0 - param(1) );
+}
+
+arma::vec SymmetricExponential::h( arma::vec x ) {
+    return .5 * param(1) * param(2) * arma::exp( - param(2) * abs(x) );
+}
+
+arma::cx_vec SymmetricExponential::H( arma::vec xi ) {
+    double beta2 = param(2) * param(2);
+    arma::cx_vec zeta = arma::cx_vec( param(1) * beta2 / (beta2 + xi % xi), arma::zeros<arma::vec>(xi.n_elem) );
+    return zeta;
+}
