@@ -110,22 +110,12 @@ public:
     Pareto3( Data* data, arma::vec param ) : Model(data, param) {};
     Pareto3( arma::vec param, Data* data ) : Model(data, param) {};
 
-    // Methods for long term mean and its derivatives
+    // Methods for long term mean
     double mean();
-    // arma::vec dmean();
-    // arma::mat ddmean();
 
     // Methods for time- and frequency-domain excitation functions
     arma::vec h( arma::vec x );
     arma::cx_vec H( arma::vec xi );
-    // arma::cx_mat dH( arma::vec xi );
-    // arma::cx_cube ddH( arma::vec xi );
-
-    // Likelihood methods
-    // double loglik();
-    // arma::vec dloglik();
-    // arma::mat ddloglik();
-    // Rcpp::List loglikngrad();
 
 };
 
@@ -142,22 +132,12 @@ public:
     Pareto2( Data* data, arma::vec param ) : Model(data, param) {};
     Pareto2( arma::vec param, Data* data ) : Model(data, param) {};
 
-    // Methods for long term mean and its derivatives
+    // Methods for long term mean
     double mean();
-    // arma::vec dmean();
-    // arma::mat ddmean();
 
     // Methods for time- and frequency-domain excitation functions
     arma::vec h( arma::vec x );
     arma::cx_vec H( arma::vec xi );
-    // arma::cx_mat dH( arma::vec xi );
-    // arma::cx_cube ddH( arma::vec xi );
-
-    // Likelihood methods
-    // double loglik();
-    // arma::vec dloglik();
-    // arma::mat ddloglik();
-    // Rcpp::List loglikngrad();
 
 };
 
@@ -174,21 +154,33 @@ public:
     Pareto1( Data* data, arma::vec param ) : Model(data, param) {};
     Pareto1( arma::vec param, Data* data ) : Model(data, param) {};
 
-    // Methods for long term mean and its derivatives
+    // Methods for long term mean
     double mean();
-    // arma::vec dmean();
-    // arma::mat ddmean();
 
     // Methods for time- and frequency-domain excitation functions
     arma::vec h( arma::vec x );
     arma::cx_vec H( arma::vec xi );
-    // arma::cx_mat dH( arma::vec xi );
-    // arma::cx_cube ddH( arma::vec xi );
 
-    // Likelihood methods
-    // double loglik();
-    // arma::vec dloglik();
-    // arma::mat ddloglik();
-    // Rcpp::List loglikngrad();
+};
+
+//' @export Gaussian
+class Gaussian: public Model {
+
+private:
+
+
+public:
+    Gaussian() : Model(arma::vec({1.0, 0.5, 0.0, 1.0})) {};
+    Gaussian( arma::vec param ) : Model(param) {};
+    Gaussian( Data* data ) : Model(data, arma::vec({1.0, 0.5, 0.0, 1.0})) {};
+    Gaussian( Data* data, arma::vec param ) : Model(data, param) {};
+    Gaussian( arma::vec param, Data* data ) : Model(data, param) {};
+
+    // Methods for long term mean
+    double mean();
+
+    // Methods for time- and frequency-domain excitation functions
+    arma::vec h( arma::vec x );
+    arma::cx_vec H( arma::vec xi );
 
 };

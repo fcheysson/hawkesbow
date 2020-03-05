@@ -73,6 +73,14 @@ RCPP_MODULE(HawkesModule) {
         .method("H", &Pareto1::H)
     ;
 
+    class_<Gaussian>("Gaussian")
+        .derives<Model>("Model")
+        .default_constructor() // This exposes the default constructor
+        .method("mean", &Gaussian::mean)
+        .method("h", &Gaussian::h)
+        .method("H", &Gaussian::H)
+    ;
+
 
     class_<Data>("Data")
         // .default_constructor()

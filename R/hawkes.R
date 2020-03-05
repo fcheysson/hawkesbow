@@ -152,7 +152,7 @@ hawkes.default <- function(T, fun, repr, family, M=NULL, ...) {
         Ei <- lapply(Di, distfun, ...)
         Fi <- lapply(1:length(Ci), function(i) {
             offsprings <- Ci[i] + Ei[[i]]
-            offsprings[offsprings < T]
+            offsprings
         })
         gen[[paste0("gen", it+1)]] <- unlist(Fi)
         ancestors[[paste0("gen", it+1)]] <- rep.int(1:length(Ci), times=sapply(Fi, length))
@@ -166,8 +166,10 @@ hawkes.default <- function(T, fun, repr, family, M=NULL, ...) {
     }
 
     # Add immigrants and sort
-    if (length(gen) > 0) p <- sort(unlist(gen, use.names=FALSE))
-    else p <- numeric(0)
+    if (length(gen) > 0) {
+        p <- sort(unlist(gen, use.names=FALSE))
+        p <- p[p < T & p > 0]
+    } else p <- numeric(0)
 
     # Return object
     sim <- list(p=p, T=T, repr=repr, distfun=distfun, family=family, distargs=list(...), n=length(p),

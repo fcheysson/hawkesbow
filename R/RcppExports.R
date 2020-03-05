@@ -22,3 +22,6 @@ NULL
 #' @export Pareto1
 NULL
 
+#' @export Gaussian
+NULL
+
