@@ -4,8 +4,16 @@
 \alias{plot.hawkes}
 \title{Plot of a Hawkes process}
 \usage{
-\method{plot}{hawkes}(hawkes, intensity = FALSE, precision = 1000,
-  fun = NULL, repr = NULL, family = NULL, M = NULL, ...)
+\method{plot}{hawkes}(
+  hawkes,
+  intensity = FALSE,
+  precision = 1000,
+  fun = NULL,
+  repr = NULL,
+  family = NULL,
+  M = NULL,
+  ...
+)
 }
 \arguments{
 \item{hawkes}{Either: a numeric vector, sorted in ascending order; or an object of class "hawkes" output by function \code{hawkes}.}

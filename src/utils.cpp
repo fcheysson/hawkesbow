@@ -21,6 +21,69 @@ arma::vec _sinc( arma::vec x ) {
     return y;
 };
 
+// Contour integration for the incomplete gamma function with imaginary argument
+// Integrate a continuous function on interval [a, b]
+double integral_midpoint(double(*f)(double x), double a, double b, int n) {
+    double step = (b - a) / n;  // width of each small rectangle
+    double area = 0.0;  // signed area
+    for (int i = 0; i < n; i ++) {
+        area += f(a + (i + 0.5) * step); // sum up each small rectangle
+    }
+    return (area * step);
+};
+
+double integral_midpoint(double(*f)(double x, double nu), double a, double b, int n, double nu) {
+    double step = (b - a) / n;  // width of each small rectangle
+    double area = 0.0;  // signed area
+    for (int i = 0; i < n; i ++) {
+        area += f(a + (i + 0.5) * step, nu); // sum up each small rectangle
+    }
+    return (area * step);
+};
+
+double integral_simpson(double(*f)(double x), double a, double b, int n) {
+    if (n % 2 == 1)
+        n++;
+    double step = (b - a) / n;  // width of each small rectangle
+    double area = f(a) + f(b);  // first and last indices
+    for (int i = 1; i < n; i++) {
+        if (i % 2 == 1)
+            area += 4 * f(a + i * step);
+        else
+            area += 2 * f(a + i * step);
+    }
+    return (area * step / 3.0);
+};
+
+double integral_simpson(double(*f)(double x, double nu), double a, double b, int n, double nu) {
+    if (n % 2 == 1)
+        n++;
+    double step = (b - a) / n;  // width of each small rectangle
+    double area = f(a, nu) + f(b, nu);  // first and last indices
+    for (int i = 1; i < n; i++) {
+        if (i % 2 == 1)
+            area += 4 * f(a + i * step, nu);
+        else
+            area += 2 * f(a + i * step, nu);
+    }
+    return (area * step / 3.0);
+};
+
+// Real and imaginary part for the contour integral on the quadrant with radius 1
+double quadrant_real(double x, double nu) {
+    return exp(-cos(x)) * cos(x*nu - sin(x));
+};
+
+double quadrant_imag(double x, double nu) {
+    return exp(-cos(x)) * sin(x*nu - sin(x));
+};
+
+arma::cx_double contour_quadrant(double x, double nu) {
+    double real_part = integral_simpson(quadrant_real, 0.0, .5 * arma::datum::pi, 100, nu);
+    double imag_part = integral_simpson(quadrant_imag, 0.0, .5 * arma::datum::pi, 100, nu);
+    return arma::cx_double(real_part, imag_part);
+};
+
 // Powers of 10
 double quick_pow10(int n)
 {

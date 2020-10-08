@@ -9,7 +9,7 @@
 This package estimating Hawkes processes when count data are only observed in discrete time, using a spectral approach derived from the Bartlett spectrum. Some general use functions for Hawkes processes are also included: simulation of (in)homogeneous Hawkes process, maximum likelihood estimation, residual analysis, etc.
 }
 \author{
-\strong{Maintainer}: Felix Cheysson \email{felix.cheysson@agroparistech.com} (0000-0002-9095-2878)
+\strong{Maintainer}: Felix Cheysson \email{felix.cheysson@agroparistech.com} (\href{https://orcid.org/0000-0002-9095-2878}{ORCID})
 
 }
 \keyword{internal}

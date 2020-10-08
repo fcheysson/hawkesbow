@@ -4,8 +4,7 @@
 \alias{compensator}
 \title{Compensator of a Hawkes process}
 \usage{
-compensator(x, t, fun = NULL, repr = NULL, family = NULL, M = NULL,
-  ...)
+compensator(x, t, fun = NULL, repr = NULL, family = NULL, M = NULL, ...)
 }
 \arguments{
 \item{x}{A non-negative numeric vector, sorted in ascending order; or an object of class "hawkes" output by function \code{hawkes}.}

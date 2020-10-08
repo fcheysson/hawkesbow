@@ -4,8 +4,7 @@
 \alias{intensity}
 \title{Intensity of a Hawkes process}
 \usage{
-intensity(x, t, fun = NULL, repr = NULL, family = NULL, M = NULL,
-  ...)
+intensity(x, t, fun = NULL, repr = NULL, family = NULL, M = NULL, ...)
 }
 \arguments{
 \item{x}{A non-negative numeric vector, sorted in ascending order; or an object of class "hawkes" output by function \code{hawkes}.}
