@@ -23,6 +23,7 @@ Suggests:
     testthat (>= 2.1.0)
 LinkingTo: 
     Rcpp,
-    RcppArmadillo
+    RcppArmadillo,
+    BH
 RcppModules: 
     HawkesModule

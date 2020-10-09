@@ -1,6 +1,7 @@
 #include "utils.hpp"
 #include <string>
 #include <iostream>
+#include <boost/math/special_functions/gamma.hpp>
 
 // Sinus cardinal: sinc(x) = sin(x) / x
 arma::vec _sinc( arma::vec x ) {
@@ -78,10 +79,16 @@ double quadrant_imag(double x, double nu) {
     return exp(-cos(x)) * sin(x*nu - sin(x));
 };
 
-arma::cx_double contour_quadrant(double x, double nu) {
+arma::cx_double contour_quadrant(double nu) {
     double real_part = integral_simpson(quadrant_real, 0.0, .5 * arma::datum::pi, 100, nu);
     double imag_part = integral_simpson(quadrant_imag, 0.0, .5 * arma::datum::pi, 100, nu);
     return arma::cx_double(real_part, imag_part);
+};
+
+arma::cx_double inc_gamma_imag(double nu) {
+    arma::cx_double term1 = exp(-.5*i*arma::datum::pi*nu) * boost::math::tgamma(nu, 1.0);
+    arma::cx_double term2 = exp(-.5*i*arma::datum::pi*(nu-1)) * contour_quadrant(nu);
+    return  term1 - term2;
 };
 
 // Powers of 10

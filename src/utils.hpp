@@ -1,6 +1,9 @@
 #pragma once
 #include <RcppArmadillo.h>
 
+// [[Rcpp::depends(RcppArmadillo, BH)]]
+using namespace Rcpp;
+
 #if !defined(MYLIB_UTILS)
 #define MYLIB_UTILS
 
@@ -10,13 +13,16 @@ const double inv_pi = 1.0 / arma::datum::pi;
 arma::vec _sinc( arma::vec x );
 
 // Contour integration for the incomplete gamma function with imaginary argument
+// Can be checked using function gamma from R::base, Gradshteyn & Ryzhik, 2007,
+// and Barakat, 1960
 double integral_midpoint(double(*f)(double x), double a, double b, int n);
 double integral_midpoint(double(*f)(double x, double nu), double a, double b, int n, double nu);
 double integral_simpson(double(*f)(double x), double a, double b, int n);
 double integral_simpson(double(*f)(double x, double nu), double a, double b, int n, double nu);
 double quadrant_real(double x, double nu);
 double quadrant_imag(double x, double nu);
-arma::cx_double contour_quadrant(double x, double nu);
+arma::cx_double contour_quadrant(double nu);
+arma::cx_double inc_gamma_imag(double nu);
 
 // Powers of 10
 double quick_pow10(int n);
