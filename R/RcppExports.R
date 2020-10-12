@@ -16,6 +16,9 @@ NULL
 #' @export SymmetricExponential
 NULL
 
+#' @export PowerLaw
+NULL
+
 #' @export Pareto3
 NULL
 

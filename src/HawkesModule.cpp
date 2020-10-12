@@ -57,6 +57,18 @@ RCPP_MODULE(HawkesModule) {
         .method("H", &SymmetricExponential::H)
     ;
 
+    class_<PowerLaw>("PowerLaw")
+        .derives<Model>("Model")
+        .default_constructor() // This exposes the default constructor
+        .method("mean", &PowerLaw::mean)
+        .method("dmean", &PowerLaw::dmean)
+        .method("h", &PowerLaw::h)
+        .method("H", &PowerLaw::H)
+        .method("loglik", &PowerLaw::loglik)
+        .method("dloglik", &PowerLaw::dloglik)
+        .method("loglikngrad", &PowerLaw::loglikngrad)
+    ;
+
     class_<Pareto3>("Pareto3")
         .derives<Model>("Model")
         .default_constructor() // This exposes the default constructor

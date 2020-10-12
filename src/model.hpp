@@ -129,6 +129,34 @@ public:
 
 };
 
+//' @export PowerLaw
+class PowerLaw: public Model {
+
+private:
+
+
+public:
+    PowerLaw() : Model(arma::vec({1.0, 0.5, 3.0, 1.0})) {};
+    PowerLaw( arma::vec param ) : Model(param) {};
+    PowerLaw( Data* data ) : Model(data, arma::vec({1.0, 0.5, 3.0, 1.0})) {};
+    PowerLaw( Data* data, arma::vec param ) : Model(data, param) {};
+    PowerLaw( arma::vec param, Data* data ) : Model(data, param) {};
+
+    // Methods for long term mean and its derivatives
+    double mean();
+    arma::vec dmean();
+
+    // Methods for time- and frequency-domain excitation functions
+    arma::vec h( arma::vec x );
+    arma::cx_vec H( arma::vec xi );
+
+    // Likelihood methods
+    double loglik();
+    arma::vec dloglik();
+    Rcpp::List loglikngrad();
+
+};
+
 //' @export Pareto3
 class Pareto3: public Model {
 
