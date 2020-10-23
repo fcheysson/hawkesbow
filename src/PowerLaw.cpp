@@ -31,10 +31,46 @@ arma::vec PowerLaw::h( arma::vec x ) {
         arma::exp(-(param(2) + 1.0) * arma::log(param(3) + x));
 }
 
-arma::cx_vec PowerLaw::H( arma::vec xi ) {              //todo
-    arma::vec factor = param(1) * param(2) / ( param(2)*param(2) + xi%xi );
-    arma::cx_vec zeta = arma::cx_vec( factor * param(2), - factor % xi );
-    return zeta;
+arma::cx_vec PowerLaw::H( arma::vec xi ) {
+    const double mu = param(1);
+    const double theta = param(2);
+    const double a = param(3);
+    double xia;
+
+    arma::cx_vec y(xi.n_elem);
+
+    // Iterators
+    arma::vec::iterator it_xi = xi.begin();
+    arma::vec::iterator it_xi_end = xi.end();
+    arma::cx_vec::iterator it_y = y.begin();
+
+    // need a if theta > 1 somewhere
+
+    // conjugate if *it_xi < 0
+
+    if (std::fmod(theta, 1.0) == 0) {
+        arma::mat xiprod = arma::cumprod(arma::kron(arma::ones<arma::rowvec>(theta - 1), xi), 1);
+        arma::vec summands_den = arma::cumprod(arma::regspace(theta - 1, 1));
+        arma::cx_vec summands_num = arma::cumprod(-i * a * arma::ones<arma::cx_vec>(theta - 1));
+        arma::cx_vec term1 = xiprod * (summands_num / summands_den);
+
+        // Get last elements that appear in the sum
+        arma::vec last_xiprod = xiprod.col(theta - 2);
+        arma::cx_double last_num = summands_num.back();
+        double last_den = summands_den.back();
+
+        arma::vec::iterator it_last = last_xiprod.begin();
+
+        // Loop on xi
+        for (; it_xi != it_xi_end; ++it_xi, ++it_y, ++it_last) {
+            xia = *it_xi * a;
+            *it_y = - i * xia * last_num * *it_last * exp(i * xia) * E1_imaginary(xia) / last_den;
+        }
+
+        return mu * (1.0 + term1 + y);
+    } else {
+        return arma::zeros<arma::cx_vec>(xi.n_elem);
+    }
 }
 
 ////////////////////////////////////////////

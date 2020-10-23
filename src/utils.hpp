@@ -9,6 +9,8 @@ using namespace Rcpp;
 
 const arma::cx_double i(0.0, 1.0);
 const double inv_pi = 1.0 / arma::datum::pi;
+arma::cx_double pow_i(int x);
+double pow_m1(int x);
 
 arma::vec _sinc( arma::vec x );
 

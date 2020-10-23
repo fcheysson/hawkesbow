@@ -3,6 +3,34 @@
 #include <iostream>
 #include <boost/math/special_functions/gamma.hpp>
 
+// Powers of i
+arma::cx_double pow_i(int x) {
+    int rem = x % 4;
+    switch(rem) {
+    case 1:
+        return i;
+    case 2:
+        return -1;
+    case 3:
+        return -i;
+    case 0:
+        return 1;
+    }
+    return 0;
+};
+
+// Powers of -1
+double pow_m1(int x) {
+    int rem = x % 2;
+    switch(rem) {
+    case 1:
+        return -1;
+    case 0:
+        return 1;
+    }
+    return 0;
+};
+
 // Sinus cardinal: sinc(x) = sin(x) / x
 arma::vec _sinc( arma::vec x ) {
     arma::vec y(x.n_elem);
