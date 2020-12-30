@@ -46,31 +46,69 @@ arma::cx_vec PowerLaw::H( arma::vec xi ) {
 
     // need a if theta > 1 somewhere
 
-    // conjugate if *it_xi < 0
+    if (std::fmod(theta, 1.0) == 0) { // Theta is integer
 
-    if (std::fmod(theta, 1.0) == 0) {
-        arma::mat xiprod = arma::cumprod(arma::kron(arma::ones<arma::rowvec>(theta - 1), xi), 1);
-        arma::vec summands_den = arma::cumprod(arma::regspace(theta - 1, 1));
-        arma::cx_vec summands_num = arma::cumprod(-i * a * arma::ones<arma::cx_vec>(theta - 1));
+        int itheta = std::floor(theta);
+
+        // Term 1 with sum from k = 1 up to theta - 1
+        arma::mat xiprod = arma::cumprod(arma::kron(arma::ones<arma::rowvec>(itheta - 1), xi), 1);
+        arma::vec summands_den = arma::cumprod(theta - arma::regspace(1, itheta - 1));
+        arma::cx_vec summands_num = arma::cumprod(-i * a * arma::ones<arma::cx_vec>(itheta - 1));
         arma::cx_vec term1 = xiprod * (summands_num / summands_den);
 
         // Get last elements that appear in the sum
-        arma::vec last_xiprod = xiprod.col(theta - 2);
+        arma::vec last_xiprod = xiprod.col(itheta - 2);
         arma::cx_double last_num = summands_num.back();
         double last_den = summands_den.back();
 
+        // Term 2 with exponential integral
+        arma::cx_vec term2(xi.n_elem);
+        arma::cx_vec::iterator it_term2 = term2.begin();
         arma::vec::iterator it_last = last_xiprod.begin();
 
         // Loop on xi
-        for (; it_xi != it_xi_end; ++it_xi, ++it_y, ++it_last) {
+        for (; it_xi != it_xi_end; ++it_xi, ++it_term2, ++it_last) {
             xia = *it_xi * a;
-            *it_y = - i * xia * last_num * *it_last * exp(i * xia) * E1_imaginary(xia) / last_den;
+            *it_term2 = - i * xia * last_num * *it_last * exp(i * xia) * E1_imaginary(xia) / last_den;
         }
 
-        return mu * (1.0 + term1 + y);
-    } else {
-        return arma::zeros<arma::cx_vec>(xi.n_elem);
+        y = mu * (1.0 + term1 + term2);
+
+    } else { // Theta is double, non integer
+
+        int itheta = std::floor(theta);
+
+        // Term 1 with sum from k = 1 up to itheta
+        arma::mat xiprod = arma::cumprod(arma::kron(arma::ones<arma::rowvec>(itheta), xi), 1);
+        arma::vec summands_den = arma::cumprod(theta - arma::regspace(1, itheta));
+        arma::cx_vec summands_num = arma::cumprod(-i * a * arma::ones<arma::cx_vec>(itheta));
+        arma::cx_vec term1 = xiprod * (summands_num / summands_den);
+
+        // Get last elements that appear in the denominator
+        double last_den = summands_den.back();
+
+        // Term 2 with exponential integral
+        arma::cx_vec term2(xi.n_elem);
+        arma::cx_vec::iterator it_term2 = term2.begin();
+
+        // Loop on xi
+        for (; it_xi != it_xi_end; ++it_xi, ++it_term2) {
+            xia = *it_xi * a;
+            *it_term2 = pow_m1(itheta + 1) * pow_i(itheta + 1) * exp(i * xia) * exp(theta*log(xia)) * inc_gamma_imag(1-theta+itheta, xia) / last_den;
+        }
+
+        y = mu * (1.0 + term1 + term2);
+
     }
+
+    // For xi < 0, take the conjugate
+    it_xi = xi.begin(); // Points back to the beginning of xi
+    for (; it_xi != it_xi_end; ++it_xi, ++it_y) {
+        if (*it_xi < 0.0)
+            *it_y = std::conj(*it_y);
+    }
+    return y;
+
 }
 
 ////////////////////////////////////////////

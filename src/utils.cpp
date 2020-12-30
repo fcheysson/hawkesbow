@@ -98,24 +98,38 @@ double integral_simpson(double(*f)(double x, double nu), double a, double b, int
     return (area * step / 3.0);
 };
 
-// Real and imaginary part for the contour integral on the quadrant with radius 1
-double quadrant_real(double x, double nu) {
-    return exp(-cos(x)) * cos(x*nu - sin(x));
+double integral_simpson(double(*f)(double x, double nu, double r), double a, double b, int n, double nu, double r) {
+    if (n % 2 == 1)
+        n++;
+    double step = (b - a) / n;  // width of each small rectangle
+    double area = f(a, nu, r) + f(b, nu, r);  // first and last indices
+    for (int i = 1; i < n; i++) {
+        if (i % 2 == 1)
+            area += 4 * f(a + i * step, nu, r);
+        else
+            area += 2 * f(a + i * step, nu, r);
+    }
+    return (area * step / 3.0);
 };
 
-double quadrant_imag(double x, double nu) {
-    return exp(-cos(x)) * sin(x*nu - sin(x));
+// Real and imaginary part for the contour integral on the quadrant with radius r > 0
+double quadrant_real(double x, double nu, double r) {
+    return exp(-r*cos(x)) * cos(x*nu - r*sin(x));
 };
 
-arma::cx_double contour_quadrant(double nu) {
-    double real_part = integral_simpson(quadrant_real, 0.0, .5 * arma::datum::pi, 100, nu);
-    double imag_part = integral_simpson(quadrant_imag, 0.0, .5 * arma::datum::pi, 100, nu);
-    return arma::cx_double(real_part, imag_part);
+double quadrant_imag(double x, double nu, double r) {
+    return exp(-r*cos(x)) * sin(x*nu - r*sin(x));
 };
 
-arma::cx_double inc_gamma_imag(double nu) {
-    arma::cx_double term1 = exp(-.5*i*arma::datum::pi*nu) * boost::math::tgamma(nu, 1.0);
-    arma::cx_double term2 = exp(-.5*i*arma::datum::pi*(nu-1)) * contour_quadrant(nu);
+arma::cx_double contour_quadrant(double nu, double r) {
+    double real_part = integral_simpson(quadrant_real, 0.0, .5 * arma::datum::pi, 100, nu, r);
+    double imag_part = integral_simpson(quadrant_imag, 0.0, .5 * arma::datum::pi, 100, nu, r);
+    return exp(nu*log(r)) * arma::cx_double(real_part, imag_part);
+};
+
+arma::cx_double inc_gamma_imag(double nu, double r) {
+    arma::cx_double term1 = exp(-.5*i*arma::datum::pi*nu) * boost::math::tgamma(nu, r);
+    arma::cx_double term2 = exp(-.5*i*arma::datum::pi*(nu-1)) * contour_quadrant(nu, r);
     return  term1 - term2;
 };
 

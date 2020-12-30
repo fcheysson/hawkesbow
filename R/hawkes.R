@@ -238,7 +238,7 @@ plot.hawkes <- function(hawkes, intensity = FALSE, precision = 1e3, fun = NULL, 
         matplot(z <- seq(0, T, by=T / precision),
                 zt <- intensity(x = hawkes, t = z, fun = fun, M = M, repr = repr, family = family, ...),
                 type="l", ylim=c(0, max(zt)),
-                xlab=expression(italic(t)), ylab=expression("Conditionnal intensity"))
+                xlab=expression(italic(t)), ylab=expression("Conditional intensity"))
         # Hawkes process
         segments(x0=0, x1=T, y0=0, col="grey")
         points(x=p, y=rep(0, length(p)), pch=4)
