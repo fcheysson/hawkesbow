@@ -51,7 +51,7 @@ arma::cx_vec PowerLaw::H( arma::vec xi ) {
         int itheta = std::floor(theta);
 
         // Term 1 with sum from k = 1 up to theta - 1
-        arma::mat xiprod = arma::cumprod(arma::kron(arma::ones<arma::rowvec>(itheta - 1), xi), 1);
+        arma::mat xiprod = arma::cumprod(arma::kron(arma::ones<arma::rowvec>(itheta - 1), arma::abs(xi)), 1);
         arma::vec summands_den = arma::cumprod(theta - arma::regspace(1, itheta - 1));
         arma::cx_vec summands_num = arma::cumprod(-i * a * arma::ones<arma::cx_vec>(itheta - 1));
         arma::cx_vec term1 = xiprod * (summands_num / summands_den);
@@ -68,7 +68,7 @@ arma::cx_vec PowerLaw::H( arma::vec xi ) {
 
         // Loop on xi
         for (; it_xi != it_xi_end; ++it_xi, ++it_term2, ++it_last) {
-            xia = *it_xi * a;
+            xia = abs(*it_xi) * a;
             *it_term2 = - i * xia * last_num * *it_last * exp(i * xia) * E1_imaginary(xia) / last_den;
         }
 
@@ -79,7 +79,7 @@ arma::cx_vec PowerLaw::H( arma::vec xi ) {
         int itheta = std::floor(theta);
 
         // Term 1 with sum from k = 1 up to itheta
-        arma::mat xiprod = arma::cumprod(arma::kron(arma::ones<arma::rowvec>(itheta), xi), 1);
+        arma::mat xiprod = arma::cumprod(arma::kron(arma::ones<arma::rowvec>(itheta), arma::abs(xi)), 1);
         arma::vec summands_den = arma::cumprod(theta - arma::regspace(1, itheta));
         arma::cx_vec summands_num = arma::cumprod(-i * a * arma::ones<arma::cx_vec>(itheta));
         arma::cx_vec term1 = xiprod * (summands_num / summands_den);
@@ -93,7 +93,7 @@ arma::cx_vec PowerLaw::H( arma::vec xi ) {
 
         // Loop on xi
         for (; it_xi != it_xi_end; ++it_xi, ++it_term2) {
-            xia = *it_xi * a;
+            xia = abs(*it_xi) * a;
             *it_term2 = pow_m1(itheta + 1) * pow_i(itheta + 1) * exp(i * xia) * exp(theta*log(xia)) * inc_gamma_imag(1-theta+itheta, xia) / last_den;
         }
 
@@ -104,7 +104,9 @@ arma::cx_vec PowerLaw::H( arma::vec xi ) {
     // For xi < 0, take the conjugate
     it_xi = xi.begin(); // Points back to the beginning of xi
     for (; it_xi != it_xi_end; ++it_xi, ++it_y) {
-        if (*it_xi < 0.0)
+        if (*it_xi == 0.0)
+            *it_y = mu;
+        else if (*it_xi < 0.0)
             *it_y = std::conj(*it_y);
     }
     return y;

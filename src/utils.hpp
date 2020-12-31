@@ -25,6 +25,9 @@ double integral_simpson(double(*f)(double x, double nu, double r), double a, dou
 double quadrant_real(double x, double nu, double r);
 double quadrant_imag(double x, double nu, double r);
 arma::cx_double contour_quadrant(double nu, double r);
+
+//' @export
+// [[Rcpp::export]]
 arma::cx_double inc_gamma_imag(double nu, double r);
 
 // Powers of 10
@@ -38,6 +41,9 @@ double padef( double x );
 double padeg( double x );
 double Ci( double x );
 double Si( double x );
+
+//' @export
+// [[Rcpp::export]]
 arma::cx_double E1_imaginary( double x );
 
 #endif

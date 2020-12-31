@@ -31,3 +31,13 @@ NULL
 #' @export Gaussian
 NULL
 
+#' @export
+inc_gamma_imag <- function(nu, r) {
+    .Call('_hawkesbow_inc_gamma_imag', PACKAGE = 'hawkesbow', nu, r)
+}
+
+#' @export
+E1_imaginary <- function(x) {
+    .Call('_hawkesbow_E1_imaginary', PACKAGE = 'hawkesbow', x)
+}
+
