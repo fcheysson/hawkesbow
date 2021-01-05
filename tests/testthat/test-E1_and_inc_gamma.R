@@ -117,3 +117,97 @@ test_that("Incomplete gamma function of imaginary argument", {
                  tolerance = 1e-5)
 
 })
+
+test_that("PowerLaw::H gives correct results", {
+
+    # theta = 0.4
+    xi = seq(0, 3.5, by = .5)
+    model = new(PowerLaw)
+    model$param[3] = .4
+    mu = model$param[2]
+    theta = model$param[3]
+    a = model$param[4]
+
+    b = 1.0 - theta
+    r = xi * a
+    gamma1 = c(1.666667 + .000000i,
+               1.619153 - .306759i,
+               1.483209 - .580166i,
+               1.277506 - .792115i,
+               1.029608 - .924050i,
+               0.771356 - .969553i,
+               0.533655 - .934797i,
+               0.341618 - .836824i)
+
+    expect_equal(as.vector(model$H(xi)),
+                 mu * (1.0 - 1.0i * r * exp(1.0i * r) * ifelse(r == 0, 0, exp(-b * log(r))) * ((-1.0i)^b * gamma(b) - (r^b) * gamma1)),
+                 tolerance = 1e-5)
+
+    # theta = 1
+    xi = seq(0, 3.5, by = .5)
+    model = new(PowerLaw)
+    model$param[3] = 1
+    mu = model$param[2]
+    theta = model$param[3]
+    a = model$param[4]
+
+    r = xi * a
+    E1 = c(     Inf - .5i * pi ,
+            .177784 - 1.077689i,
+           -.337404 -  .624713i,
+           -.470356 -  .246113i,
+           -.422981 +  .034617i,
+           -.285871 +  .207724i,
+           -.119630 +  .277856i,
+            .032129 +  .262329i)
+
+    expect_equal(as.vector(model$H(xi)),
+                 mu * (1.0 - ifelse(r == 0, 0, 1.0i * r * exp(1.0i * r) * E1)),
+                 tolerance = 1e-5)
+
+    # theta = 1.4
+    xi = seq(0, 3.5, by = .5)
+    model = new(PowerLaw)
+    model$param[3] = 1.4
+    mu = model$param[2]
+    theta = model$param[3]
+    a = model$param[4]
+
+    b = 2.0 - theta
+    r = xi * a
+    gamma1 = c(1.666667 + .000000i,
+               1.619153 - .306759i,
+               1.483209 - .580166i,
+               1.277506 - .792115i,
+               1.029608 - .924050i,
+               0.771356 - .969553i,
+               0.533655 - .934797i,
+               0.341618 - .836824i)
+
+    expect_equal(as.vector(model$H(xi)),
+                 mu * (1.0 - 1.0i * r / (theta - 1.0) - (r^2 / (theta - 1.0)) * exp(1.0i * r) * ifelse(r == 0, 0, exp(-b * log(r))) * ((-1.0i)^b * gamma(b) - (r^b) * gamma1)),
+                 tolerance = 1e-5)
+
+    # theta = 2
+    xi = seq(0, 3.5, by = .5)
+    model = new(PowerLaw)
+    model$param[3] = 2
+    mu = model$param[2]
+    theta = model$param[3]
+    a = model$param[4]
+
+    r = xi * a
+    E1 = c(     Inf - .5i * pi ,
+                .177784 - 1.077689i,
+                -.337404 -  .624713i,
+                -.470356 -  .246113i,
+                -.422981 +  .034617i,
+                -.285871 +  .207724i,
+                -.119630 +  .277856i,
+                .032129 +  .262329i)
+
+    expect_equal(as.vector(model$H(xi)),
+                 mu * (1.0 + ifelse(r == 0, 0, - 1.0i * r / (theta - 1.0) - (r^2 / (theta - 1.0)) * exp(1.0i * r) * E1)),
+                 tolerance = 1e-5)
+
+})

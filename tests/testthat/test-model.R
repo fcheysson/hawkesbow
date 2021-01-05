@@ -3,6 +3,7 @@ test_that("Methods for spectral densities work", {
     # Create exponential Hawkes model
     model = new(Exponential)
     model$param=c(1,.5,2)
+    model$attach(new(DiscreteData, c(1, 1), 1))
 
     # For w = 0
     expect_equal(   model$f(0)[1,], 8 )
