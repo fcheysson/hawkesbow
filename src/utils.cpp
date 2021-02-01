@@ -1,4 +1,4 @@
-#include "utils.hpp"
+#include "utils.h"
 #include <string>
 #include <iostream>
 #include <boost/math/special_functions/gamma.hpp>
@@ -17,7 +17,7 @@ arma::cx_double pow_i(int x) {
         return 1;
     }
     return 0;
-};
+}
 
 // Powers of -1
 double pow_m1(int x) {
@@ -29,7 +29,7 @@ double pow_m1(int x) {
         return 1;
     }
     return 0;
-};
+}
 
 // Sinus cardinal: sinc(x) = sin(x) / x
 arma::vec _sinc( arma::vec x ) {
@@ -48,7 +48,7 @@ arma::vec _sinc( arma::vec x ) {
             *it_y = sin(*it_x) / *it_x;
     }
     return y;
-};
+}
 
 // Contour integration for the incomplete gamma function with imaginary argument
 // Integrate a continuous function on interval [a, b]
@@ -59,7 +59,7 @@ double integral_midpoint(double(*f)(double x), double a, double b, int n) {
         area += f(a + (i + 0.5) * step); // sum up each small rectangle
     }
     return (area * step);
-};
+}
 
 double integral_midpoint(double(*f)(double x, double nu), double a, double b, int n, double nu) {
     double step = (b - a) / n;  // width of each small rectangle
@@ -68,7 +68,7 @@ double integral_midpoint(double(*f)(double x, double nu), double a, double b, in
         area += f(a + (i + 0.5) * step, nu); // sum up each small rectangle
     }
     return (area * step);
-};
+}
 
 double integral_simpson(double(*f)(double x), double a, double b, int n) {
     if (n % 2 == 1)
@@ -82,7 +82,7 @@ double integral_simpson(double(*f)(double x), double a, double b, int n) {
             area += 2 * f(a + i * step);
     }
     return (area * step / 3.0);
-};
+}
 
 double integral_simpson(double(*f)(double x, double nu), double a, double b, int n, double nu) {
     if (n % 2 == 1)
@@ -96,7 +96,7 @@ double integral_simpson(double(*f)(double x, double nu), double a, double b, int
             area += 2 * f(a + i * step, nu);
     }
     return (area * step / 3.0);
-};
+}
 
 double integral_simpson(double(*f)(double x, double nu, double r), double a, double b, int n, double nu, double r) {
     if (n % 2 == 1)
@@ -110,28 +110,28 @@ double integral_simpson(double(*f)(double x, double nu, double r), double a, dou
             area += 2 * f(a + i * step, nu, r);
     }
     return (area * step / 3.0);
-};
+}
 
 // Real and imaginary part for the contour integral on the quadrant with radius r > 0
 double quadrant_real(double x, double nu, double r) {
     return exp(-r*cos(x)) * cos(x*nu - r*sin(x));
-};
+}
 
 double quadrant_imag(double x, double nu, double r) {
     return exp(-r*cos(x)) * sin(x*nu - r*sin(x));
-};
+}
 
 arma::cx_double contour_quadrant(double nu, double r) {
     double real_part = integral_simpson(quadrant_real, 0.0, .5 * arma::datum::pi, 100, nu, r);
     double imag_part = integral_simpson(quadrant_imag, 0.0, .5 * arma::datum::pi, 100, nu, r);
     return exp(nu*log(r)) * arma::cx_double(real_part, imag_part);
-};
+}
 
 arma::cx_double inc_gamma_imag(double nu, double r) {
     arma::cx_double term1 = exp(-.5*i*arma::datum::pi*nu) * boost::math::tgamma(nu, r);
     arma::cx_double term2 = exp(-.5*i*arma::datum::pi*(nu-1)) * contour_quadrant(nu, r);
     return  term1 - term2;
-};
+}
 
 // Powers of 10
 double quick_pow10(int n)
@@ -143,7 +143,7 @@ double quick_pow10(int n)
     };
 
     return pow10[n];
-};
+}
 
 double quick_negpow10(int n)
 {
@@ -155,7 +155,7 @@ double quick_negpow10(int n)
     };
 
     return pow10[n];
-};
+}
 
 // Padé approximants
 // cf. https://en.wikipedia.org/wiki/Trigonometric_integral
@@ -195,7 +195,7 @@ double padef( double x ) {
                      + 1.11535493509914254097 * quick_pow10(13) * inv_x18;
 
     return inv_x * num / denom;
-};
+}
 
 double padeg( double x ) {
     double inv_x = 1.0 / x,
@@ -233,7 +233,7 @@ double padeg( double x ) {
                      + 3.99653257887490811 * quick_pow10(13) * inv_x18;
 
     return inv_x2 * num / denom;
-};
+}
 
 double Ci( double x ) {
     try {
@@ -272,7 +272,7 @@ double Ci( double x ) {
     }
 
     return 0.0;
-};
+}
 
 double Si( double x ) {
     try {
@@ -311,8 +311,19 @@ double Si( double x ) {
     }
 
     return 0.0;
-};
+}
 
 arma::cx_double E1_imaginary( double x ) {
-    return i * (- 0.5 * arma::datum::pi + Si(x)) - Ci(x);
-};
+
+    try {
+        if (x < 0)
+            throw "ERROR in E1_imaginary: 'x' cannot be negative.";
+        else
+            return i * (- 0.5 * arma::datum::pi + Si(x)) - Ci(x);
+    } catch (const char* msg) {
+        std::cerr << msg << std::endl;
+    }
+
+    return arma::cx_double(0.0, 0.0);
+
+}

@@ -26,7 +26,26 @@ double quadrant_real(double x, double nu, double r);
 double quadrant_imag(double x, double nu, double r);
 arma::cx_double contour_quadrant(double nu, double r);
 
+//' Incomplete gamma function of imaginary argument
+//'
+//' Calculates the value of
+//' \deqn{\Gamma_1(\nu, r) = \int_r^\infty y^{\nu-1} e^{-iy} \mathrm{d}y}
+//' for \eqn{0 < \nu < 1} through the following relation (obtained by contour integration)
+//' \deqn{\int_r^\infty y^{\nu-1} e^{-iy} \mathrm{d}y =
+//' e^{-i\frac{\pi}{2}\nu} \int_r^\infty x^{\nu-1} e^{-x} \mathrm{d}x -
+//' e^{-i\frac{\pi}{2}(\nu-1)} r^\nu \int_0^{\pi/2}
+//' e^{i\theta \nu}e^{-re^{i\theta}}\mathrm{d}\theta.}
+//' The first integral is calculated using function "tgamma" from the library
+//' "boost::math", while the second is approximated via Simpson's rule.
+//'
+//' @param nu A number between 0 and 1 (strictly)
+//' @param r A non-negative number
+//'
+//' @return The incomplete gamma function of imaginary argument (see Details)
 //' @export
+//'
+//' @examples
+//' inc_gamma_imag(0.5, 1.0)
 // [[Rcpp::export]]
 arma::cx_double inc_gamma_imag(double nu, double r);
 
@@ -42,7 +61,23 @@ double padeg( double x );
 double Ci( double x );
 double Si( double x );
 
+//' Exponential integral of imaginary argument
+//'
+//' Calculates the value of
+//' \deqn{E_1(ix) = \int_1^\infty \frac{e^{-ixt}}{t} \mathrm{d}t}
+//' using its relation to the trigonometric integrals
+//' (cf. \url{https://en.wikipedia.org/wiki/Exponential_integral#Exponential_integral_of_imaginary_argument}):
+//' \deqn{E_1(ix) = i \left[ -\frac{1}{2} \pi + Si(x) \right] - Ci(x)}
+//' and their Pad\'e approximants
+//' (cf. \url{https://en.wikipedia.org/wiki/Trigonometric_integral#Efficient_evaluation})
+//'
+//' @param x A non-negative number
+//'
+//' @return The exponential integral of argument ix
 //' @export
+//'
+//' @examples
+//' E1_imaginary(1.0)
 // [[Rcpp::export]]
 arma::cx_double E1_imaginary( double x );
 

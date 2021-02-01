@@ -1,5 +1,5 @@
-#include "model.hpp"
-#include "utils.hpp"
+#include "model.h"
+#include "utils.h"
 
 // Model is given by its intensity :
 // Intensity = param(0) + int h(t-u) dN(u)
@@ -65,12 +65,10 @@ arma::cx_cube Exponential::ddH( arma::vec xi ) {
 ////////////////////////////////////////////
 // Methods for maximum likelihood estimation
 
-double Exponential::loglik() {
+double Exponential::loglik( const arma::vec& events, double T ) {
 
     // Constants
-    const arma::vec events = data->getEvents();
     const arma::uword n = events.n_elem;
-    const double T = data->getTimeEnd() - data->getTimeBegin();
     const double eta = param(0);
     const double mu = param(1);
     const double beta = param(2);
@@ -87,14 +85,12 @@ double Exponential::loglik() {
     double part2 = eta * T + mu * ((double)n - exp(-beta * (T - events(n-1))) * (1.0 + A));
 
     return part1 - part2;
-};
+}
 
-arma::vec Exponential::dloglik() {
+arma::vec Exponential::dloglik( const arma::vec& events, double T ) {
 
     // Constants
-    const arma::vec events = data->getEvents();
     const arma::uword n = events.n_elem;
-    const double T = data->getTimeEnd() - data->getTimeBegin();
     const double eta = param(0);
     const double mu = param(1);
     const double beta = param(2);
@@ -127,14 +123,12 @@ arma::vec Exponential::dloglik() {
     grad(2) -= mu * B;
 
     return grad;
-};
+}
 
-arma::mat Exponential::ddloglik() {
+arma::mat Exponential::ddloglik( const arma::vec& events, double T ) {
 
     // Constants
-    const arma::vec events = data->getEvents();
     const arma::uword n = events.n_elem;
-    const double T = data->getTimeEnd() - data->getTimeBegin();
     const double eta = param(0);
     const double mu = param(1);
     const double mu2 = mu * mu;
@@ -185,14 +179,12 @@ arma::mat Exponential::ddloglik() {
     hess(2,1) = hess(1,2);
 
     return hess;
-};
+}
 
-Rcpp::List Exponential::loglikngrad() {
+Rcpp::List Exponential::loglikngrad( const arma::vec& events, double T ) {
 
     // Constants
-    const arma::vec events = data->getEvents();
     const arma::uword n = events.n_elem;
-    const double T = data->getTimeEnd() - data->getTimeBegin();
     const double eta = param(0);
     const double mu = param(1);
     const double beta = param(2);
@@ -229,7 +221,7 @@ Rcpp::List Exponential::loglikngrad() {
     grad(2) -= mu * B;
 
     return Rcpp::List::create(Rcpp::Named("objective") = lik, Rcpp::Named("gradient") = grad);
-};
+}
 
 
 ////////////////////////////////////////////////

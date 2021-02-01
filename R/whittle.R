@@ -3,7 +3,8 @@
 #' This function fits a Hawkes process to discrete data by minimizing the Whittle contrast.
 #'
 #' @param model An object of class Model
-#' @param data An object of class DiscreteData
+#' @param counts A bin-count sequence
+#' @param binsize The bin size of the bin-count sequence
 #' @param trunc (Optional) The number of foldings taken into account due to aliasing
 #' @param ... Additional arguments passed to `optim`
 #'
@@ -13,14 +14,12 @@
 #'
 #' @examples
 #' x = hawkes(100, fun = 1, repr = .5, family = "exp", rate = 1)
-#' y = discrete(x, length = 100)
+#' y = discrete(x, binsize = 1)
 #' model = new(Exponential)
-#' data = new(DiscreteData, y, 1)
-#' whittle(model, data)
-whittle <- function(model, data, trunc=5L, ...) {
+#' whittle(model, y, 1)
+whittle <- function(model, counts, binsize, trunc=5L, ...) {
 
-    model$attach(data)
-    counts <- data$counts
+    model$binsize = binsize
     n <- length(counts)
 
     # Periodogram

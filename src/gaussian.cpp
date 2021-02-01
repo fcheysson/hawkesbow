@@ -1,5 +1,5 @@
-#include "model.hpp"
-#include "utils.hpp"
+#include "model.h"
+#include "utils.h"
 
 // Model is given by its intensity :
 // Intensity = param(0) + int h(t-u) dN(u)

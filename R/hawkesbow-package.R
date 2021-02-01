@@ -6,6 +6,7 @@
 ## usethis namespace: start
 #' @useDynLib hawkesbow
 #' @importFrom Rcpp sourceCpp
+#' @importFrom Rcpp loadModule
 ## usethis namespace: end
 NULL
 

@@ -1,5 +1,5 @@
-#include "model.hpp"
-#include "utils.hpp"
+#include "model.h"
+#include "utils.h"
 
 // Model is given by its intensity :
 // Intensity = param(0) + int h(t-u) dN(u)
@@ -141,12 +141,10 @@ arma::cx_vec PowerLaw::H( arma::vec xi ) {
 ////////////////////////////////////////////
 // Methods for maximum likelihood estimation
 
-double PowerLaw::loglik() {
+double PowerLaw::loglik( const arma::vec& events, double T ) {
 
     // Constants
-    const arma::vec events = data->getEvents();
     const arma::uword n = events.n_elem;
-    const double T = data->getTimeEnd() - data->getTimeBegin();
     const double eta = param(0);
     const double mu = param(1);
     const double theta = param(2);
@@ -167,14 +165,12 @@ double PowerLaw::loglik() {
     double part2 = eta * T + mu * (double)n - mu * atheta * hsum;
 
     return part1 - part2;
-};
+}
 
-arma::vec PowerLaw::dloglik() {
+arma::vec PowerLaw::dloglik( const arma::vec& events, double T ) {
 
     // Constants
-    const arma::vec events = data->getEvents();
     const arma::uword n = events.n_elem;
-    const double T = data->getTimeEnd() - data->getTimeBegin();
     const double eta = param(0);
     const double mu = param(1);
     const double theta = param(2);
@@ -220,14 +216,12 @@ arma::vec PowerLaw::dloglik() {
     );
 
     return grad;
-};
+}
 
-Rcpp::List PowerLaw::loglikngrad() {
+Rcpp::List PowerLaw::loglikngrad( const arma::vec& events, double T ) {
 
     // Constants
-    const arma::vec events = data->getEvents();
     const arma::uword n = events.n_elem;
-    const double T = data->getTimeEnd() - data->getTimeBegin();
     const double eta = param(0);
     const double mu = param(1);
     const double theta = param(2);
@@ -281,4 +275,4 @@ Rcpp::List PowerLaw::loglikngrad() {
     );
 
     return Rcpp::List::create(Rcpp::Named("objective") = lik, Rcpp::Named("gradient") = grad);
-};
+}

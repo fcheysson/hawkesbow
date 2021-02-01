@@ -4,12 +4,14 @@
 \alias{mle}
 \title{Fitting Hawkes processes from continuous data}
 \usage{
-mle(model, data, opts = NULL, ...)
+mle(model, events, end, opts = NULL, ...)
 }
 \arguments{
 \item{model}{An object of class Model}
 
-\item{data}{An object of class ContinuousData}
+\item{events}{The locations of events (sorted in ascending order)}
+
+\item{end}{The time until which the process is observed.}
 
 \item{opts}{(Optional) To be passed to \code{nloptr}}
 
@@ -19,11 +21,11 @@ mle(model, data, opts = NULL, ...)
 Returns the \code{optim} output
 }
 \description{
-This function fits a Hawkes process to continuous data by minimizing the likelihood.
+This function fits a Hawkes process to continuous data by minimizing the likelihood
+on the interval \eqn{[0,T]}.
 }
 \examples{
 x = hawkes(100, fun = 1, repr = .5, family = "exp", rate = 1)
 model = new(Exponential)
-data = new(ContinuousData, x$p, x$T)
-mle(model, data)
+mle(model, x$p, x$T)
 }

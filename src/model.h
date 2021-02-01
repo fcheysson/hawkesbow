@@ -1,6 +1,5 @@
 #pragma once
 #include <RcppArmadillo.h>
-#include "data.hpp"
 
 // [[Rcpp::depends(RcppArmadillo)]]
 using namespace Rcpp;
@@ -9,13 +8,14 @@ using namespace Rcpp;
 class Model {
 
 protected:
-    Data* data;
     arma::vec param;
+    double binsize;
 
 public:
     Model() {};
-    Model( arma::vec param ) : param(param) {};
-    Model( Data* data , arma::vec param ) : data(data), param(param) {};
+    Model( arma::vec param ) : param(param), binsize(1.0) {};
+    Model( double binsize ) : param(arma::zeros<arma::vec>(1)), binsize(binsize) {};
+    Model( arma::vec param, double binsize ) : param(param), binsize(binsize) {};
     virtual ~Model() {};
 
     // Methods for long term mean and its derivatives
@@ -30,10 +30,10 @@ public:
     virtual arma::cx_cube ddH( arma::vec xi ) { return arma::zeros<arma::cx_cube>(param.n_elem, param.n_elem, xi.n_elem); };
 
     // Likelihood estimation methods
-    virtual double loglik() { return 0.0; };
-    virtual arma::vec dloglik() { return arma::zeros<arma::vec>(param.n_elem); };
-    virtual arma::mat ddloglik() { return arma::zeros<arma::mat>(param.n_elem, param.n_elem); };
-    virtual Rcpp::List loglikngrad() { return Rcpp::List::create(); };
+    virtual double loglik( const arma::vec& events, double T ) { return 0.0; };
+    virtual arma::vec dloglik( const arma::vec& events, double T ) { return arma::zeros<arma::vec>(param.n_elem); };
+    virtual arma::mat ddloglik( const arma::vec& events, double T ) { return arma::zeros<arma::mat>(param.n_elem, param.n_elem); };
+    virtual Rcpp::List loglikngrad( const arma::vec& events, double T ) { return Rcpp::List::create(); };
 
     // Methods for continuous- and discretized-time spectral densities
     arma::vec G( arma::vec xi );    // G(w) = |1-H(w)|^{-2}
@@ -55,13 +55,9 @@ public:
     void setParam( arma::vec param_ ) { param = param_; };
     arma::vec getParam() { return param; };
 
-    // Property for data
-    void attach( Data* data_ ) { data = data_; };
-    void detach() { data = nullptr; };
-    Data getData() {
-        if (data) { return *data; }
-        else { return Data(0.0, 0.0); }
-    };
+    // Property for binsize
+    void setBinsize( double binsize_ ) { binsize = binsize_; };
+    double getBinsize() { return binsize; };
 
 };
 
@@ -74,9 +70,8 @@ private:
 public:
     Exponential() : Model(arma::vec({1.0, 0.5, 1.0})) {};
     Exponential( arma::vec param ) : Model(param) {};
-    Exponential( Data* data ) : Model(data, arma::vec({1.0, 0.5, 1.0})) {};
-    Exponential( Data* data, arma::vec param ) : Model(data, param) {};
-    Exponential( arma::vec param, Data* data ) : Model(data, param) {};
+    Exponential( double binsize ) : Model(arma::vec({1.0, 0.5, 1.0}), binsize) {};
+    Exponential( arma::vec param, double binsize ) : Model(param, binsize) {};
 
     // Methods for long term mean and its derivatives
     double mean();
@@ -90,10 +85,10 @@ public:
     arma::cx_cube ddH( arma::vec xi );
 
     // Likelihood methods
-    double loglik();
-    arma::vec dloglik();
-    arma::mat ddloglik();
-    Rcpp::List loglikngrad();
+    double loglik( const arma::vec& events, double T );
+    arma::vec dloglik( const arma::vec& events, double T );
+    arma::mat ddloglik( const arma::vec& events, double T );
+    Rcpp::List loglikngrad( const arma::vec& events, double T );
 
 };
 
@@ -106,9 +101,8 @@ private:
 public:
     SymmetricExponential() : Model(arma::vec({1.0, 0.5, 1.0})) {};
     SymmetricExponential( arma::vec param ) : Model(param) {};
-    SymmetricExponential( Data* data ) : Model(data, arma::vec({1.0, 0.5, 1.0})) {};
-    SymmetricExponential( Data* data, arma::vec param ) : Model(data, param) {};
-    SymmetricExponential( arma::vec param, Data* data ) : Model(data, param) {};
+    SymmetricExponential( double binsize ) : Model(arma::vec({1.0, 0.5, 1.0}), binsize) {};
+    SymmetricExponential( arma::vec param, double binsize ) : Model(param, binsize) {};
 
     // Methods for long term mean and its derivatives
     double mean();
@@ -122,10 +116,10 @@ public:
     // arma::cx_cube ddH( arma::vec xi );
 
     // Likelihood methods
-    // double loglik();
-    // arma::vec dloglik();
-    // arma::mat ddloglik();
-    // Rcpp::List loglikngrad();
+    // double loglik( const arma::vec& events, double T );
+    // arma::vec dloglik( const arma::vec& events, double T );
+    // arma::mat ddloglik( const arma::vec& events, double T );
+    // Rcpp::List loglikngrad( const arma::vec& events, double T );
 
 };
 
@@ -138,9 +132,8 @@ private:
 public:
     PowerLaw() : Model(arma::vec({1.0, 0.5, 3.0, 1.0})) {};
     PowerLaw( arma::vec param ) : Model(param) {};
-    PowerLaw( Data* data ) : Model(data, arma::vec({1.0, 0.5, 3.0, 1.0})) {};
-    PowerLaw( Data* data, arma::vec param ) : Model(data, param) {};
-    PowerLaw( arma::vec param, Data* data ) : Model(data, param) {};
+    PowerLaw( double binsize ) : Model(arma::vec({1.0, 0.5, 3.0, 1.0}), binsize) {};
+    PowerLaw( arma::vec param, double binsize ) : Model(param, binsize) {};
 
     // Methods for long term mean and its derivatives
     double mean();
@@ -151,9 +144,9 @@ public:
     arma::cx_vec H( arma::vec xi );
 
     // Likelihood methods
-    double loglik();
-    arma::vec dloglik();
-    Rcpp::List loglikngrad();
+    double loglik( const arma::vec& events, double T );
+    arma::vec dloglik( const arma::vec& events, double T );
+    Rcpp::List loglikngrad( const arma::vec& events, double T );
 
 };
 
@@ -166,9 +159,8 @@ private:
 public:
     Pareto3() : Model(arma::vec({1.0, 0.5, 1.0})) {};
     Pareto3( arma::vec param ) : Model(param) {};
-    Pareto3( Data* data ) : Model(data, arma::vec({1.0, 0.5, 1.0})) {};
-    Pareto3( Data* data, arma::vec param ) : Model(data, param) {};
-    Pareto3( arma::vec param, Data* data ) : Model(data, param) {};
+    Pareto3( double binsize ) : Model(arma::vec({1.0, 0.5, 1.0}), binsize) {};
+    Pareto3( arma::vec param, double binsize ) : Model(param, binsize) {};
 
     // Methods for long term mean
     double mean();
@@ -188,9 +180,8 @@ private:
 public:
     Pareto2() : Model(arma::vec({1.0, 0.5, 1.0})) {};
     Pareto2( arma::vec param ) : Model(param) {};
-    Pareto2( Data* data ) : Model(data, arma::vec({1.0, 0.5, 1.0})) {};
-    Pareto2( Data* data, arma::vec param ) : Model(data, param) {};
-    Pareto2( arma::vec param, Data* data ) : Model(data, param) {};
+    Pareto2( double binsize ) : Model(arma::vec({1.0, 0.5, 1.0}), binsize) {};
+    Pareto2( arma::vec param, double binsize ) : Model(param, binsize) {};
 
     // Methods for long term mean
     double mean();
@@ -210,9 +201,8 @@ private:
 public:
     Pareto1() : Model(arma::vec({1.0, 0.5, 1.0})) {};
     Pareto1( arma::vec param ) : Model(param) {};
-    Pareto1( Data* data ) : Model(data, arma::vec({1.0, 0.5, 1.0})) {};
-    Pareto1( Data* data, arma::vec param ) : Model(data, param) {};
-    Pareto1( arma::vec param, Data* data ) : Model(data, param) {};
+    Pareto1( double binsize ) : Model(arma::vec({1.0, 0.5, 1.0}), binsize) {};
+    Pareto1( arma::vec param, double binsize ) : Model(param, binsize) {};
 
     // Methods for long term mean
     double mean();
@@ -232,9 +222,8 @@ private:
 public:
     Gaussian() : Model(arma::vec({1.0, 0.5, 0.0, 1.0})) {};
     Gaussian( arma::vec param ) : Model(param) {};
-    Gaussian( Data* data ) : Model(data, arma::vec({1.0, 0.5, 0.0, 1.0})) {};
-    Gaussian( Data* data, arma::vec param ) : Model(data, param) {};
-    Gaussian( arma::vec param, Data* data ) : Model(data, param) {};
+    Gaussian( double binsize ) : Model(arma::vec({1.0, 0.5, 0.0, 1.0}), binsize) {};
+    Gaussian( arma::vec param, double binsize ) : Model(param, binsize) {};
 
     // Methods for long term mean
     double mean();

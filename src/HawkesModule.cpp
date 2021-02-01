@@ -1,16 +1,4 @@
-#include "model.hpp"
-#include "data.hpp"
-
-// // For overloaded methods: help disambiguate which one to use
-// // Here: select method if argument is an integer
-// bool get_int_valid(SEXP* args, int nargs){
-//     if( nargs != 1 ) return false ;
-//     if( TYPEOF(args[0]) != INTSXP ) return false ;
-//     return ( LENGTH(args[0]) == 1 ) ;
-// }
-
-RCPP_EXPOSED_CLASS(Data);
-RCPP_EXPOSED_CLASS(DiscreteData);
+#include "model.h"
 
 RCPP_MODULE(HawkesModule) {
     using namespace Rcpp;
@@ -27,10 +15,8 @@ RCPP_MODULE(HawkesModule) {
         .method("df1", &Model::df1)
         .method("ddf1", &Model::ddf1)
         .method("whittle", &Model::whittle)
-        .method("attach", &Model::attach)
-        .method("detach", &Model::detach)
         .property("param", &Model::getParam, &Model::setParam)
-        .property("data", &Model::getData)
+        .property("binsize", &Model::getBinsize, &Model::setBinsize)
     ;
 
     class_<Exponential>("Exponential")
@@ -99,39 +85,5 @@ RCPP_MODULE(HawkesModule) {
         .method("mean", &Gaussian::mean)
         .method("h", &Gaussian::h)
         .method("H", &Gaussian::H)
-    ;
-
-
-    class_<Data>("Data")
-        // .default_constructor()
-        .constructor<double,double>()
-        .property("timeBegin", &DiscreteData::getTimeBegin)
-        .property("timeEnd", &DiscreteData::getTimeEnd)
-        .property("timeRange", &DiscreteData::getTimeRange)
-    ;
-
-    class_<DiscreteData>("DiscreteData")
-        .derives<Data>("Data")
-        // .default_constructor()
-        .constructor<arma::Col<unsigned int>,double>()
-        .constructor<arma::Col<unsigned int>,double,double>()
-        .property("counts", &DiscreteData::getCounts)
-        .property("binsize", &DiscreteData::getBinsize)
-    ;
-
-    // // Help the compiler disambiguate things
-    // DiscreteData (ContinuousData::*toDiscrete_length)(unsigned int) = &ContinuousData::toDiscrete;
-    // DiscreteData (ContinuousData::*toDiscrete_binsize)(double) = &ContinuousData::toDiscrete;
-
-    class_<ContinuousData>("ContinuousData")
-        .derives<Data>("Data")
-        // .default_constructor()
-        .constructor<arma::vec,double>()
-        .constructor<arma::vec,double,double>()
-        .property("events", &ContinuousData::getEvents)
-        .method("binl", &ContinuousData::binl)
-        .method("bins", &ContinuousData::bins)
-        // .method("toDiscrete", ( DiscreteData (ContinuousData::*)(unsigned int) )(&ContinuousData::toDiscrete), "ContinuousData", &get_int_valid )
-        // .method("toDiscrete", ( DiscreteData (ContinuousData::*)(double) )      (&ContinuousData::toDiscrete))
     ;
 }

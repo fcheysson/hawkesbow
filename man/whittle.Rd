@@ -4,12 +4,14 @@
 \alias{whittle}
 \title{Fitting Hawkes processes from discrete data}
 \usage{
-whittle(model, data, trunc = 5L, ...)
+whittle(model, counts, binsize, trunc = 5L, ...)
 }
 \arguments{
 \item{model}{An object of class Model}
 
-\item{data}{An object of class DiscreteData}
+\item{counts}{A bin-count sequence}
+
+\item{binsize}{The bin size of the bin-count sequence}
 
 \item{trunc}{(Optional) The number of foldings taken into account due to aliasing}
 
@@ -23,8 +25,7 @@ This function fits a Hawkes process to discrete data by minimizing the Whittle c
 }
 \examples{
 x = hawkes(100, fun = 1, repr = .5, family = "exp", rate = 1)
-y = discrete(x, length = 100)
+y = discrete(x, binsize = 1)
 model = new(Exponential)
-data = new(DiscreteData, y, 1)
-whittle(model, data)
+whittle(model, y, 1)
 }

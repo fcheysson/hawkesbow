@@ -5,8 +5,8 @@ test_that("Loglik and its derivatives are correct", {
     model$param=c(1.0,.5,log(2.0))
 
     # Create dataset
-    cdata = new(ContinuousData, 1.0:4.0, 5.0)
-    model$attach(cdata)
+    events = 1.0:4.0
+    end = 5.0
 
     # Useful outputs
     A = c(0.0, 1.0/2.0, 3.0/4.0,  7.0/8.0,  15.0/16.0)
@@ -37,10 +37,11 @@ test_that("Loglik and its derivatives are correct", {
     ), byrow = TRUE, nrow = 3, ncol = 3)
 
     # expect_equals
-    expect_equal(  model$loglik()    ,   loglik )
-    expect_equal( model$dloglik()[,1],  dloglik )
-    expect_equal(model$ddloglik()    , ddloglik )
-    expect_equal(model$loglikngrad() , list(objective=model$loglik(),
-                                            gradient =model$dloglik()))
+    expect_equal(  model$loglik(events, end)    ,   loglik )
+    expect_equal( model$dloglik(events, end)[,1],  dloglik )
+    expect_equal(model$ddloglik(events, end)    , ddloglik )
+    expect_equal(model$loglikngrad(events, end) ,
+                 list(objective=model$loglik(events, end),
+                      gradient =model$dloglik(events, end)))
 
 })

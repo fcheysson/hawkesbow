@@ -1,5 +1,5 @@
-#include "model.hpp"
-#include "utils.hpp"
+#include "model.h"
+#include "utils.h"
 
 //////////////////////////////////////////////////////////////////
 // Methods for continuous- and discretized-time spectral densities
@@ -9,7 +9,7 @@
 arma::vec Model::G( arma::vec xi ) {
     arma::cx_vec temp = arma::cx_double(1.0, 0.0) - H( xi );
     return 1.0 / arma::conv_to<arma::vec>::from( temp % arma::conj(temp) );
-};
+}
 
 arma::mat Model::dG( arma::vec xi ) {
     arma::mat grad( xi.n_elem, param.n_elem );
@@ -21,7 +21,7 @@ arma::mat Model::dG( arma::vec xi ) {
         grad.col(k) = 2.0 * Gxi2 % arma::real( term1 % dHxi.col(k) );
     }
     return grad;
-};
+}
 
 arma::cube Model::ddG( arma::vec xi ) {
     arma::cube hess( param.n_elem, param.n_elem, xi.n_elem );
@@ -42,28 +42,16 @@ arma::cube Model::ddG( arma::vec xi ) {
         }
     }
     return hess;
-};
+}
 
 // f(w) = m * binsize * sinc²(w/2) * G(w/binsize)
 
 arma::vec Model::f( arma::vec xi ) {
-    double binsize;
-    if (data)
-        binsize = data->getBinsize();
-    else
-        binsize = 1.0;
-
     arma::vec term1 = _sinc( .5 * xi );
     return mean() * binsize * term1 % term1 % G(xi / binsize);
-};
+}
 
 arma::mat Model::df( arma::vec xi ) {
-    double binsize;
-    if (data)
-        binsize = data->getBinsize();
-    else
-        binsize = 1.0;
-
     arma::mat grad( xi.n_elem, param.n_elem );
 
     arma::vec term0 = _sinc( .5 * xi );
@@ -78,15 +66,9 @@ arma::mat Model::df( arma::vec xi ) {
         grad.col(k) = binsize * term1 % ( dm(k) * Gxi + m * dGxi.col(k) );
     }
     return grad;
-};
+}
 
 arma::cube Model::ddf( arma::vec xi ) {
-    double binsize;
-    if (data)
-        binsize = data->getBinsize();
-    else
-        binsize = 1.0;
-
     arma::cube hess( param.n_elem, param.n_elem, xi.n_elem );
 
     arma::vec term0 = _sinc( .5 * xi );
@@ -107,7 +89,7 @@ arma::cube Model::ddf( arma::vec xi ) {
         }
     }
     return hess;
-};
+}
 
 // f1(w) = sum_{k=-trunc}^{+trunc} f(w + 2*k*pi)
 
@@ -118,7 +100,7 @@ arma::vec Model::f1( arma::vec xi, int trunc ) {
         y(k) = arma::sum( f(xi(k) + omega) );
     }
     return y;
-};
+}
 
 arma::mat Model::df1( arma::vec xi, int trunc ) {
     arma::vec omega = 2.0 * arma::datum::pi * arma::regspace<arma::vec>(-trunc, trunc);
@@ -127,7 +109,7 @@ arma::mat Model::df1( arma::vec xi, int trunc ) {
         y.row(k) = arma::sum( df(xi(k) + omega), 0 );
     }
     return y;
-};
+}
 
 arma::cube Model::ddf1( arma::vec xi, int trunc ) {
     arma::vec omega = 2.0 * arma::datum::pi * arma::regspace<arma::vec>(-trunc, trunc);
@@ -136,7 +118,7 @@ arma::cube Model::ddf1( arma::vec xi, int trunc ) {
         y.slice(k) = arma::sum( ddf(xi(k) + omega), 2 );
     }
     return y;
-};
+}
 
 // Whittle likelihood estimation methods
 double Model::whittle( arma::vec& periodogram, int trunc ) {
@@ -144,4 +126,4 @@ double Model::whittle( arma::vec& periodogram, int trunc ) {
     arma::vec omega = 2.0 * arma::datum::pi * arma::regspace<arma::vec>(1, n-1) / (double)n;
     arma::vec spectrum = f1( omega, trunc );
     return arma::sum( arma::log(spectrum) + periodogram / spectrum );
-};
+}
