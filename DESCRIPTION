@@ -14,15 +14,14 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
 Depends:
-    methods
+    Rcpp
 Imports: 
+    methods,
     nloptr,
     PtProcess
 Suggests: 
     testthat (>= 2.1.0)
-LinkingTo: 
+LinkingTo:
     Rcpp,
     RcppArmadillo,
     BH
-RcppModules: 
-    HawkesModule

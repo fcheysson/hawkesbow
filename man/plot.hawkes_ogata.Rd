@@ -4,7 +4,7 @@
 \alias{plot.hawkes_ogata}
 \title{Plot of a simulated Hawkes process}
 \usage{
-\method{plot}{hawkes_ogata}(hawkes, precision = 1000, ...)
+\method{plot}{hawkes_ogata}(hawkes, precision = 1000)
 }
 \arguments{
 \item{hawkes}{A simulated Hawkes process from \code{hawkes_ogata}.}

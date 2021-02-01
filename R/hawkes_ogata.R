@@ -6,7 +6,7 @@
 
 #' Simulation of a Hawkes process
 #'
-#' Simulates a Hawkes process via Ogata's modified thinning algorithm on [0,T].
+#' Simulates a Hawkes process via Ogata's modified thinning algorithm on \eqn{[0,T]}.
 #' This is less efficient than function `hawkes`, but can be useful for pedagogical reasons.
 #'
 #' @param T Right bound on time.
@@ -103,12 +103,12 @@ hawkes_ogata <- function(T, lambda, alpha, beta, lambda0=NULL) {
 #' # excitation function 1*exp(-2t)
 #' x <- hawkes_ogata(10, 1, 1, 2)
 #' plot(x)
-plot.hawkes_ogata <- function(hawkes, precision=1e3, ...) {
+plot.hawkes_ogata <- function(hawkes, precision=1e3) {
 	# Conditional intensity
 	matplot(z <- seq(0, hawkes$T, by=hawkes$T / precision),
-		intensity(hawkes, z),
+		intensity_ogata(hawkes, z),
 		type="l", ylim=c(0, max(hawkes$M)),
-		xlab=expression(italic(t)), ylab=expression(italic(U)), ...)
+		xlab=expression(italic(t)), ylab=expression(italic(U)))
 	# Upper bound M of Ogata's modified thinning algorithm
 	segments(x0=c(0, hawkes$t[-hawkes$m]), x1=c(hawkes$t[-hawkes$m], hawkes$T),
 		y0=hawkes$M[-1-hawkes$m],
@@ -116,8 +116,8 @@ plot.hawkes_ogata <- function(hawkes, precision=1e3, ...) {
 	# All points considered and the corresponding value for U
 	points(x=hawkes$t[-hawkes$m],
 		y=hawkes$U[-hawkes$m],
-		pch=ifelse(hawkes$U[-hawkes$m] > sapply(hawkes$t[-hawkes$m], function(t) {intensity(hawkes, t)}), 3, 1),
-		col=ifelse(hawkes$U[-hawkes$m] > sapply(hawkes$t[-hawkes$m], function(t) {intensity(hawkes, t)}), "firebrick1", "green4"))
+		pch=ifelse(hawkes$U[-hawkes$m] > sapply(hawkes$t[-hawkes$m], function(t) {intensity_ogata(hawkes, t)}), 3, 1),
+		col=ifelse(hawkes$U[-hawkes$m] > sapply(hawkes$t[-hawkes$m], function(t) {intensity_ogata(hawkes, t)}), "firebrick1", "green4"))
 	# The resulting points of the Hawkes process
 	points(x=hawkes$p, y=rep(0, hawkes$n), col="green4", pch=15)
 	# Nice lines showing which point considered resulted in which point of the Hawkes process
@@ -145,8 +145,8 @@ plot.hawkes_ogata <- function(hawkes, precision=1e3, ...) {
 #' # excitation function 1*exp(-2t)
 #' x <- hawkes_ogata(10, 1, 1, 2)
 #' plot(x)
-#' intensity.hawkes_ogata(x, 0:10)
-intensity.hawkes_ogata <- function(hawkes, t) {
+#' intensity_ogata(x, 0:10)
+intensity_ogata <- function(hawkes, t) {
 	# If outside of bounds, return error
 	if (any(t < 0) || any(t > hawkes$T))
 		stop("t is out of bound.")
@@ -180,8 +180,8 @@ intensity.hawkes_ogata <- function(hawkes, t) {
 #' # excitation function 1*exp(-2t)
 #' x <- hawkes_ogata(10, 1, 1, 2)
 #' plot(x)
-#' compensator.hawkes_ogata(x, 0:10)
-compensator.hawkes_ogata <- function(hawkes, t, ...) {
+#' compensator_ogata(x, 0:10)
+compensator_ogata <- function(hawkes, t) {
 	# If outside of bounds, return error
 	if (any(t < 0) || any(t > hawkes$T))
 		stop("t is out of bound.")
@@ -217,10 +217,10 @@ compensator.hawkes_ogata <- function(hawkes, t, ...) {
 #' # excitation function 1*exp(-2t)
 #' x <- hawkes_ogata(10, 1, 1, 2)
 #' plot(x)
-#' z = residuals(x)
+#' z = residuals_ogata(x)
 #' plot(z)
 #' abline(0, 1)
-residuals.hawkes_ogata <- function(hawkes) {
+residuals_ogata <- function(hawkes) {
 	return( hawkes$lambda * hawkes$p + (hawkes$lambda0 - hawkes$lambda) / hawkes$beta +
 		hawkes$alpha / hawkes$beta * (1:hawkes$n - 1 - hawkes$A) )
 }

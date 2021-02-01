@@ -5,8 +5,11 @@
 # roxygen namespace tags. Modify with care!
 ## usethis namespace: start
 #' @useDynLib hawkesbow
-#' @importFrom Rcpp sourceCpp
-#' @importFrom Rcpp loadModule
+#' @importFrom Rcpp sourceCpp loadModule
+#' @importFrom graphics arrows axis legend matplot points segments
+#' @importFrom methods is
+#' @importFrom stats fft integrate optim rexp rpois runif
+#' @importFrom utils modifyList tail
 ## usethis namespace: end
 NULL
 

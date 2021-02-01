@@ -7,7 +7,7 @@
 inhpois(T, fun, M = NULL)
 }
 \arguments{
-\item{T}{A non-negative numeric value - right bound of the interval \link{0,T}.}
+\item{T}{A non-negative numeric value - right bound of the interval \eqn{[0,T]}.}
 
 \item{fun}{A non-negative function or numeric value - intensity (function) of the Poisson process.}
 
@@ -18,8 +18,8 @@ A S3 object of class \code{inhpois} containing a vector ($p) of simulated values
 and all other objects used for the simulation.
 }
 \description{
-Simulates an inhomogeneous Poisson process via Ogata's modified thinning algorithm on \link{0,T}.
-An homogeneous Poisson process with intensity \code{M} is first generated on \link{0,T}, then thinned using the specified intensity function \code{fun}.
+Simulates an inhomogeneous Poisson process via Ogata's modified thinning algorithm on \eqn{[0,T]}.
+An homogeneous Poisson process with intensity \code{M} is first generated on \eqn{[0,T]}, then thinned using the specified intensity function \code{fun}.
 }
 \examples{
 # Simulate an inhomogeneous Poisson process with function intensity 1 + sin(x) (bounded by 2)

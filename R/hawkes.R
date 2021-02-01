@@ -6,10 +6,10 @@
 
 #' Simulation of an inhomogeneous Poisson process by thinning
 #'
-#' Simulates an inhomogeneous Poisson process via Ogata's modified thinning algorithm on [0,T].
-#' An homogeneous Poisson process with intensity `M` is first generated on [0,T], then thinned using the specified intensity function `fun`.
+#' Simulates an inhomogeneous Poisson process via Ogata's modified thinning algorithm on \eqn{[0,T]}.
+#' An homogeneous Poisson process with intensity `M` is first generated on \eqn{[0,T]}, then thinned using the specified intensity function `fun`.
 #'
-#' @param T A non-negative numeric value - right bound of the interval [0,T].
+#' @param T A non-negative numeric value - right bound of the interval \eqn{[0,T]}.
 #' @param fun A non-negative function or numeric value - intensity (function) of the Poisson process.
 #' @param M (default = NULL) A non-negative numeric value - upper bound on `fun` (ignored if `fun` is a numeric value).
 #'
@@ -23,10 +23,7 @@
 #' x <- inhpois(T=10, fun=function(y) {1 + sin(y)}, M=2)
 #' # Simulate a homogeneous Poisson process with intensity 3
 #' x <- inhpois(T=10, fun=3)
-inhpois <- function(T, fun, M=NULL) UseMethod("inhpois")
-
-#' @export
-inhpois.default <- function(T, fun, M=NULL) {
+inhpois <- function(T, fun, M=NULL) {
 
     if (is.numeric(fun)) {
         m = rpois(1, lambda = fun*T)
@@ -108,7 +105,7 @@ plot.inhpois <- function(inhpois, precision=1e3) {
 #' - Third, these offsprings are distributed according to the `family` distribution.
 #' - Then, generate further offsprings according to the last two steps.
 #'
-#' @param T A non-negative numeric value - right bound of the interval [0,T].
+#' @param T A non-negative numeric value - right bound of the interval \eqn{[0,T]}.
 #' @param fun A non-negative function or numeric value - intensity (function) of the immigrant process.
 #' @param repr A non-negative numeric value - mean number of offsprings.
 #' @param family A character string "name" naming a distribution with corresponding random generation function `rname`, or directly the random generation function.
@@ -125,10 +122,7 @@ plot.inhpois <- function(inhpois, precision=1e3) {
 #' x <- hawkes(10, fun=1, repr=0.5, family="exp", rate=2)
 #' # Simulate a Hawkes process with baseline intensity function 1 + sin(x), reproduction mean 0.5 and custom [0,1]-triangular fertility function.
 #' x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5, family=function(n) {1 - sqrt(1 - runif(n))})
-hawkes <- function(T, fun, repr, family, M=NULL, ...) UseMethod("hawkes")
-
-#' @export
-hawkes.default <- function(T, fun, repr, family, M=NULL, ...) {
+hawkes <- function(T, fun, repr, family, M=NULL, ...) {
 
     # Check if fertility distribution function is user specified or chosen amongst R "r___" functions
     if (is.character(family))

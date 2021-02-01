@@ -22,7 +22,7 @@ A S3 object of class Hawkes containing a vector ($p) of simulated values,
 and all other objects used for the simulation.
 }
 \description{
-Simulates a Hawkes process via Ogata's modified thinning algorithm on \link{0,T}.
+Simulates a Hawkes process via Ogata's modified thinning algorithm on \eqn{[0,T]}.
 This is less efficient than function \code{hawkes}, but can be useful for pedagogical reasons.
 }
 \examples{

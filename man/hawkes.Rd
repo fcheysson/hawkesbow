@@ -7,7 +7,7 @@
 hawkes(T, fun, repr, family, M = NULL, ...)
 }
 \arguments{
-\item{T}{A non-negative numeric value - right bound of the interval \link{0,T}.}
+\item{T}{A non-negative numeric value - right bound of the interval \eqn{[0,T]}.}
 
 \item{fun}{A non-negative function or numeric value - intensity (function) of the immigrant process.}
 
