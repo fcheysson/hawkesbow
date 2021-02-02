@@ -32,14 +32,17 @@ If the input \code{x} has been simulated using the function \code{hawkes}, the p
 If any parameter is specified in this function call, the function will use this instead.
 }
 \examples{
-# Simulate an exponential Hawkes process with baseline intensity 1, reproduction mean 0.5 and exponential fertility distribution with rate 2.
+# Simulate an exponential Hawkes process with baseline intensity 1,
+# reproduction mean 0.5 and exponential fertility distribution with rate 2.
 x <- hawkes(10, fun=1, repr=0.5, family="exp", rate=2)
 intensity(x, 0:10)
 # Intensity with a different set of parameters
 intensity(x, 0:10, repr=0.8, rate=3)
 # Intensity with a different distribution function
 intensity(x, 0:10, family="chisq", df=2)
-# Simulate a Hawkes process with baseline intensity function 1 + sin(x), reproduction mean 0.5 and custom [0,1]-triangular fertility function.
-x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5, family=function(n) {1 - sqrt(1 - runif(n))})
+# Simulate a Hawkes process with baseline intensity function 1 + sin(x),
+# reproduction mean 0.5 and custom [0,1]-triangular fertility function.
+x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5,
+            family=function(n) {1 - sqrt(1 - runif(n))})
 intensity(x, 0:10, family=function(y) ifelse(y>0 & y<1, 2-2*y, 0))
 }

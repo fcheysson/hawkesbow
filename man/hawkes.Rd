@@ -33,8 +33,11 @@ Simulates a Hawkes process using its cluster representation:
 }
 }
 \examples{
-# Simulate an exponential Hawkes process with baseline intensity 1, reproduction mean 0.5 and exponential fertility function with rate 2.
+# Simulate an exponential Hawkes process with baseline intensity 1,
+# reproduction mean 0.5 and exponential fertility function with rate 2.
 x <- hawkes(10, fun=1, repr=0.5, family="exp", rate=2)
-# Simulate a Hawkes process with baseline intensity function 1 + sin(x), reproduction mean 0.5 and custom [0,1]-triangular fertility function.
-x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5, family=function(n) {1 - sqrt(1 - runif(n))})
+# Simulate a Hawkes process with baseline intensity function 1 + sin(x),
+# reproduction mean 0.5 and custom [0,1]-triangular fertility function.
+x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5,
+            family=function(n) {1 - sqrt(1 - runif(n))})
 }

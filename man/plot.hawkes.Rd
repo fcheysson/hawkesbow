@@ -5,7 +5,7 @@
 \title{Plot of a Hawkes process}
 \usage{
 \method{plot}{hawkes}(
-  hawkes,
+  x,
   intensity = FALSE,
   precision = 1000,
   fun = NULL,
@@ -16,7 +16,7 @@
 )
 }
 \arguments{
-\item{hawkes}{Either: a numeric vector, sorted in ascending order; or an object of class "hawkes" output by function \code{hawkes}.}
+\item{x}{Either: a numeric vector, sorted in ascending order; or an object of class "hawkes" output by function \code{hawkes}.}
 
 \item{intensity}{(default = FALSE) A boolean - whether to represent the cluster representation (\code{FALSE}) or the intensity function (\code{TRUE}).}
 
@@ -39,10 +39,13 @@ None
 Plots the realisation of a Hawkes process and either its cluster representation (\code{intensity=FALSE}, only available for a simulated Hawkes process) or its intensity function (\code{intensity=TRUE}).
 }
 \examples{
-# Simulate an exponential Hawkes process with baseline intensity 1, reproduction mean 0.5 and exponential fertility function with rate 2.
+# Simulate an exponential Hawkes process with baseline intensity 1,
+# reproduction mean 0.5 and exponential fertility function with rate 2.
 x <- hawkes(10, fun=1, repr=0.5, family="exp", rate=2)
 plot(x)
-# Simulate a Hawkes process with baseline intensity function 1 + sin(x), reproduction mean 0.5 and custom [0,1]-triangular fertility function.
-x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5, family=function(n) {1 - sqrt(1 - runif(n))})
+# Simulate a Hawkes process with baseline intensity function 1 + sin(x),
+# reproduction mean 0.5 and custom [0,1]-triangular fertility function.
+x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5,
+            family=function(n) {1 - sqrt(1 - runif(n))})
 plot(x, intensity=TRUE, family=function(y) ifelse(y>0 & y<1, 2-2*y, 0))
 }

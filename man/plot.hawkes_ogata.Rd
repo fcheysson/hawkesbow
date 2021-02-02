@@ -4,12 +4,14 @@
 \alias{plot.hawkes_ogata}
 \title{Plot of a simulated Hawkes process}
 \usage{
-\method{plot}{hawkes_ogata}(hawkes, precision = 1000)
+\method{plot}{hawkes_ogata}(x, precision = 1000, ...)
 }
 \arguments{
-\item{hawkes}{A simulated Hawkes process from \code{hawkes_ogata}.}
+\item{x}{A simulated Hawkes process from \code{hawkes_ogata}.}
 
 \item{precision}{(default = 1e3) Number of points to plot.}
+
+\item{...}{Only there to fit the declaration of S3 method \code{plot}.}
 }
 \value{
 None

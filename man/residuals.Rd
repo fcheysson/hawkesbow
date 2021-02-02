@@ -28,7 +28,8 @@ Useful function for diagnosis through the random time change theorem: the residu
 a unit rate Poisson process.
 }
 \examples{
-# Simulate an exponential Hawkes process with baseline intensity 1, reproduction mean 0.5 and exponential fertility distribution with rate 2.
+# Simulate an exponential Hawkes process with baseline intensity 1,
+# reproduction mean 0.5 and exponential fertility distribution with rate 2.
 x <- hawkes(10, fun=1, repr=0.5, family="exp", rate=2)
 resid = residuals(x)
 resid
@@ -38,8 +39,10 @@ abline(0, 1, col="red", lty="dashed")
 residuals(x, repr=0.8, rate=3)
 # Residuals with a different distribution function
 residuals(x, family="chisq", df=2)
-# Simulate a Hawkes process with baseline intensity function 1 + sin(x), reproduction mean 0.5 and custom [0,1]-triangular fertility function.
-x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5, family=function(n) {1 - sqrt(1 - runif(n))})
+# Simulate a Hawkes process with baseline intensity function 1 + sin(x),
+# reproduction mean 0.5 and custom [0,1]-triangular fertility function.
+x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5,
+            family=function(n) {1 - sqrt(1 - runif(n))})
 resid = residuals(x, family=function(y) ifelse(y>0 & y<1, 2-2*y, 0))
 plot(resid)
 abline(0, 1, col="red", lty="dashed")

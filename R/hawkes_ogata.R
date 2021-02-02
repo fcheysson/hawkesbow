@@ -91,8 +91,9 @@ hawkes_ogata <- function(T, lambda, alpha, beta, lambda0=NULL) {
 #'
 #' Plots a simulated Hawkes process, highlighting the steps used in Ogata's thinning algorithm.
 #'
-#' @param hawkes A simulated Hawkes process from `hawkes_ogata`.
+#' @param x A simulated Hawkes process from `hawkes_ogata`.
 #' @param precision (default = 1e3) Number of points to plot.
+#' @param ... Only there to fit the declaration of S3 method `plot`.
 #'
 #' @return None
 #'
@@ -103,26 +104,26 @@ hawkes_ogata <- function(T, lambda, alpha, beta, lambda0=NULL) {
 #' # excitation function 1*exp(-2t)
 #' x <- hawkes_ogata(10, 1, 1, 2)
 #' plot(x)
-plot.hawkes_ogata <- function(hawkes, precision=1e3) {
+plot.hawkes_ogata <- function(x, precision=1e3, ...) {
 	# Conditional intensity
-	matplot(z <- seq(0, hawkes$T, by=hawkes$T / precision),
-		intensity_ogata(hawkes, z),
-		type="l", ylim=c(0, max(hawkes$M)),
+	matplot(z <- seq(0, x$T, by=x$T / precision),
+		intensity_ogata(x, z),
+		type="l", ylim=c(0, max(x$M)),
 		xlab=expression(italic(t)), ylab=expression(italic(U)))
 	# Upper bound M of Ogata's modified thinning algorithm
-	segments(x0=c(0, hawkes$t[-hawkes$m]), x1=c(hawkes$t[-hawkes$m], hawkes$T),
-		y0=hawkes$M[-1-hawkes$m],
+	segments(x0=c(0, x$t[-x$m]), x1=c(x$t[-x$m], x$T),
+		y0=x$M[-1-x$m],
 		lwd=4, col="blue")
 	# All points considered and the corresponding value for U
-	points(x=hawkes$t[-hawkes$m],
-		y=hawkes$U[-hawkes$m],
-		pch=ifelse(hawkes$U[-hawkes$m] > sapply(hawkes$t[-hawkes$m], function(t) {intensity_ogata(hawkes, t)}), 3, 1),
-		col=ifelse(hawkes$U[-hawkes$m] > sapply(hawkes$t[-hawkes$m], function(t) {intensity_ogata(hawkes, t)}), "firebrick1", "green4"))
+	points(x=x$t[-x$m],
+		y=x$U[-x$m],
+		pch=ifelse(x$U[-x$m] > sapply(x$t[-x$m], function(t) {intensity_ogata(x, t)}), 3, 1),
+		col=ifelse(x$U[-x$m] > sapply(x$t[-x$m], function(t) {intensity_ogata(x, t)}), "firebrick1", "green4"))
 	# The resulting points of the Hawkes process
-	points(x=hawkes$p, y=rep(0, hawkes$n), col="green4", pch=15)
+	points(x=x$p, y=rep(0, x$n), col="green4", pch=15)
 	# Nice lines showing which point considered resulted in which point of the Hawkes process
-	segments(x0=hawkes$p, y0=rep(0, hawkes$n),
-		y1=(hawkes$U[-hawkes$m])[which(hawkes$U[-hawkes$m] <= sapply(hawkes$t[-hawkes$m], function(t) {intensity(hawkes, t)}))],
+	segments(x0=x$p, y0=rep(0, x$n),
+		y1=(x$U[-x$m])[which(x$U[-x$m] <= sapply(x$t[-x$m], function(t) {intensity_ogata(x, t)}))],
 		col="green4", lty=2)
 	# Legends
 	legend("topleft", legend=c(expression(italic(lambda(t))), expression(italic(M)), expression(Accepted), expression(Rejected)),

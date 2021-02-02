@@ -62,8 +62,9 @@ inhpois <- function(T, fun, M=NULL) {
 #'
 #' Plots a simulated inhomogeneous Poisson process, highlighting the steps used in Ogata's thinning algorithm.
 #'
-#' @param inhpois A simulated inhomogeneous Poisson process.
+#' @param x A simulated inhomogeneous Poisson process.
 #' @param precision (default = 1e3) Number of points to plot.
+#' @param ... Only there to fit the declaration of S3 method `plot`.
 #'
 #' @return None
 #'
@@ -73,24 +74,24 @@ inhpois <- function(T, fun, M=NULL) {
 #' # Simulate an inhomogeneous Poisson process with function intensity 1 + sin(x)
 #' x <- inhpois(T=10, fun=function(y) {1 + sin(y)}, M=2)
 #' plot(x)
-plot.inhpois <- function(inhpois, precision=1e3) {
+plot.inhpois <- function(x, precision=1e3, ...) {
     # Conditional intensity
-    matplot(z <- seq(0, inhpois$T, length.out=precision), sapply(z, inhpois$fun),
-            type="l", ylim=c(0, inhpois$M),
+    matplot(z <- seq(0, x$T, length.out=precision), sapply(z, x$fun),
+            type="l", ylim=c(0, x$M),
             xlab=expression(italic(t)), ylab=expression(italic(U)))
     # Upper bound M of Ogata's modified thinning algorithm
-    segments(x0=0, x1=inhpois$T,
-             y0=inhpois$M,
+    segments(x0=0, x1=x$T,
+             y0=x$M,
              lwd=4, col="blue")
     # All points considered and the corresponding value for U
-    points(x=inhpois$x, y=inhpois$y,
-           pch=ifelse(inhpois$accepted, 1, 3),
-           col=ifelse(inhpois$accepted, "green4", "firebrick1"))
+    points(x=x$x, y=x$y,
+           pch=ifelse(x$accepted, 1, 3),
+           col=ifelse(x$accepted, "green4", "firebrick1"))
     # The resulting points of the Hawkes process
-    points(x=inhpois$p, y=rep(0, inhpois$n), col="green4", pch=15)
+    points(x=x$p, y=rep(0, x$n), col="green4", pch=15)
     # Nice lines showing which point considered resulted in which point of the Hawkes process
-    segments(x0=inhpois$x[inhpois$accepted], y0=rep(0, inhpois$n),
-             y1=inhpois$y[inhpois$accepted],
+    segments(x0=x$x[x$accepted], y0=rep(0, x$n),
+             y1=x$y[x$accepted],
              col="green4", lty=2)
     # Legends
     legend("topleft", legend=c(expression(italic(lambda(t))), expression(italic(M)), expression(Accepted), expression(Rejected)),
@@ -118,10 +119,13 @@ plot.inhpois <- function(inhpois, precision=1e3) {
 #' @export
 #'
 #' @examples
-#' # Simulate an exponential Hawkes process with baseline intensity 1, reproduction mean 0.5 and exponential fertility function with rate 2.
+#' # Simulate an exponential Hawkes process with baseline intensity 1,
+#' # reproduction mean 0.5 and exponential fertility function with rate 2.
 #' x <- hawkes(10, fun=1, repr=0.5, family="exp", rate=2)
-#' # Simulate a Hawkes process with baseline intensity function 1 + sin(x), reproduction mean 0.5 and custom [0,1]-triangular fertility function.
-#' x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5, family=function(n) {1 - sqrt(1 - runif(n))})
+#' # Simulate a Hawkes process with baseline intensity function 1 + sin(x),
+#' # reproduction mean 0.5 and custom [0,1]-triangular fertility function.
+#' x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5,
+#'             family=function(n) {1 - sqrt(1 - runif(n))})
 hawkes <- function(T, fun, repr, family, M=NULL, ...) {
 
     # Check if fertility distribution function is user specified or chosen amongst R "r___" functions
@@ -177,7 +181,7 @@ hawkes <- function(T, fun, repr, family, M=NULL, ...) {
 #'
 #' Plots the realisation of a Hawkes process and either its cluster representation (`intensity=FALSE`, only available for a simulated Hawkes process) or its intensity function (`intensity=TRUE`).
 #'
-#' @param hawkes Either: a numeric vector, sorted in ascending order; or an object of class "hawkes" output by function `hawkes`.
+#' @param x Either: a numeric vector, sorted in ascending order; or an object of class "hawkes" output by function `hawkes`.
 #' @param intensity (default = FALSE) A boolean - whether to represent the cluster representation (`FALSE`) or the intensity function (`TRUE`).
 #' @param precision (default = 1e3) Number of points to plot.
 #' @param fun (default = NULL) A numeric function - intensity (function) of the immigrant process.
@@ -191,46 +195,49 @@ hawkes <- function(T, fun, repr, family, M=NULL, ...) {
 #' @export
 #'
 #' @examples
-#' # Simulate an exponential Hawkes process with baseline intensity 1, reproduction mean 0.5 and exponential fertility function with rate 2.
+#' # Simulate an exponential Hawkes process with baseline intensity 1,
+#' # reproduction mean 0.5 and exponential fertility function with rate 2.
 #' x <- hawkes(10, fun=1, repr=0.5, family="exp", rate=2)
 #' plot(x)
-#' # Simulate a Hawkes process with baseline intensity function 1 + sin(x), reproduction mean 0.5 and custom [0,1]-triangular fertility function.
-#' x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5, family=function(n) {1 - sqrt(1 - runif(n))})
+#' # Simulate a Hawkes process with baseline intensity function 1 + sin(x),
+#' # reproduction mean 0.5 and custom [0,1]-triangular fertility function.
+#' x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5,
+#'             family=function(n) {1 - sqrt(1 - runif(n))})
 #' plot(x, intensity=TRUE, family=function(y) ifelse(y>0 & y<1, 2-2*y, 0))
-plot.hawkes <- function(hawkes, intensity = FALSE, precision = 1e3, fun = NULL, repr = NULL, family = NULL, M = NULL, ...) {
+plot.hawkes <- function(x, intensity = FALSE, precision = 1e3, fun = NULL, repr = NULL, family = NULL, M = NULL, ...) {
     if (intensity==FALSE) {
-        if (!is(hawkes, "hawkes")) stop("'intensity==FALSE' is only compatible with Hawkes processes simulated from function 'hawkes'.")
+        if (!is(x, "hawkes")) stop("'intensity==FALSE' is only compatible with Hawkes processes simulated from function 'hawkes'.")
         # Draw a convenient empty plot
-        plot(x=NULL, xlim=c(0, hawkes$T), ylim=c(-1, length(hawkes$gen)-.5), yaxt="n",
+        plot(x=NULL, xlim=c(0, x$T), ylim=c(-1, length(x$gen)-.5), yaxt="n",
              ylab="Generations", xlab="Time")
-        axis(2, at=1:length(hawkes$gen)-1)
+        axis(2, at=1:length(x$gen)-1)
         # Add generation 0 (i.e. immigrants)
-        points(x=hawkes$gen$gen0, y=rep(0, length(hawkes$gen$gen0)), pch=15)
+        points(x=x$gen$gen0, y=rep(0, length(x$gen$gen0)), pch=15)
         # Add further generations
         eps <- 0.05
-        if (length(hawkes$gen) == 1) return()
-        for (i in 2:length(hawkes$gen)) {
-            points(x=hawkes$gen[[i]], y=rep(i-1, length(hawkes$gen[[i]])), pch=19, col=i)
-            arrows(x0=hawkes$gen[[i]], x1=hawkes$gen[[i-1]][hawkes$ancestors[[i-1]]],
+        if (length(x$gen) == 1) return()
+        for (i in 2:length(x$gen)) {
+            points(x=x$gen[[i]], y=rep(i-1, length(x$gen[[i]])), pch=19, col=i)
+            arrows(x0=x$gen[[i]], x1=x$gen[[i-1]][x$ancestors[[i-1]]],
                    y0=i-1-eps, y1=i-2+eps, code=1, length=.1)
         }
         # Add full process
-        points(x=hawkes$p, y=rep(-0.5, hawkes$n), pch=4)
-        segments(x0=0, x1=hawkes$T, y0=-.5, col="grey")
+        points(x=x$p, y=rep(-0.5, x$n), pch=4)
+        segments(x0=0, x1=x$T, y0=-.5, col="grey")
     }
     if (intensity==TRUE) {
         # Define pattern
-        if (is.numeric(hawkes)) p = hawkes
-        else if (is(hawkes, "hawkes")) p = hawkes$p
-        else stop("Argument 'hawkes' must either be of class 'hawkes' or a numeric vector.")
+        if (is.numeric(x)) p = x
+        else if (is(x, "hawkes")) p = x$p
+        else stop("Argument 'x' must either be of class 'hawkes' or a numeric vector.")
 
         # Define end point
-        if (is(hawkes, "hawkes")) T = hawkes$T
-        else T = tail(hawkes, 1)
+        if (is(x, "hawkes")) T = x$T
+        else T = tail(x, 1)
 
         # Conditional intensity
         matplot(z <- seq(0, T, by=T / precision),
-                zt <- intensity(x = hawkes, t = z, fun = fun, M = M, repr = repr, family = family, ...),
+                zt <- intensity(x = x, t = z, fun = fun, M = M, repr = repr, family = family, ...),
                 type="l", ylim=c(0, max(zt)),
                 xlab=expression(italic(t)), ylab=expression("Conditional intensity"))
         # Hawkes process
@@ -259,15 +266,18 @@ plot.hawkes <- function(hawkes, intensity = FALSE, precision = 1e3, fun = NULL, 
 #' @export
 #'
 #' @examples
-#' # Simulate an exponential Hawkes process with baseline intensity 1, reproduction mean 0.5 and exponential fertility distribution with rate 2.
+#' # Simulate an exponential Hawkes process with baseline intensity 1,
+#' # reproduction mean 0.5 and exponential fertility distribution with rate 2.
 #' x <- hawkes(10, fun=1, repr=0.5, family="exp", rate=2)
 #' intensity(x, 0:10)
 #' # Intensity with a different set of parameters
 #' intensity(x, 0:10, repr=0.8, rate=3)
 #' # Intensity with a different distribution function
 #' intensity(x, 0:10, family="chisq", df=2)
-#' # Simulate a Hawkes process with baseline intensity function 1 + sin(x), reproduction mean 0.5 and custom [0,1]-triangular fertility function.
-#' x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5, family=function(n) {1 - sqrt(1 - runif(n))})
+#' # Simulate a Hawkes process with baseline intensity function 1 + sin(x),
+#' # reproduction mean 0.5 and custom [0,1]-triangular fertility function.
+#' x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5,
+#'             family=function(n) {1 - sqrt(1 - runif(n))})
 #' intensity(x, 0:10, family=function(y) ifelse(y>0 & y<1, 2-2*y, 0))
 intensity <- function(x, t, fun = NULL, repr = NULL, family = NULL, M = NULL, ...) {
 
@@ -386,15 +396,18 @@ intensity <- function(x, t, fun = NULL, repr = NULL, family = NULL, M = NULL, ..
 #' @export
 #'
 #' @examples
-#' # Simulate an exponential Hawkes process with baseline intensity 1, reproduction mean 0.5 and exponential fertility distribution with rate 2.
+#' # Simulate an exponential Hawkes process with baseline intensity 1,
+#' # reproduction mean 0.5 and exponential fertility distribution with rate 2.
 #' x <- hawkes(10, fun=1, repr=0.5, family="exp", rate=2)
 #' compensator(x, 0:10)
 #' # Compensator with a different set of parameters
 #' compensator(x, 0:10, repr=0.8, rate=3)
 #' # Compensator with a different distribution function
 #' compensator(x, 0:10, family="chisq", df=2)
-#' # Simulate a Hawkes process with baseline intensity function 1 + sin(x), reproduction mean 0.5 and custom [0,1]-triangular fertility function.
-#' x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5, family=function(n) {1 - sqrt(1 - runif(n))})
+#' # Simulate a Hawkes process with baseline intensity function 1 + sin(x),
+#' # reproduction mean 0.5 and custom [0,1]-triangular fertility function.
+#' x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5,
+#'             family=function(n) {1 - sqrt(1 - runif(n))})
 #' compensator(x, 0:10, family=function(y) ifelse(y>0 & y<1, 2-2*y, 0))
 compensator <- function(x, t, fun = NULL, repr = NULL, family = NULL, M = NULL, ...) {
 
@@ -488,7 +501,8 @@ compensator <- function(x, t, fun = NULL, repr = NULL, family = NULL, M = NULL, 
 #' @export
 #'
 #' @examples
-#' # Simulate an exponential Hawkes process with baseline intensity 1, reproduction mean 0.5 and exponential fertility distribution with rate 2.
+#' # Simulate an exponential Hawkes process with baseline intensity 1,
+#' # reproduction mean 0.5 and exponential fertility distribution with rate 2.
 #' x <- hawkes(10, fun=1, repr=0.5, family="exp", rate=2)
 #' resid = residuals(x)
 #' resid
@@ -498,8 +512,10 @@ compensator <- function(x, t, fun = NULL, repr = NULL, family = NULL, M = NULL, 
 #' residuals(x, repr=0.8, rate=3)
 #' # Residuals with a different distribution function
 #' residuals(x, family="chisq", df=2)
-#' # Simulate a Hawkes process with baseline intensity function 1 + sin(x), reproduction mean 0.5 and custom [0,1]-triangular fertility function.
-#' x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5, family=function(n) {1 - sqrt(1 - runif(n))})
+#' # Simulate a Hawkes process with baseline intensity function 1 + sin(x),
+#' # reproduction mean 0.5 and custom [0,1]-triangular fertility function.
+#' x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5,
+#'             family=function(n) {1 - sqrt(1 - runif(n))})
 #' resid = residuals(x, family=function(y) ifelse(y>0 & y<1, 2-2*y, 0))
 #' plot(resid)
 #' abline(0, 1, col="red", lty="dashed")

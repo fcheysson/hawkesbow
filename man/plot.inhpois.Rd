@@ -4,12 +4,14 @@
 \alias{plot.inhpois}
 \title{Plot of a simulated inhomogeneous Poisson process}
 \usage{
-\method{plot}{inhpois}(inhpois, precision = 1000)
+\method{plot}{inhpois}(x, precision = 1000, ...)
 }
 \arguments{
-\item{inhpois}{A simulated inhomogeneous Poisson process.}
+\item{x}{A simulated inhomogeneous Poisson process.}
 
 \item{precision}{(default = 1e3) Number of points to plot.}
+
+\item{...}{Only there to fit the declaration of S3 method \code{plot}.}
 }
 \value{
 None
