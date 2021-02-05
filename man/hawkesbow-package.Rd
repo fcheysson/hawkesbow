@@ -8,6 +8,15 @@
 \description{
 This package estimating Hawkes processes when count data are only observed in discrete time, using a spectral approach derived from the Bartlett spectrum. Some general use functions for Hawkes processes are also included: simulation of (in)homogeneous Hawkes process, maximum likelihood estimation, residual analysis, etc.
 }
+\details{
+To be implemented later:
+\itemize{
+\item Add derivatives dH to accelerate Whittle's estimation method
+\item Variance and confidence interval for the estimated parameters
+\item Spectral density based goodness-of-fit tests
+\item Custom built-kernels
+}
+}
 \author{
 \strong{Maintainer}: Felix Cheysson \email{felix.cheysson@agroparistech.com} (\href{https://orcid.org/0000-0002-9095-2878}{ORCID})
 

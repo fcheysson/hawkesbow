@@ -20,7 +20,7 @@ The vector of counts
 Discretizes a Hawkes simulation
 }
 \examples{
-x = hawkes(100,1,1,2)
+x = hawkes(100, fun=1, repr=0.5, family="exp", rate=2)
 y = discrete(x, length=100)
 z = discrete(x, binsize=1)
 all(y == z)

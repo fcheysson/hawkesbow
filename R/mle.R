@@ -14,7 +14,7 @@
 #' The maximum likelihood estimation procedure has only been implemented for the
 #' exponential and the power law kernels.
 #' For the exponential kernel, the likelihood is computed in \eqn{O(n)} complexity
-#' (as described in details in [1] T. Ozaki and Y. Ogata, “Maximum likelihood
+#' (as described in details in T. Ozaki and Y. Ogata, “Maximum likelihood
 #' estimation of Hawkes’ self-exciting point processes,” Ann. Inst. Stat. Math.,
 #' vol. 31, no. 1, pp. 145–155, Dec. 1979).
 #' For the power law kernel, the complexity is \eqn{O(n^2)}.

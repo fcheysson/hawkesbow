@@ -4,7 +4,7 @@
 \alias{whittle}
 \title{Fitting Hawkes processes from discrete data}
 \usage{
-whittle(counts, kern, binsize = 1, init = NULL, trunc = 10L, ...)
+whittle(counts, kern, binsize = 1, init = NULL, trunc = 5L, ...)
 }
 \arguments{
 \item{counts}{A bin-count sequence}
@@ -40,7 +40,7 @@ y = discrete(x, binsize = 1)
 whittle(y, "Exponential")
 
 # Simulate and fit a Hawkes process with power law kernel
-x = hawkes(100, fun = 1, repr= .3, family = "powerlaw", shape = 3.5, scale = 1.0)
-y = discrete(x, binsize = 2)
-whittle(y, "powerlaw", 2)
+x = hawkes(500, fun = 1, repr= .3, family = "powerlaw", shape = 3.5, scale = 1.0)
+y = discrete(x, binsize = 1)
+whittle(y, "powerlaw", 1, init = c(2.0, .5, 3.0, 1.5), trunc = 2L)
 }

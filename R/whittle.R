@@ -30,7 +30,7 @@
 #' # Simulate and fit a Hawkes process with power law kernel
 #' x = hawkes(100, fun = 1, repr= .3, family = "powerlaw", shape = 3.5, scale = 1.0)
 #' y = discrete(x, binsize = 2)
-#' whittle(y, "powerlaw", 2)
+#' whittle(y, "powerlaw", 2, init = c(2.0, .5, 3.0, 1.5), trunc = 2L)
 whittle <- function(counts, kern, binsize = 1.0, init = NULL, trunc = 5L, ...) {
 
     # Check that the argument 'kern' is either a string that matches of the kernels implemented
