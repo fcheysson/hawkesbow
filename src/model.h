@@ -19,9 +19,9 @@ public:
     virtual ~Model() {};
 
     // Methods for long term mean and its derivatives
-    virtual double mean() { return 0.0; };
-    virtual arma::vec dmean() { return arma::zeros<arma::vec>(param.n_elem); };
-    virtual arma::mat ddmean() { return arma::zeros<arma::mat>(param.n_elem, param.n_elem); };
+    double mean();
+    arma::vec dmean();
+    arma::mat ddmean();
 
     // Virtual methods for time- and frequency-domain excitation functions
     virtual arma::vec h( arma::vec x ) { return arma::zeros<arma::vec>(x.n_elem); };
@@ -73,11 +73,6 @@ public:
     Exponential( double binsize ) : Model(arma::vec({1.0, 0.5, 1.0}), binsize) {};
     Exponential( arma::vec param, double binsize ) : Model(param, binsize) {};
 
-    // Methods for long term mean and its derivatives
-    double mean();
-    arma::vec dmean();
-    arma::mat ddmean();
-
     // Methods for time- and frequency-domain excitation functions
     arma::vec h( arma::vec x );
     arma::cx_vec H( arma::vec xi );
@@ -103,11 +98,6 @@ public:
     SymmetricExponential( arma::vec param ) : Model(param) {};
     SymmetricExponential( double binsize ) : Model(arma::vec({1.0, 0.5, 1.0}), binsize) {};
     SymmetricExponential( arma::vec param, double binsize ) : Model(param, binsize) {};
-
-    // Methods for long term mean and its derivatives
-    double mean();
-    // arma::vec dmean();
-    // arma::mat ddmean();
 
     // Methods for time- and frequency-domain excitation functions
     arma::vec h( arma::vec x );
@@ -135,10 +125,6 @@ public:
     PowerLaw( double binsize ) : Model(arma::vec({1.0, 0.5, 3.0, 1.0}), binsize) {};
     PowerLaw( arma::vec param, double binsize ) : Model(param, binsize) {};
 
-    // Methods for long term mean and its derivatives
-    double mean();
-    arma::vec dmean();
-
     // Methods for time- and frequency-domain excitation functions
     arma::vec h( arma::vec x );
     arma::cx_vec H( arma::vec xi );
@@ -162,9 +148,6 @@ public:
     Pareto3( double binsize ) : Model(arma::vec({1.0, 0.5, 1.0}), binsize) {};
     Pareto3( arma::vec param, double binsize ) : Model(param, binsize) {};
 
-    // Methods for long term mean
-    double mean();
-
     // Methods for time- and frequency-domain excitation functions
     arma::vec h( arma::vec x );
     arma::cx_vec H( arma::vec xi );
@@ -182,9 +165,6 @@ public:
     Pareto2( arma::vec param ) : Model(param) {};
     Pareto2( double binsize ) : Model(arma::vec({1.0, 0.5, 1.0}), binsize) {};
     Pareto2( arma::vec param, double binsize ) : Model(param, binsize) {};
-
-    // Methods for long term mean
-    double mean();
 
     // Methods for time- and frequency-domain excitation functions
     arma::vec h( arma::vec x );
@@ -204,9 +184,6 @@ public:
     Pareto1( double binsize ) : Model(arma::vec({1.0, 0.5, 1.0}), binsize) {};
     Pareto1( arma::vec param, double binsize ) : Model(param, binsize) {};
 
-    // Methods for long term mean
-    double mean();
-
     // Methods for time- and frequency-domain excitation functions
     arma::vec h( arma::vec x );
     arma::cx_vec H( arma::vec xi );
@@ -224,9 +201,6 @@ public:
     Gaussian( arma::vec param ) : Model(param) {};
     Gaussian( double binsize ) : Model(arma::vec({1.0, 0.5, 0.0, 1.0}), binsize) {};
     Gaussian( arma::vec param, double binsize ) : Model(param, binsize) {};
-
-    // Methods for long term mean
-    double mean();
 
     // Methods for time- and frequency-domain excitation functions
     arma::vec h( arma::vec x );

@@ -9,28 +9,6 @@
 // param(1): reproduction rate /in [0,1]
 // param(2): time scale parameter of the exponential fertility distribution
 
-////////////////////////////////////////////////
-// Methods for long term mean and its derivative
-
-double Exponential::mean() {
-    return param(0) / ( 1.0 - param(1) );
-}
-
-arma::vec Exponential::dmean() {
-    double denom = 1.0 / ( 1.0 - param(1) );
-    arma::vec grad = { denom, param(0) * denom * denom, 0 };
-    return grad;
-}
-
-arma::mat Exponential::ddmean() {
-    double denom = 1.0 / ( 1.0 - param(1) );
-    double denom2 = denom * denom;
-    arma::mat hess = {  {   0.0,                  denom2, 0.0},
-                        {denom2, 2*param(0)*denom2*denom, 0.0},
-                        {   0.0,                     0.0, 0.0} };
-    return hess;
-}
-
 //////////////////////////////////////////////////////////////
 // Methods for time- and frequency-domain excitation functions
 
@@ -226,10 +204,6 @@ Rcpp::List Exponential::loglikngrad( const arma::vec& events, double T ) {
 
 ////////////////////////////////////////////////
 // SymmetricExponential
-
-double SymmetricExponential::mean() {
-    return param(0) / ( 1.0 - param(1) );
-}
 
 arma::vec SymmetricExponential::h( arma::vec x ) {
     return .5 * param(1) * param(2) * arma::exp( - param(2) * abs(x) );

@@ -1,6 +1,28 @@
 #include "model.h"
 #include "utils.h"
 
+////////////////////////////////////////////////
+// Methods for long term mean and its derivative
+
+double Model::mean() {
+    return param(0) / ( 1.0 - param(1) );
+}
+
+arma::vec Model::dmean() {
+    double denom = 1.0 / ( 1.0 - param(1) );
+    arma::vec grad = { denom, param(0) * denom * denom, 0 };
+    return grad;
+}
+
+arma::mat Model::ddmean() {
+    double denom = 1.0 / ( 1.0 - param(1) );
+    double denom2 = denom * denom;
+    arma::mat hess = {  {   0.0,                  denom2, 0.0},
+                        {denom2, 2*param(0)*denom2*denom, 0.0},
+                        {   0.0,                     0.0, 0.0} };
+    return hess;
+}
+
 //////////////////////////////////////////////////////////////////
 // Methods for continuous- and discretized-time spectral densities
 

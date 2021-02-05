@@ -10,13 +10,6 @@
 // param(1): reproduction rate /in [0,1]
 // param(2): scale parameter of the Pareto distribution function
 
-////////////////////////////////////////////////
-// Methods for long term mean and its derivative
-
-double Pareto3::mean() {
-    return param(0) / ( 1.0 - param(1) );
-}
-
 //////////////////////////////////////////////////////////////
 // Methods for time- and frequency-domain excitation functions
 
@@ -83,10 +76,6 @@ arma::cx_vec Pareto3::H( arma::vec xi ) {
 ////////////////////////////////////////////////
 // Pareto2
 
-double Pareto2::mean() {
-    return param(0) / ( 1.0 - param(1) );
-}
-
 arma::vec Pareto2::h( arma::vec x ) {
     arma::vec y(x.n_elem);
 
@@ -144,10 +133,6 @@ arma::cx_vec Pareto2::H( arma::vec xi ) {
 
 ////////////////////////////////////////////////
 // Pareto1
-
-double Pareto1::mean() {
-    return param(0) / ( 1.0 - param(1) );
-}
 
 arma::vec Pareto1::h( arma::vec x ) {
     arma::vec y(x.n_elem);

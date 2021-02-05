@@ -10,19 +10,6 @@
 // param(2): shape parameter of the power law kernel
 // param(3): scale parameter of the power law kernel
 
-////////////////////////////////////////////////
-// Methods for long term mean and its derivative
-
-double PowerLaw::mean() {
-    return param(0) / ( 1.0 - param(1) );
-}
-
-arma::vec PowerLaw::dmean() {
-    double denom = 1.0 / ( 1.0 - param(1) );
-    arma::vec grad = { denom, param(0) * denom * denom, 0, 0 };
-    return grad;
-}
-
 //////////////////////////////////////////////////////////////
 // Methods for time- and frequency-domain excitation functions
 

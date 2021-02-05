@@ -5,6 +5,9 @@ RCPP_MODULE(HawkesModule) {
 
     class_<Model>("Model")
         .default_constructor() // This exposes the default constructor
+        .method("mean", &Model::mean)
+        .method("dmean", &Model::dmean)
+        .method("ddmean", &Model::ddmean)
         .method("G", &Model::G)
         .method("dG", &Model::dG)
         .method("ddG", &Model::ddG)
@@ -22,9 +25,6 @@ RCPP_MODULE(HawkesModule) {
     class_<Exponential>("Exponential")
         .derives<Model>("Model")
         .default_constructor() // This exposes the default constructor
-        .method("mean", &Exponential::mean)
-        .method("dmean", &Exponential::dmean)
-        .method("ddmean", &Exponential::ddmean)
         .method("h", &Exponential::h)
         .method("H", &Exponential::H)
         .method("dH", &Exponential::dH)
@@ -38,7 +38,6 @@ RCPP_MODULE(HawkesModule) {
     class_<SymmetricExponential>("SymmetricExponential")
         .derives<Model>("Model")
         .default_constructor() // This exposes the default constructor
-        .method("mean", &SymmetricExponential::mean)
         .method("h", &SymmetricExponential::h)
         .method("H", &SymmetricExponential::H)
     ;
@@ -46,8 +45,6 @@ RCPP_MODULE(HawkesModule) {
     class_<PowerLaw>("PowerLaw")
         .derives<Model>("Model")
         .default_constructor() // This exposes the default constructor
-        .method("mean", &PowerLaw::mean)
-        .method("dmean", &PowerLaw::dmean)
         .method("h", &PowerLaw::h)
         .method("H", &PowerLaw::H)
         .method("loglik", &PowerLaw::loglik)
@@ -58,7 +55,6 @@ RCPP_MODULE(HawkesModule) {
     class_<Pareto3>("Pareto3")
         .derives<Model>("Model")
         .default_constructor() // This exposes the default constructor
-        .method("mean", &Pareto3::mean)
         .method("h", &Pareto3::h)
         .method("H", &Pareto3::H)
     ;
@@ -66,7 +62,6 @@ RCPP_MODULE(HawkesModule) {
     class_<Pareto2>("Pareto2")
         .derives<Model>("Model")
         .default_constructor() // This exposes the default constructor
-        .method("mean", &Pareto2::mean)
         .method("h", &Pareto2::h)
         .method("H", &Pareto2::H)
     ;
@@ -74,7 +69,6 @@ RCPP_MODULE(HawkesModule) {
     class_<Pareto1>("Pareto1")
         .derives<Model>("Model")
         .default_constructor() // This exposes the default constructor
-        .method("mean", &Pareto1::mean)
         .method("h", &Pareto1::h)
         .method("H", &Pareto1::H)
     ;
@@ -82,7 +76,6 @@ RCPP_MODULE(HawkesModule) {
     class_<Gaussian>("Gaussian")
         .derives<Model>("Model")
         .default_constructor() // This exposes the default constructor
-        .method("mean", &Gaussian::mean)
         .method("h", &Gaussian::h)
         .method("H", &Gaussian::H)
     ;

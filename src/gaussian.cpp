@@ -10,13 +10,6 @@
 // param(2): mean parameter of the Gaussian distribution function
 // param(3): variance parameter of the Gaussian distribution function
 
-////////////////////////////////////////////////
-// Methods for long term mean and its derivative
-
-double Gaussian::mean() {
-    return param(0) / ( 1.0 - param(1) );
-}
-
 //////////////////////////////////////////////////////////////
 // Methods for time- and frequency-domain excitation functions
 
