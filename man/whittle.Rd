@@ -4,28 +4,43 @@
 \alias{whittle}
 \title{Fitting Hawkes processes from discrete data}
 \usage{
-whittle(model, counts, binsize, trunc = 5L, ...)
+whittle(counts, kern, binsize = 1, init = NULL, trunc = 10L, ...)
 }
 \arguments{
-\item{model}{An object of class Model}
-
 \item{counts}{A bin-count sequence}
 
-\item{binsize}{The bin size of the bin-count sequence}
+\item{kern}{Either a string (partially) matching one of the kernels implemented (see Details), or an object of class Model}
+
+\item{binsize}{(Optional) The bin size of the bin-count sequence; ignored if \code{kern} is of class Model}
+
+\item{init}{(Optional) Initial values of the optimisation algorithm}
 
 \item{trunc}{(Optional) The number of foldings taken into account due to aliasing}
 
 \item{...}{Additional arguments passed to \code{optim}}
 }
 \value{
-Returns the \code{optim} output
+eturns a list containing the solution of the optimisation procedure, the object Model
+with its parameters updated to the solution, and the output produced by \code{optim}.
 }
 \description{
 This function fits a Hawkes process to discrete data by minimizing the Whittle contrast.
 }
+\details{
+If specified as string, the argument \code{kern} must match (partially) one of the following
+(upper cases not taken into account): Exponential, SymmetricExponential,
+Gaussian, PowerLaw, Pareto3, Pareto2, Pareto1.
+The periodogram used in the optimisation procedure is computed in complexity
+\eqn{O(n \log n)}, using function \code{fft}.
+}
 \examples{
+# Simulate and fit a Hawkes process with exponential kernel
 x = hawkes(100, fun = 1, repr = .5, family = "exp", rate = 1)
 y = discrete(x, binsize = 1)
-model = new(Exponential)
-whittle(model, y, 1)
+whittle(y, "Exponential")
+
+# Simulate and fit a Hawkes process with power law kernel
+x = hawkes(100, fun = 1, repr= .3, family = "powerlaw", shape = 3.5, scale = 1.0)
+y = discrete(x, binsize = 2)
+whittle(y, "powerlaw", 2)
 }

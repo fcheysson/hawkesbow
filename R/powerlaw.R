@@ -11,6 +11,11 @@
 #' @param shape parameter of shape.
 #' @param scale parameter of scale.
 #'
+#' @details
+#' The density function of the power law distribution is
+#' \deqn{f(t) = \theta a^\theta (a+t)^{-\theta-1}}
+#' where \eqn{\theta} is the shape parameter, and \eqn{a} the scale parameter.
+#'
 #' @return
 #' `dpowerlaw` gives the density, `ppowerlaw` gives the distribution function,
 #' `qpowerlaw` gives the quantile function, and `rpowerlaw` generates random

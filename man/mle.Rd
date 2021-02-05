@@ -4,28 +4,39 @@
 \alias{mle}
 \title{Fitting Hawkes processes from continuous data}
 \usage{
-mle(model, events, end, opts = NULL, ...)
+mle(events, kern, end, init = NULL, opts = NULL, ...)
 }
 \arguments{
-\item{model}{An object of class Model}
-
 \item{events}{The locations of events (sorted in ascending order)}
 
+\item{kern}{Either a string (partially) matching one of the kernels implemented (see Details), or an object of class Model}
+
 \item{end}{The time until which the process is observed.}
+
+\item{init}{(Optional) Initial values of the optimisation algorithm}
 
 \item{opts}{(Optional) To be passed to \code{nloptr}}
 
 \item{...}{Additional arguments passed to \code{nloptr}}
 }
 \value{
-Returns the \code{optim} output
+Returns a list containing the solution of the optimisation procedure, the object Model
+with its parameters updated to the solution, and the output produced by \code{nloptr}.
 }
 \description{
 This function fits a Hawkes process to continuous data by minimizing the likelihood
 on the interval \eqn{[0,T]}.
 }
+\details{
+The maximum likelihood estimation procedure has only been implemented for the
+exponential and the power law kernels.
+For the exponential kernel, the likelihood is computed in \eqn{O(n)} complexity
+(as described in details in \link{1} T. Ozaki and Y. Ogata, “Maximum likelihood
+estimation of Hawkes’ self-exciting point processes,” Ann. Inst. Stat. Math.,
+vol. 31, no. 1, pp. 145–155, Dec. 1979).
+For the power law kernel, the complexity is \eqn{O(n^2)}.
+}
 \examples{
 x = hawkes(100, fun = 1, repr = .5, family = "exp", rate = 1)
-model = new(Exponential)
-mle(model, x$p, x$T)
+mle(x$p, "Exponential", x$T)
 }

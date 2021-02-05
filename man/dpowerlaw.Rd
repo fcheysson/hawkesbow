@@ -36,3 +36,8 @@ Density, distribution function, quantile function and random generation for
 the power law distribution with shape equal to \code{shape} and scale equal to
 \code{scale}.
 }
+\details{
+The density function of the power law distribution is
+\deqn{f(t) = \theta a^\theta (a+t)^{-\theta-1}}
+where \eqn{\theta} is the shape parameter, and \eqn{a} the scale parameter.
+}
