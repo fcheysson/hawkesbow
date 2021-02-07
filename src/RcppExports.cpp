@@ -18,6 +18,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// Etheta_imaginary
+arma::cx_vec Etheta_imaginary(double theta, arma::vec x);
+RcppExport SEXP _hawkesbow_Etheta_imaginary(SEXP thetaSEXP, SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(Etheta_imaginary(theta, x));
+    return rcpp_result_gen;
+END_RCPP
+}
 // E1_imaginary
 arma::cx_double E1_imaginary(double x);
 RcppExport SEXP _hawkesbow_E1_imaginary(SEXP xSEXP) {
@@ -34,6 +46,7 @@ RcppExport SEXP _rcpp_module_boot_HawkesModule();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_hawkesbow_inc_gamma_imag", (DL_FUNC) &_hawkesbow_inc_gamma_imag, 2},
+    {"_hawkesbow_Etheta_imaginary", (DL_FUNC) &_hawkesbow_Etheta_imaginary, 2},
     {"_hawkesbow_E1_imaginary", (DL_FUNC) &_hawkesbow_E1_imaginary, 1},
     {"_rcpp_module_boot_HawkesModule", (DL_FUNC) &_rcpp_module_boot_HawkesModule, 0},
     {NULL, NULL, 0}

@@ -128,10 +128,108 @@ arma::cx_double contour_quadrant(double nu, double r) {
 }
 
 arma::cx_double inc_gamma_imag(double nu, double r) {
+
+    if (r < 0)
+        Rcpp::stop("ERROR in inc_gamma_imag: 'r' cannot be negative.");
+    if (nu <= 0)
+        Rcpp::stop("ERROR in inc_gamma_imag: 'nu' must be between 0 and 1.");
+    if (nu >= 1)
+        Rcpp::stop("ERROR in inc_gamma_imag: 'nu' must be between 0 and 1.");
+
     arma::cx_double term1 = exp(-.5*i*arma::datum::pi*nu) * boost::math::tgamma(nu, r);
     arma::cx_double term2 = exp(-.5*i*arma::datum::pi*(nu-1)) * contour_quadrant(nu, r);
     return  term1 - term2;
+
 }
+
+arma::cx_vec Etheta_imaginary( double theta, arma::vec x ) {
+
+    arma::cx_vec y(x.n_elem);
+
+    // Iterators
+    arma::vec::iterator it_x = x.begin();
+    arma::vec::iterator it_x_end = x.end();
+    arma::cx_vec::iterator it_y = y.begin();
+
+    if (std::fmod(theta, 1.0) == 0) { // Theta is integer
+
+        int itheta = std::floor(theta);
+
+        if (itheta == 1) {
+
+            // Loop on x
+            for (; it_x != it_x_end; ++it_x, ++it_y) {
+                *it_y = - i * *it_x * exp(i * *it_x) * E1_imaginary(*it_x);
+            }
+
+        } else {
+
+            // Term 1 with sum from k = 1 up to theta - 1
+            arma::mat xiprod = arma::cumprod(arma::kron(arma::ones<arma::rowvec>(itheta - 1), x), 1);
+            arma::vec summands_den = arma::cumprod(theta - arma::regspace(1, itheta - 1));
+            arma::cx_vec summands_num = arma::cumprod(-i * arma::ones<arma::cx_vec>(itheta - 1));
+            arma::cx_vec term1 = xiprod * (summands_num / summands_den);
+
+            // Get last elements that appear in the sum
+            arma::vec last_xiprod = xiprod.col(itheta - 2);
+            arma::cx_double last_num = summands_num.back();
+            double last_den = summands_den.back();
+
+            // Term 2 with exponential integral
+            arma::cx_vec term2(x.n_elem);
+            arma::cx_vec::iterator it_term2 = term2.begin();
+            arma::vec::iterator it_last = last_xiprod.begin();
+
+            // Loop on xi
+            for (; it_x != it_x_end; ++it_x, ++it_term2, ++it_last) {
+                *it_term2 = - i * *it_x * last_num * *it_last * exp(i * *it_x) * E1_imaginary(*it_x) / last_den;
+            }
+
+            y = term1 + term2;
+
+        }
+
+    } else { // Theta is double, non integer
+
+        int itheta = std::floor(theta);
+
+        if (itheta == 0) {
+
+            // Loop on xi
+            for (; it_x != it_x_end; ++it_x, ++it_y) {
+                *it_y = - i * *it_x * exp(i * *it_x) * exp((theta-1.0)*log(*it_x)) * inc_gamma_imag(1.0-theta, *it_x);
+            }
+
+        } else {
+
+            // Term 1 with sum from k = 1 up to itheta
+            arma::mat xiprod = arma::cumprod(arma::kron(arma::ones<arma::rowvec>(itheta), x), 1);
+            arma::vec summands_den = arma::cumprod(theta - arma::regspace(1, itheta));
+            arma::cx_vec summands_num = arma::cumprod(-i * arma::ones<arma::cx_vec>(itheta));
+            arma::cx_vec term1 = xiprod * (summands_num / summands_den);
+
+            // Get last elements that appear in the denominator
+            double last_den = summands_den.back();
+
+            // Term 2 with exponential integral
+            arma::cx_vec term2(x.n_elem);
+            arma::cx_vec::iterator it_term2 = term2.begin();
+
+            // Loop on xi
+            for (; it_x != it_x_end; ++it_x, ++it_term2) {
+                *it_term2 = pow_m1(itheta + 1) * pow_i(itheta + 1) * exp(i * *it_x) * exp(theta*log(*it_x)) * inc_gamma_imag(1-theta+itheta, *it_x) / last_den;
+            }
+
+            y = term1 + term2;
+
+        }
+
+    }
+
+    return y;
+
+}
+
 
 // Powers of 10
 double quick_pow10(int n)

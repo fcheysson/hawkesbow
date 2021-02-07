@@ -19,110 +19,40 @@ arma::vec PowerLaw::h( arma::vec x ) {
 }
 
 arma::cx_vec PowerLaw::H( arma::vec xi ) {
+
     const double mu = param(1);
     const double theta = param(2);
     const double a = param(3);
-    double xia;
+    arma::vec xia = a * arma::abs(xi);
 
-    arma::cx_vec y(xi.n_elem);
+    arma::cx_vec y = mu * (1 + Etheta_imaginary(theta, xia));
 
     // Iterators
     arma::vec::iterator it_xi = xi.begin();
     arma::vec::iterator it_xi_end = xi.end();
     arma::cx_vec::iterator it_y = y.begin();
 
-    // need a if theta > 1 somewhere
-
-    if (std::fmod(theta, 1.0) == 0) { // Theta is integer
-
-        int itheta = std::floor(theta);
-
-        if (itheta == 1) {
-
-            // Loop on xi
-            for (; it_xi != it_xi_end; ++it_xi, ++it_y) {
-                xia = abs(*it_xi) * a;
-                *it_y = mu * (1.0 - i * xia * exp(i * xia) * E1_imaginary(xia));
-            }
-
-        } else {
-
-            // Term 1 with sum from k = 1 up to theta - 1
-            arma::mat xiprod = arma::cumprod(arma::kron(arma::ones<arma::rowvec>(itheta - 1), arma::abs(xi)), 1);
-            arma::vec summands_den = arma::cumprod(theta - arma::regspace(1, itheta - 1));
-            arma::cx_vec summands_num = arma::cumprod(-i * a * arma::ones<arma::cx_vec>(itheta - 1));
-            arma::cx_vec term1 = xiprod * (summands_num / summands_den);
-
-            // Get last elements that appear in the sum
-            arma::vec last_xiprod = xiprod.col(itheta - 2);
-            arma::cx_double last_num = summands_num.back();
-            double last_den = summands_den.back();
-
-            // Term 2 with exponential integral
-            arma::cx_vec term2(xi.n_elem);
-            arma::cx_vec::iterator it_term2 = term2.begin();
-            arma::vec::iterator it_last = last_xiprod.begin();
-
-            // Loop on xi
-            for (; it_xi != it_xi_end; ++it_xi, ++it_term2, ++it_last) {
-                xia = abs(*it_xi) * a;
-                *it_term2 = - i * xia * last_num * *it_last * exp(i * xia) * E1_imaginary(xia) / last_den;
-            }
-
-            y = mu * (1.0 + term1 + term2);
-
-        }
-
-    } else { // Theta is double, non integer
-
-        int itheta = std::floor(theta);
-
-        if (itheta == 0) {
-
-            // Loop on xi
-            for (; it_xi != it_xi_end; ++it_xi, ++it_y) {
-                xia = abs(*it_xi) * a;
-                *it_y = mu * (1.0 - i * xia * exp(i * xia) * exp((theta-1.0)*log(xia)) * inc_gamma_imag(1.0-theta, xia));
-            }
-
-        } else {
-
-            // Term 1 with sum from k = 1 up to itheta
-            arma::mat xiprod = arma::cumprod(arma::kron(arma::ones<arma::rowvec>(itheta), arma::abs(xi)), 1);
-            arma::vec summands_den = arma::cumprod(theta - arma::regspace(1, itheta));
-            arma::cx_vec summands_num = arma::cumprod(-i * a * arma::ones<arma::cx_vec>(itheta));
-            arma::cx_vec term1 = xiprod * (summands_num / summands_den);
-
-            // Get last elements that appear in the denominator
-            double last_den = summands_den.back();
-
-            // Term 2 with exponential integral
-            arma::cx_vec term2(xi.n_elem);
-            arma::cx_vec::iterator it_term2 = term2.begin();
-
-            // Loop on xi
-            for (; it_xi != it_xi_end; ++it_xi, ++it_term2) {
-                xia = abs(*it_xi) * a;
-                *it_term2 = pow_m1(itheta + 1) * pow_i(itheta + 1) * exp(i * xia) * exp(theta*log(xia)) * inc_gamma_imag(1-theta+itheta, xia) / last_den;
-            }
-
-            y = mu * (1.0 + term1 + term2);
-
-        }
-
-    }
-
     // For xi < 0, take the conjugate
-    it_xi = xi.begin(); // Points back to the beginning of xi and y
-    it_y = y.begin();
     for (; it_xi != it_xi_end; ++it_xi, ++it_y) {
         if (*it_xi == 0.0)
             *it_y = mu;
         else if (*it_xi < 0.0)
             *it_y = std::conj(*it_y);
     }
+
     return y;
 
+}
+
+arma::cx_mat PowerLaw::dH( arma::vec xi ) {
+
+    const double mu = param(1);
+    const double theta = param(2);
+    const double a = param(3);
+
+    arma::cx_mat grad = arma::zeros<arma::cx_mat>( xi.n_elem, param.n_elem );
+
+    //// TO FINISH
 }
 
 ////////////////////////////////////////////

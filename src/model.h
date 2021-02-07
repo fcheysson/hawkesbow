@@ -128,6 +128,7 @@ public:
     // Methods for time- and frequency-domain excitation functions
     arma::vec h( arma::vec x );
     arma::cx_vec H( arma::vec xi );
+    arma::cx_mat dH( arma::vec xi );
 
     // Likelihood methods
     double loglik( const arma::vec& events, double T );

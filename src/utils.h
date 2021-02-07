@@ -49,6 +49,26 @@ arma::cx_double contour_quadrant(double nu, double r);
 // [[Rcpp::export]]
 arma::cx_double inc_gamma_imag(double nu, double r);
 
+//' Incomplete gamma function of imaginary argument with arbitrary power
+//'
+//' Calculates the value of
+//' \deqn{-ix e^{ix} E_\theta(ix) = -ix e{ix} \int_1^\infty t^{-\theta} e^{-ixt} \mathrm d t}
+//' for \eqn{\theta > 0}.
+//' This is achieved using recursive integrations by parts until \eqn{0 < \theta \le 1},
+//' then using either the exponential integral `E1_imaginary` if \eqn{\theta = 1},
+//' or the incomplete gamma function `inc_gamma_imag` if \eqn{0 < \theta < 1}.
+//'
+//' @param theta A strictly positive number
+//' @param x A vector of non-negative numbers
+//'
+//' @return The incomplete gamma function of imaginary argument with arbitrary power (see Details)
+//' @export
+//'
+//' @examples
+//' Etheta_imaginary(3.14, 1.0)
+// [[Rcpp::export]]
+arma::cx_vec Etheta_imaginary( double theta, arma::vec x );
+
 // Powers of 10
 double quick_pow10(int n);
 double quick_negpow10(int n);
