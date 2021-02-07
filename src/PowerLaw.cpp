@@ -49,10 +49,20 @@ arma::cx_mat PowerLaw::dH( arma::vec xi ) {
     const double mu = param(1);
     const double theta = param(2);
     const double a = param(3);
+    arma::vec xia = a * arma::abs(xi);
+
+    // We have H = mu * (1 + almostH)
+    arma::cx_vec almostH = Etheta_imaginary(theta, xia);
 
     arma::cx_mat grad = arma::zeros<arma::cx_mat>( xi.n_elem, param.n_elem );
+    grad.col(1) = 1.0 + almostH;
+    grad.col(2) = i * xia % (1.0 + almostH);
+    grad.col(3) = i * xi + (i * xi + theta / a) % almostH;
 
-    //// TO FINISH
+    //// TO FINISH: conjugate values for xi < 0
+
+    return grad;
+
 }
 
 ////////////////////////////////////////////
