@@ -47,6 +47,7 @@ RCPP_MODULE(HawkesModule) {
         .default_constructor() // This exposes the default constructor
         .method("h", &PowerLaw::h)
         .method("H", &PowerLaw::H)
+        // .method("dH", &PowerLaw::dH)
         .method("loglik", &PowerLaw::loglik)
         .method("dloglik", &PowerLaw::dloglik)
         .method("loglikngrad", &PowerLaw::loglikngrad)

@@ -4,7 +4,7 @@
 \alias{whittle}
 \title{Fitting Hawkes processes from discrete data}
 \usage{
-whittle(counts, kern, binsize = 1, init = NULL, trunc = 5L, ...)
+whittle(counts, kern, binsize = 1, trunc = 5L, init = NULL, ...)
 }
 \arguments{
 \item{counts}{A bin-count sequence}
@@ -13,9 +13,9 @@ whittle(counts, kern, binsize = 1, init = NULL, trunc = 5L, ...)
 
 \item{binsize}{(Optional) The bin size of the bin-count sequence; ignored if \code{kern} is of class Model}
 
-\item{init}{(Optional) Initial values of the optimisation algorithm}
-
 \item{trunc}{(Optional) The number of foldings taken into account due to aliasing}
+
+\item{init}{(Optional) Initial values of the optimisation algorithm}
 
 \item{...}{Additional arguments passed to \code{optim}}
 }
@@ -41,6 +41,6 @@ whittle(y, "Exponential")
 
 # Simulate and fit a Hawkes process with power law kernel
 x = hawkes(100, fun = 1, repr= .3, family = "powerlaw", shape = 3.5, scale = 1.0)
-y = discrete(x, binsize = 2)
-whittle(y, "powerlaw", 2, init = c(2.0, .5, 3.0, 1.5), trunc = 2L)
+y = discrete(x, binsize = 1)
+whittle(y, "powerlaw", 1.0, trunc = 2L, init = c(2.0, .5, 3.0, 1.5))
 }

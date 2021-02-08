@@ -23,8 +23,61 @@ arma::cx_vec PowerLaw::H( arma::vec xi ) {
     const double mu = param(1);
     const double theta = param(2);
     const double a = param(3);
+    arma::vec xia = a * arma::abs(xi);
 
-    return mu * (1 + Etheta_imaginary(theta, a * xi));
+    arma::cx_vec y = mu * (1 + Etheta_imaginary(theta, xia));
+
+    // Iterators
+    arma::vec::iterator it_xi = xi.begin();
+    arma::vec::iterator it_xi_end = xi.end();
+    arma::cx_vec::iterator it_y = y.begin();
+
+    // For xi < 0, take the conjugate
+    for (; it_xi != it_xi_end; ++it_xi, ++it_y) {
+        if (*it_xi == 0.0)
+            *it_y = mu;
+        else if (*it_xi < 0.0)
+            *it_y = std::conj(*it_y);
+    }
+
+    return y;
+
+}
+
+arma::cx_mat PowerLaw::dH( arma::vec xi ) {
+
+    // not functional
+
+    const double mu = param(1);
+    const double theta = param(2);
+    const double a = param(3);
+    arma::vec xia = a * arma::abs(xi);
+
+    // We have H = mu * (1 + almostH)
+    arma::cx_vec almostH = Etheta_imaginary(theta, xia);
+
+    arma::cx_mat grad = arma::zeros<arma::cx_mat>( xi.n_elem, param.n_elem );
+    grad.col(1) = 1.0 + almostH;
+    grad.col(2) = mu * (i * xia % (1.0 + almostH)); // This is so wrong - finite-difference approximation instead?
+    grad.col(3) = mu * (i * xi + (i * xi + theta / a) % almostH);
+
+    //// TO FINISH: conjugate values for xi < 0
+    // Iterators
+    arma::vec::iterator it_xi = xi.begin();
+    arma::vec::iterator it_xi_end = xi.end();
+    arma::uword k = 0;
+
+    arma::cx_rowvec deriv_at_0 = { 0.0, 1.0, 0.0, 0.0 };
+
+    // For xi < 0, take the conjugate
+    for (; it_xi != it_xi_end; ++it_xi, ++k) {
+        if (*it_xi == 0.0)
+            grad.row(k) = deriv_at_0;
+        else if (*it_xi < 0.0)
+            grad.row(k) = arma::conj(grad.row(k));
+    }
+
+    return grad;
 
 }
 
