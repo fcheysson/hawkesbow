@@ -50,8 +50,12 @@ mle <- function(events, kern, end, init = NULL, opts = NULL, ...) {
 
     if (is.null(opts))
         opts <- list("algorithm" = "NLOPT_LD_LBFGS")
-    else if (is.null(opts[["algorithm"]]))
-        opts <- c(opts, "algorithm" = "NLOPT_LD_LBFGS")
+    else {
+        if (is.null(opts[["algorithm"]]))
+            opts <- c(opts, "algorithm" = "NLOPT_LD_LBFGS")
+        if (is.null(opts[["xtol_rel"]]))
+            opts <- c(opts, "xtol_rel" = 1e-04)
+    }
 
     if (is.null(init))
         x0 = c(runif(1, 0, 2),
