@@ -4,7 +4,7 @@
 #'
 #' @param counts A bin-count sequence
 #' @param kern Either a string (partially) matching one of the kernels implemented (see Details), or an object of class Model
-#' @param binsize (Optional) The bin size of the bin-count sequence; ignored if `kern` is of class Model
+#' @param binsize (Optional) The bin size of the bin-count sequence; if omitted, defaults to 1 if `kern` is a string, or uses the member `binsize` of `kern` if it is of class Model
 #' @param trunc (Optional) The number of foldings taken into account due to aliasing
 #' @param init (Optional) Initial values of the optimisation algorithm
 #' @param ... Additional arguments passed to `optim`
@@ -31,7 +31,7 @@
 #' x = hawkes(100, fun = 1, repr= .3, family = "powerlaw", shape = 3.5, scale = 1.0)
 #' y = discrete(x, binsize = 1)
 #' whittle(y, "powerlaw", 1.0, trunc = 2L, init = c(2.0, .5, 3.0, 1.5))
-whittle <- function(counts, kern, binsize = 1.0, trunc = 5L, init = NULL, ...) {
+whittle <- function(counts, kern, binsize = NULL, trunc = 5L, init = NULL, ...) {
 
     # Check that the argument 'kern' is either a string that matches of the kernels implemented
     if (is.character(kern)) {
@@ -39,20 +39,21 @@ whittle <- function(counts, kern, binsize = 1.0, trunc = 5L, init = NULL, ...) {
                          c("exponential", "symmetricexponential", "gaussian",
                            "powerlaw", "pareto3", "pareto2", "pareto1"))
         switch(kern,
-               exponential = {model = new(Exponential)},
-               symmetricexponential = {model = new(SymmetricExponential)},
-               gaussian = {model = new(Gaussian)},
-               powerlaw = {model = new(PowerLaw)},
-               pareto3 = {model = new(Pareto3)},
-               pareto2 = {model = new(Pareto2)},
-               pareto1 = {model = new(Pareto1)})
-        model$binsize = binsize
-    } else if ( # or that it refers to a valid hawkes model
+               exponential = {kern = new(Exponential)},
+               symmetricexponential = {kern = new(SymmetricExponential)},
+               gaussian = {kern = new(Gaussian)},
+               powerlaw = {kern = new(PowerLaw)},
+               pareto3 = {kern = new(Pareto3)},
+               pareto2 = {kern = new(Pareto2)},
+               pareto1 = {kern = new(Pareto1)})
+    } else if ( # or that it refers to a valid hawkes kernel
         !any(sapply(
             paste0("Rcpp_", c("Exponential", "SymmetricExponential", "Gaussian", "PowerLaw", "Pareto3", "Pareto2", "Pareto1")),
-            function(class_) {is(model, class_)}
+            function(class_) {is(kern, class_)}
         ))
     ) stop("'kern' must be a valid kernel.")
+
+    if (!is.null(binsize)) kern$binsize = binsize
 
     # Periodogram
     n <- length(counts)
@@ -62,32 +63,78 @@ whittle <- function(counts, kern, binsize = 1.0, trunc = 5L, init = NULL, ...) {
 
     # Whittle pseudo likelihood function (for optim)
     nlopt_fn <- function(param) {
-        model$param <- param
-        return( model$whittle(I, trunc) )
+        kern$param <- param
+        return( kern$whittle(I, trunc) )
     }
 
-    if (is.null(init))
-        x0 = c(runif(1, 0, 10),
-               runif(1, 0, 1),
-               runif(length(model$param)-2, 0, 10))
-    else x0 = init
+    # Sensible initialisation
+    if (is.null(init)) {
+        ymean = mean(y)
+        # For PowerLaw
+        if (is(kern, "Rcpp_PowerLaw")) {
+            wmin = Inf
+            mu = .25
+            shape = 1
+            scale = 1
+            for (mu_ in c(.25, .5, .75)) {
+                for (shape_ in 1:5) {
+                    for (scale_ in 1:5) {
+                        kern$param[1] = ymean * (1 - mu_)
+                        kern$param[2] = mu_
+                        kern$param[3] = shape_
+                        kern$param[4] = scale_
+                        whit = kern$whittle(I, trunc = trunc)
+                        if (whit < wmin) {
+                            mu = mu_
+                            shape = shape_
+                            scale = scale_
+                            wmin = whit
+                        }
+                    }
+                }
+            }
+            x0 = c(ymean * (1 - mu), mu, shape, scale)
+        } else if (is(kern, "Rcpp_Exponential")) {
+            wmin = Inf
+            mu = .25
+            rate = 1
+            for (mu_ in c(.25, .5, .75)) {
+                for (rate_ in 1:5) {
+                    kern$param[1] = ymean * (1 - mu_)
+                    kern$param[2] = mu_
+                    kern$param[3] = rate_
+                    whit = kern$whittle(I, trunc = trunc)
+                    if (whit < wmin) {
+                        mu = mu_
+                        rate = rate_
+                        wmin = whit
+                    }
+                }
+            }
+            x0 = c(ymean * (1 - mu), mu, rate)
+        } else {
+            x0 = c(runif(1, 0, 3),
+                   runif(1, 0, 1),
+                   runif(length(kern$param)-2, 0, 5))
+        }
+    } else x0 = init
 
     optargs = list(hessian = TRUE,
-                   lower = rep(.0001, length(model$param)),
-                   upper = c(Inf, .9999, rep(Inf, length(model$param)-2)),
+                   lower = rep(.0001, length(kern$param)),
+                   upper = c(Inf, .9999, rep(Inf, length(kern$param)-2)),
                    method = "L-BFGS-B")
 
     optargs = modifyList(optargs, list(...))
     opt <- do.call(optim, c(list(par = x0, fn = nlopt_fn), optargs))
 
     # Create output object
-    model$param = opt$par
+    kern$param = opt$par
 
     output = list(
         par = opt$par,
-        model = model,
+        kernel = kern,
         counts = counts,
-        binsize = model$binsize,
+        binsize = kern$binsize,
         opt = opt
     )
 
@@ -104,18 +151,18 @@ whittle <- function(counts, kern, binsize = 1.0, trunc = 5L, init = NULL, ...) {
 #                          c("exponential", "symmetricexponential", "gaussian",
 #                            "powerlaw", "pareto3", "pareto2", "pareto1"))
 #         switch(kern,
-#                exponential = {model = new(Exponential)},
-#                symmetricexponential = {model = new(SymmetricExponential)},
-#                gaussian = {model = new(Gaussian)},
-#                powerlaw = {model = new(PowerLaw)},
-#                pareto3 = {model = new(Pareto3)},
-#                pareto2 = {model = new(Pareto2)},
-#                pareto1 = {model = new(Pareto1)})
-#         model$binsize = binsize
-#     } else if ( # or that it refers to a valid hawkes model
+#                exponential = {kern = new(Exponential)},
+#                symmetricexponential = {kern = new(SymmetricExponential)},
+#                gaussian = {kern = new(Gaussian)},
+#                powerlaw = {kern = new(PowerLaw)},
+#                pareto3 = {kern = new(Pareto3)},
+#                pareto2 = {kern = new(Pareto2)},
+#                pareto1 = {kern = new(Pareto1)})
+#         kern$binsize = binsize
+#     } else if ( # or that it refers to a valid hawkes kernel
 #         !any(sapply(
 #             paste0("Rcpp_", c("Exponential", "SymmetricExponential", "Gaussian", "PowerLaw", "Pareto3", "Pareto2", "Pareto1")),
-#             function(class_) {is(model, class_)}
+#             function(class_) {is(kern, class_)}
 #         ))
 #     ) stop("'kern' must be a valid kernel.")
 #
@@ -127,8 +174,8 @@ whittle <- function(counts, kern, binsize = 1.0, trunc = 5L, init = NULL, ...) {
 #
 #     # Whittle pseudo likelihood function (for optim)
 #     nlopt_fn <- function(param) {
-#         model$param <- param
-#         return( model$whittle(I, trunc) )
+#         kern$param <- param
+#         return( kern$whittle(I, trunc) )
 #     }
 #
 #     if (is.null(opts))
@@ -143,23 +190,23 @@ whittle <- function(counts, kern, binsize = 1.0, trunc = 5L, init = NULL, ...) {
 #     if (is.null(init))
 #         x0 = c(runif(1, 0, 2),
 #                runif(1, 0, 1),
-#                runif(length(model$param)-2, 0, 2))
+#                runif(length(kern$param)-2, 0, 2))
 #     else x0 = init
 #
-#     optargs = list(lb = rep(.0001, length(model$param)),
-#                    ub = c(Inf, .9999, rep(Inf, length(model$param)-2)),
+#     optargs = list(lb = rep(.0001, length(kern$param)),
+#                    ub = c(Inf, .9999, rep(Inf, length(kern$param)-2)),
 #                    opts = opts)
 #     optargs = modifyList(optargs, list(...))
 #     opt <- do.call(nloptr::nloptr, c(list(x0 = x0, eval_f = nlopt_fn), optargs))
 #
 #     # Create output object
-#     model$param = opt$solution
+#     kern$param = opt$solution
 #
 #     output = list(
 #         par = opt$solution,
-#         model = model,
+#         kernel = kern,
 #         counts = counts,
-#         binsize = model$binsize,
+#         binsize = kern$binsize,
 #         opt = opt
 #     )
 #

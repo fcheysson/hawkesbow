@@ -35,7 +35,7 @@ The periodogram used in the optimisation procedure is computed in complexity
 }
 \examples{
 # Simulate and fit a Hawkes process with exponential kernel
-x = hawkes(100, fun = 1, repr = .5, family = "exp", rate = 1)
+x = hawkes(1000, fun = 1, repr = .5, family = "exp", rate = 1)
 y = discrete(x, binsize = 1)
 whittle(y, "Exponential")
 

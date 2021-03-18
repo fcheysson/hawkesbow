@@ -1,5 +1,6 @@
 ---
 output: github_document
+bibliography: references.bib
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -17,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of hawkesbow is to ...
+In this package, we implement a spectral approach to the parametric estimation of Hawkes processes from binned observations.
 
 ## Installation
 
@@ -27,27 +28,76 @@ You can install the released version of hawkesbow from [CRAN](https://CRAN.R-pro
 install.packages("hawkesbow")
 ```
 
-## Example
+## The Hawkes process
 
-This is a basic example which shows you how to solve a common problem:
+Hawkes processes form a family of models for point processes for which the occurrence of an event temporarily increases the probability of future events occurring [@Hawkes1971a].
+Formally, a Hawkes process $N$ on $\mathbb R$ can be defined from its conditional intensity $\lambda(\cdot)$ :
+\begin{align*}
+\lambda(t) &= \eta + \int_{-\infty}^t h(t-u) N(\mathrm du)
+&= \eta + \sum_{T_i < t} h(t - T_i),
+\end{align*}
+where the variables $T_i$ denote the arrival times of the process, the *immigration intensity* $\eta$ is a positive constant, and the *reproduction function* $h: \mathbb R_{\ge 0} \rightarrow \mathbb R_{\ge 0}$ is a measurable function.
+Alternatively, the Hawkes process can be constructed as a poissonian cluster process [@Hawkes1974].
+The process consists of a flow of *immigrants*, the cluster centres, arriving according to a homogeneous Poisson process of intensity $\eta$. 
+Then, an immigrant arriving at time $T_i$ generates *children* according to an inhomogeneous Poisson process of intensity $h(\cdot - T_i)$. 
+These in turn independently generate children according to the same process, and so on *ad infinitum*.
+The processes consisting of an immigrant and all its descendants are therefore branching processes, and are independent of each other.
+Finally, the process resulting from the superposition of all these branching processes is a Hawkes process of conditional intensity $(\lambda(\cdot)$ (Figure \ref{fig:hawkes}).
 
-```{r example}
-library(hawkesbow)
-## basic example code
+```{r hawkes, fig.align="center", out.width="80%", fig.cap="Realization of an exponential Hawkes process, with $\\eta = 1$, $h(t) = e^{-2t}$. The crosses represent the arrival times of the process. (Top) Representation of the conditional intensity: each event increases the probability of occurrence of future events, according to the reproduction function $h$. (Bottom) Representation of branching: each immigrant (black squares, of generation 0) can generate children (red dots, of generation 1), which can in turn generate children, and so on."}
+knitr::include_graphics("man/figures/hawkes.eps")
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+## Reproduction kernels
 
-```{r cars}
-summary(cars)
-```
+Fourier transform:
+$$\widetilde {h^\ast}(\omega) = \int_\mathbb R \exp(-i\omega t) h(t) \mathrm dt$$
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date.
+### The exponential kernel
 
-You can also embed plots, for example:
+$$h^\ast(t) = \beta e^{-\beta t} 1_{\{t > 0\}}$$
 
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
+Fourier transform
+$$\widetilde {h^\ast}(\omega) = \beta \frac{1}{\beta + i\omega} = \beta \frac{\beta - i \omega}{\beta^2 + \omega^2}$$
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub!
+The exponential kernel can be specified with the string "Exponential"
+
+Both mle and whittle methods are available for exponential kernels.
+
+### The Gaussian kernel
+
+$$h^\ast(t) = \frac{1}{\sigma \sqrt(2\pi)}\exp\left(-\frac{(t-\nu)^2}{2\sigma^2}\right)$$
+
+Fourier transform
+$$\widetilde {h^\ast}(\omega) = \exp\left(-\frac{\sigma^2\omega^2}{2}-i\nu\omega\right)$$
+
+The gaussian kernel can be specified with the string "Gaussian"
+
+Only whittle method is available for gaussian kernels.
+
+### The Pareto kernels
+
+$$h_\theta^\ast(t) = \theta a^\theta t^{-\theta - 1} 1_{\{t > a\}}$$
+
+Fourier transform
+$$\widetilde{h_\theta^\ast}(\omega) = \theta a^\theta E_{\theta + 1} (i\omega) $$
+where
+$$E_{\theta+1}(i\omega) = \int_a^{+\infty} \frac{\exp(-i\omega t)}{t^{\theta+1}} \mathrm dt$$
+
+Only Pareto kernels with $\theta = 1$, $2$, and $3$ have been implemented and can specified with the strngs "Pareto1", "Pareto2" and "Pareto3" respectively.
+
+Only whittle method is available for Pareto kernels.
+
+### Power law kernel
+
+$$h^\ast(t) = \theta a^\theta (t+a)^{-\theta-1} 1_{\{\theta > 0 \}}$$
+
+Fourier transform
+$$\widetilde{h_\theta^\ast}(\omega) = \theta a^\theta \exp(i\omega a)E_{\theta + 1} (i\omega) $$
+
+The power law kernel can be specified with the string "PowerLaw"
+
+Both mle and whittle methods are available for power law kernels.
+
+
+
