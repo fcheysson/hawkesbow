@@ -108,15 +108,15 @@ Only whittle method is available for gaussian kernels.
 ### The Pareto kernels
 
   
-![h\_\\theta^\\ast(t) = \\theta a^\\theta t^{-\\theta - 1} 1\_{\\{t \>
-a\\}}](https://latex.codecogs.com/png.latex?h_%5Ctheta%5E%5Cast%28t%29%20%3D%20%5Ctheta%20a%5E%5Ctheta%20t%5E%7B-%5Ctheta%20-%201%7D%201_%7B%5C%7Bt%20%3E%20a%5C%7D%7D
-"h_\\theta^\\ast(t) = \\theta a^\\theta t^{-\\theta - 1} 1_{\\{t \> a\\}}")  
+![h^\\ast(t) = \\theta a^\\theta t^{-\\theta - 1} 1\_{\\{t \>
+a\\}}](https://latex.codecogs.com/png.latex?h%5E%5Cast%28t%29%20%3D%20%5Ctheta%20a%5E%5Ctheta%20t%5E%7B-%5Ctheta%20-%201%7D%201_%7B%5C%7Bt%20%3E%20a%5C%7D%7D
+"h^\\ast(t) = \\theta a^\\theta t^{-\\theta - 1} 1_{\\{t \> a\\}}")  
 
 Fourier transform   
-![\\widetilde{h\_\\theta^\\ast}(\\omega) = \\theta a^\\theta E\_{\\theta
-+ 1} (i\\omega)
-](https://latex.codecogs.com/png.latex?%5Cwidetilde%7Bh_%5Ctheta%5E%5Cast%7D%28%5Comega%29%20%3D%20%5Ctheta%20a%5E%5Ctheta%20E_%7B%5Ctheta%20%2B%201%7D%20%28i%5Comega%29%20
-"\\widetilde{h_\\theta^\\ast}(\\omega) = \\theta a^\\theta E_{\\theta + 1} (i\\omega) ")  
+![\\widetilde {h^\\ast}(\\omega) = \\theta a^\\theta E\_{\\theta + 1}
+(i\\omega)
+](https://latex.codecogs.com/png.latex?%5Cwidetilde%20%7Bh%5E%5Cast%7D%28%5Comega%29%20%3D%20%5Ctheta%20a%5E%5Ctheta%20E_%7B%5Ctheta%20%2B%201%7D%20%28i%5Comega%29%20
+"\\widetilde {h^\\ast}(\\omega) = \\theta a^\\theta E_{\\theta + 1} (i\\omega) ")  
 where   
 ![E\_{\\theta+1}(i\\omega) = \\int\_a^{+\\infty} \\frac{\\exp(-i\\omega
 t)}{t^{\\theta+1}} \\mathrm

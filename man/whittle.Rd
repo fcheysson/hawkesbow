@@ -4,14 +4,14 @@
 \alias{whittle}
 \title{Fitting Hawkes processes from discrete data}
 \usage{
-whittle(counts, kern, binsize = 1, trunc = 5L, init = NULL, ...)
+whittle(counts, kern, binsize = NULL, trunc = 5L, init = NULL, ...)
 }
 \arguments{
 \item{counts}{A bin-count sequence}
 
 \item{kern}{Either a string (partially) matching one of the kernels implemented (see Details), or an object of class Model}
 
-\item{binsize}{(Optional) The bin size of the bin-count sequence; ignored if \code{kern} is of class Model}
+\item{binsize}{(Optional) The bin size of the bin-count sequence; if omitted, defaults to 1 if \code{kern} is a string, or uses the member \code{binsize} of \code{kern} if it is of class Model}
 
 \item{trunc}{(Optional) The number of foldings taken into account due to aliasing}
 

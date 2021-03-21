@@ -50,98 +50,6 @@ arma::vec _sinc( arma::vec x ) {
     return y;
 }
 
-// Contour integration for the incomplete gamma function with imaginary argument
-// Integrate a continuous function on interval [a, b]
-double integral_midpoint(double(*f)(double x), double a, double b, int n) {
-    double step = (b - a) / n;  // width of each small rectangle
-    double area = 0.0;  // signed area
-    for (int i = 0; i < n; i ++) {
-        area += f(a + (i + 0.5) * step); // sum up each small rectangle
-    }
-    return (area * step);
-}
-
-double integral_midpoint(double(*f)(double x, double nu), double a, double b, int n, double nu) {
-    double step = (b - a) / n;  // width of each small rectangle
-    double area = 0.0;  // signed area
-    for (int i = 0; i < n; i ++) {
-        area += f(a + (i + 0.5) * step, nu); // sum up each small rectangle
-    }
-    return (area * step);
-}
-
-double integral_simpson(double(*f)(double x), double a, double b, int n) {
-    if (n % 2 == 1)
-        n++;
-    double step = (b - a) / n;  // width of each small rectangle
-    double area = f(a) + f(b);  // first and last indices
-    for (int i = 1; i < n; i++) {
-        if (i % 2 == 1)
-            area += 4 * f(a + i * step);
-        else
-            area += 2 * f(a + i * step);
-    }
-    return (area * step / 3.0);
-}
-
-double integral_simpson(double(*f)(double x, double nu), double a, double b, int n, double nu) {
-    if (n % 2 == 1)
-        n++;
-    double step = (b - a) / n;  // width of each small rectangle
-    double area = f(a, nu) + f(b, nu);  // first and last indices
-    for (int i = 1; i < n; i++) {
-        if (i % 2 == 1)
-            area += 4 * f(a + i * step, nu);
-        else
-            area += 2 * f(a + i * step, nu);
-    }
-    return (area * step / 3.0);
-}
-
-double integral_simpson(double(*f)(double x, double nu, double r), double a, double b, int n, double nu, double r) {
-    if (n % 2 == 1)
-        n++;
-    double step = (b - a) / n;  // width of each small rectangle
-    double area = f(a, nu, r) + f(b, nu, r);  // first and last indices
-    for (int i = 1; i < n; i++) {
-        if (i % 2 == 1)
-            area += 4 * f(a + i * step, nu, r);
-        else
-            area += 2 * f(a + i * step, nu, r);
-    }
-    return (area * step / 3.0);
-}
-
-// Real and imaginary part for the contour integral on the quadrant with radius r > 0
-double quadrant_real(double x, double nu, double r) {
-    return exp(-r*cos(x)) * cos(x*nu - r*sin(x));
-}
-
-double quadrant_imag(double x, double nu, double r) {
-    return exp(-r*cos(x)) * sin(x*nu - r*sin(x));
-}
-
-arma::cx_double contour_quadrant(double nu, double r) {
-    double real_part = integral_simpson(quadrant_real, 0.0, .5 * arma::datum::pi, 100, nu, r);
-    double imag_part = integral_simpson(quadrant_imag, 0.0, .5 * arma::datum::pi, 100, nu, r);
-    return exp(nu*log(r)) * arma::cx_double(real_part, imag_part);
-}
-
-arma::cx_double inc_gamma_imag(double nu, double r) {
-
-    if (r < 0)
-        Rcpp::stop("ERROR in inc_gamma_imag: 'r' cannot be negative.");
-    if (nu <= 0)
-        Rcpp::stop("ERROR in inc_gamma_imag: 'nu' must be between 0 and 1.");
-    if (nu >= 1)
-        Rcpp::stop("ERROR in inc_gamma_imag: 'nu' must be between 0 and 1.");
-
-    arma::cx_double term1 = exp(-.5*i*arma::datum::pi*nu) * boost::math::tgamma(nu, r);
-    arma::cx_double term2 = exp(-.5*i*arma::datum::pi*(nu-1)) * contour_quadrant(nu, r);
-    return  term1 - term2;
-
-}
-
 arma::cx_vec Etheta_imaginary( double theta, arma::vec x ) {
 
     arma::cx_vec y(x.n_elem);
@@ -197,7 +105,7 @@ arma::cx_vec Etheta_imaginary( double theta, arma::vec x ) {
 
             // Loop on xi
             for (; it_x != it_x_end; ++it_x, ++it_y) {
-                *it_y = - i * *it_x * exp(i * *it_x) * exp((theta-1.0)*log(*it_x)) * inc_gamma_imag(1.0-theta, *it_x);
+                *it_y = - i * *it_x * exp(i * *it_x) * exp((theta-1.0)*log(*it_x)) * inc_gamma_imag(*it_x, 1.0-theta);
             }
 
         } else {
@@ -217,7 +125,7 @@ arma::cx_vec Etheta_imaginary( double theta, arma::vec x ) {
 
             // Loop on xi
             for (; it_x != it_x_end; ++it_x, ++it_term2) {
-                *it_term2 = pow_m1(itheta + 1) * pow_i(itheta + 1) * exp(i * *it_x) * exp(theta*log(*it_x)) * inc_gamma_imag(1-theta+itheta, *it_x) / last_den;
+                *it_term2 = pow_m1(itheta + 1) * pow_i(itheta + 1) * exp(i * *it_x) * exp(theta*log(*it_x)) * inc_gamma_imag(*it_x, 1-theta+itheta) / last_den;
             }
 
             y = term1 + term2;
@@ -230,6 +138,84 @@ arma::cx_vec Etheta_imaginary( double theta, arma::vec x ) {
 
 }
 
+// Taylor approximants for the incomplete gamma function with imaginary argument
+double Ci( double x, double alpha ) {
+
+    if (x < 0.0)
+        Rcpp::stop("ERROR in Ci: 'x' cannot be negative.");
+
+    if (x == 0.0)
+        return 0.0;
+
+    if (alpha <= 0.0 || alpha >= 1.0) {
+        Rcpp::stop("ERROR in Ci: 'alpha' must be between 0 and 1 strictly.");
+    }
+
+    int n = std::ceil(7.0 + 1.36 * x); // Change constant term 'a' to get an approximation to order 10^{-a-1}
+    double x2 = x * x;
+    double xalpha = exp(alpha * log(x));
+
+    arma::vec summands_num = arma::cumprod(- x2 * arma::ones<arma::vec>(n));
+    arma::vec evens = 2 * arma::regspace(1, n);
+    arma::vec odds = 2 * arma::regspace(1, n) - 1;
+    arma::vec summands_den = (evens + alpha) % arma::cumprod(evens % odds);
+
+    return xalpha * (1.0 / alpha + arma::accu(summands_num / summands_den));
+}
+
+double Si( double x, double alpha ) {
+
+    if (x < 0.0)
+        Rcpp::stop("ERROR in Ci: 'x' cannot be negative.");
+
+    if (x == 0.0)
+        return 0.0;
+
+    if (alpha <= 0.0 || alpha >= 1.0) {
+        Rcpp::stop("ERROR in Ci: 'alpha' must be between 0 and 1 strictly.");
+    }
+
+    int n = std::ceil(7.0 + 1.36 * x); // Change constant term 'a' to get an approximation to order 10^{-a-1}
+    double x2 = x * x;
+    double xalpha = exp(alpha * log(x));
+
+    arma::vec summands_num = arma::cumprod(- x2 * arma::ones<arma::vec>(n));
+    arma::vec evens = 2 * arma::regspace(1, n);
+    arma::vec odds = 2 * arma::regspace(1, n) + 1;
+    arma::vec summands_den = (odds + alpha) % arma::cumprod(evens % odds);
+
+    return x * xalpha * (1.0 / (1.0 + alpha) + arma::accu(summands_num / summands_den));
+}
+
+arma::cx_double inc_gamma_imag( double x, double alpha ) {
+
+    if (x < 0.0)
+        Rcpp::stop("ERROR in Ci: 'x' cannot be negative.");
+
+    if (x == 0.0)
+        return exp(-.5*i*arma::datum::pi*alpha) * boost::math::tgamma(alpha);
+
+    if (alpha <= 0.0 || alpha >= 1.0) {
+        Rcpp::stop("ERROR in Ci: 'alpha' must be between 0 and 1 strictly.");
+    }
+
+    int n = std::ceil(7.0 + 1.36 * x); // Change constant term 'a' to get an approximation to order 10^{-a-1}
+    double x2 = x * x;
+    double xalpha = exp(alpha * log(x));
+
+    arma::vec summands_num = arma::cumprod(- x2 * arma::ones<arma::vec>(n));
+    arma::vec evens = 2 * arma::regspace(1, n);
+    arma::vec oddsm1 = 2 * arma::regspace(1, n) - 1;
+    arma::vec oddsp1 = 2 * arma::regspace(1, n) + 1;
+    arma::vec Ci_summands_den = (evens + alpha) % arma::cumprod(evens % oddsm1);
+    arma::vec Si_summands_den = (oddsp1 + alpha) % arma::cumprod(evens % oddsp1);
+
+    double Ci = xalpha * (1.0 / alpha + arma::accu(summands_num / Ci_summands_den));
+    double Si = x * xalpha * (1.0 / (1.0 + alpha) + arma::accu(summands_num / Si_summands_den));
+
+    return exp(-.5*i*arma::datum::pi*alpha) * boost::math::tgamma(alpha) - Ci + i*Si;
+
+}
 
 // Powers of 10
 double quick_pow10(int n)
@@ -413,3 +399,95 @@ arma::cx_double E1_imaginary( double x ) {
     return i * (- 0.5 * arma::datum::pi + Si(x)) - Ci(x);
 
 }
+
+// // Contour integration for the incomplete gamma function with imaginary argument
+// // Integrate a continuous function on interval [a, b]
+// double integral_midpoint(double(*f)(double x), double a, double b, int n) {
+//     double step = (b - a) / n;  // width of each small rectangle
+//     double area = 0.0;  // signed area
+//     for (int i = 0; i < n; i ++) {
+//         area += f(a + (i + 0.5) * step); // sum up each small rectangle
+//     }
+//     return (area * step);
+// }
+//
+// double integral_midpoint(double(*f)(double x, double nu), double a, double b, int n, double nu) {
+//     double step = (b - a) / n;  // width of each small rectangle
+//     double area = 0.0;  // signed area
+//     for (int i = 0; i < n; i ++) {
+//         area += f(a + (i + 0.5) * step, nu); // sum up each small rectangle
+//     }
+//     return (area * step);
+// }
+//
+// double integral_simpson(double(*f)(double x), double a, double b, int n) {
+//     if (n % 2 == 1)
+//         n++;
+//     double step = (b - a) / n;  // width of each small rectangle
+//     double area = f(a) + f(b);  // first and last indices
+//     for (int i = 1; i < n; i++) {
+//         if (i % 2 == 1)
+//             area += 4 * f(a + i * step);
+//         else
+//             area += 2 * f(a + i * step);
+//     }
+//     return (area * step / 3.0);
+// }
+//
+// double integral_simpson(double(*f)(double x, double nu), double a, double b, int n, double nu) {
+//     if (n % 2 == 1)
+//         n++;
+//     double step = (b - a) / n;  // width of each small rectangle
+//     double area = f(a, nu) + f(b, nu);  // first and last indices
+//     for (int i = 1; i < n; i++) {
+//         if (i % 2 == 1)
+//             area += 4 * f(a + i * step, nu);
+//         else
+//             area += 2 * f(a + i * step, nu);
+//     }
+//     return (area * step / 3.0);
+// }
+//
+// double integral_simpson(double(*f)(double x, double nu, double r), double a, double b, int n, double nu, double r) {
+//     if (n % 2 == 1)
+//         n++;
+//     double step = (b - a) / n;  // width of each small rectangle
+//     double area = f(a, nu, r) + f(b, nu, r);  // first and last indices
+//     for (int i = 1; i < n; i++) {
+//         if (i % 2 == 1)
+//             area += 4 * f(a + i * step, nu, r);
+//         else
+//             area += 2 * f(a + i * step, nu, r);
+//     }
+//     return (area * step / 3.0);
+// }
+//
+// // Real and imaginary part for the contour integral on the quadrant with radius r > 0
+// double quadrant_real(double x, double nu, double r) {
+//     return exp(-r*cos(x)) * cos(x*nu - r*sin(x));
+// }
+//
+// double quadrant_imag(double x, double nu, double r) {
+//     return exp(-r*cos(x)) * sin(x*nu - r*sin(x));
+// }
+//
+// arma::cx_double contour_quadrant(double nu, double r) {
+//     double real_part = integral_simpson(quadrant_real, 0.0, .5 * arma::datum::pi, 100, nu, r);
+//     double imag_part = integral_simpson(quadrant_imag, 0.0, .5 * arma::datum::pi, 100, nu, r);
+//     return exp(nu*log(r)) * arma::cx_double(real_part, imag_part);
+// }
+//
+// arma::cx_double inc_gamma_imag(double nu, double r) {
+//
+//     if (r < 0)
+//         Rcpp::stop("ERROR in inc_gamma_imag: 'r' cannot be negative.");
+//     if (nu <= 0)
+//         Rcpp::stop("ERROR in inc_gamma_imag: 'nu' must be between 0 and 1.");
+//     if (nu >= 1)
+//         Rcpp::stop("ERROR in inc_gamma_imag: 'nu' must be between 0 and 1.");
+//
+//     arma::cx_double term1 = exp(-.5*i*arma::datum::pi*nu) * boost::math::tgamma(nu, r);
+//     arma::cx_double term2 = exp(-.5*i*arma::datum::pi*(nu-1)) * contour_quadrant(nu, r);
+//     return  term1 - term2;
+//
+// }

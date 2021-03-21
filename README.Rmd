@@ -48,6 +48,9 @@ Finally, the process resulting from the superposition of all these branching pro
 
 ![Realisation of an exponential Hawkes process](man/figures/hawkes.png)
 
+This package also supports non-causal Hawkes processes, for which the reproduction kernel $h^\ast$ may take non-negative values on $\mathbb R_{\le 0}$.
+Such processes are not defined through their conditional intensity functions, but ...
+
 ## Usage
 
 
@@ -81,10 +84,10 @@ Only whittle method is available for gaussian kernels.
 
 ### The Pareto kernels
 
-$$h_\theta^\ast(t) = \theta a^\theta t^{-\theta - 1} 1_{\{t > a\}}$$
+$$h^\ast(t) = \theta a^\theta t^{-\theta - 1} 1_{\{t > a\}}$$
 
 Fourier transform
-$$\widetilde{h_\theta^\ast}(\omega) = \theta a^\theta E_{\theta + 1} (i\omega) $$
+$$\widetilde {h^\ast}(\omega) = \theta a^\theta E_{\theta + 1} (i\omega) $$
 where
 $$E_{\theta+1}(i\omega) = \int_a^{+\infty} \frac{\exp(-i\omega t)}{t^{\theta+1}} \mathrm dt$$
 

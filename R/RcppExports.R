@@ -25,30 +25,6 @@ NULL
 #' @export Gaussian
 NULL
 
-#' Incomplete gamma function of imaginary argument
-#'
-#' Calculates the value of
-#' \deqn{\Gamma_1(\nu, r) = \int_r^\infty y^{\nu-1} e^{-iy} \mathrm{d}y}
-#' for \eqn{0 < \nu < 1} through the following relation (obtained by contour integration)
-#' \deqn{\int_r^\infty y^{\nu-1} e^{-iy} \mathrm{d}y =
-#' e^{-i\frac{\pi}{2}\nu} \int_r^\infty x^{\nu-1} e^{-x} \mathrm{d}x -
-#' e^{-i\frac{\pi}{2}(\nu-1)} r^\nu \int_0^{\pi/2}
-#' e^{i\theta \nu}e^{-re^{i\theta}}\mathrm{d}\theta.}
-#' The first integral is calculated using function "tgamma" from the library
-#' "boost::math", while the second is approximated via Simpson's rule.
-#'
-#' @param nu A number between 0 and 1 (strictly)
-#' @param r A non-negative number
-#'
-#' @return The incomplete gamma function of imaginary argument (see Details)
-#' @export
-#'
-#' @examples
-#' inc_gamma_imag(0.5, 1.0)
-inc_gamma_imag <- function(nu, r) {
-    .Call('_hawkesbow_inc_gamma_imag', PACKAGE = 'hawkesbow', nu, r)
-}
-
 #' Incomplete gamma function of imaginary argument with arbitrary power
 #'
 #' Calculates the value of
@@ -68,6 +44,35 @@ inc_gamma_imag <- function(nu, r) {
 #' Etheta_imaginary(3.14, 1.0)
 Etheta_imaginary <- function(theta, x) {
     .Call('_hawkesbow_Etheta_imaginary', PACKAGE = 'hawkesbow', theta, x)
+}
+
+#' Incomplete gamma function of imaginary argument
+#'
+#' Calculates the value of
+#' \deqn{\Gamma_1(x, \alpha) = \int_x^\infty t^{\alpha-1} e^{-it} \mathrm{d}t}
+#' for \eqn{0 < \alpha < 1} through the following relations:
+#' \deqn{\int_0^\infty t^{\alpha-1} e^{-it} \mathrm{d}t =
+#' e^{-i\frac{\pi}{2}\alpha} \int_0^\infty t^{\alpha-1} e^{-t} \mathrm{d}t =
+#' e^{-i\frac{\pi}{2}\alpha} \Gamma(\alpha).}
+#' obtained by contour integration, and:
+#' \deqn{\int_0^x t^{\alpha-1} e^{-it} \mathrm{d}t =
+#' \int_0^x t^{\alpha-1} \mathrm{cos}(t) \mathrm{d}t -
+#' i \int_0^x t^{\alpha-1} \mathrm{sin}(t) \mathrm{d}t =
+#' Ci(x, \alpha) - i Si(x, \alpha)}.
+#' The first integral is calculated using function "tgamma" from the library
+#' "boost::math", while the functions Ci and Si are approximated via
+#' Taylor expansions.
+#'
+#' @param x A non-negative number
+#' @param alpha A number between 0 and 1 (strictly)
+#'
+#' @return The incomplete gamma function of imaginary argument (see Details)
+#' @export
+#'
+#' @examples
+#' inc_gamma_imag(1.0, 0.5)
+inc_gamma_imag <- function(x, alpha) {
+    .Call('_hawkesbow_inc_gamma_imag', PACKAGE = 'hawkesbow', x, alpha)
 }
 
 #' Exponential integral of imaginary argument

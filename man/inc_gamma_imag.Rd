@@ -4,27 +4,32 @@
 \alias{inc_gamma_imag}
 \title{Incomplete gamma function of imaginary argument}
 \usage{
-inc_gamma_imag(nu, r)
+inc_gamma_imag(x, alpha)
 }
 \arguments{
-\item{nu}{A number between 0 and 1 (strictly)}
+\item{x}{A non-negative number}
 
-\item{r}{A non-negative number}
+\item{alpha}{A number between 0 and 1 (strictly)}
 }
 \value{
 The incomplete gamma function of imaginary argument (see Details)
 }
 \description{
 Calculates the value of
-\deqn{\Gamma_1(\nu, r) = \int_r^\infty y^{\nu-1} e^{-iy} \mathrm{d}y}
-for \eqn{0 < \nu < 1} through the following relation (obtained by contour integration)
-\deqn{\int_r^\infty y^{\nu-1} e^{-iy} \mathrm{d}y =
-e^{-i\frac{\pi}{2}\nu} \int_r^\infty x^{\nu-1} e^{-x} \mathrm{d}x -
-e^{-i\frac{\pi}{2}(\nu-1)} r^\nu \int_0^{\pi/2}
-e^{i\theta \nu}e^{-re^{i\theta}}\mathrm{d}\theta.}
+\deqn{\Gamma_1(x, \alpha) = \int_x^\infty t^{\alpha-1} e^{-it} \mathrm{d}t}
+for \eqn{0 < \alpha < 1} through the following relations:
+\deqn{\int_0^\infty t^{\alpha-1} e^{-it} \mathrm{d}t =
+e^{-i\frac{\pi}{2}\alpha} \int_0^\infty t^{\alpha-1} e^{-t} \mathrm{d}t =
+e^{-i\frac{\pi}{2}\alpha} \Gamma(\alpha).}
+obtained by contour integration, and:
+\deqn{\int_0^x t^{\alpha-1} e^{-it} \mathrm{d}t =
+\int_0^x t^{\alpha-1} \mathrm{cos}(t) \mathrm{d}t -
+i \int_0^x t^{\alpha-1} \mathrm{sin}(t) \mathrm{d}t =
+Ci(x, \alpha) - i Si(x, \alpha)}.
 The first integral is calculated using function "tgamma" from the library
-"boost::math", while the second is approximated via Simpson's rule.
+"boost::math", while the functions Ci and Si are approximated via
+Taylor expansions.
 }
 \examples{
-inc_gamma_imag(0.5, 1.0)
+inc_gamma_imag(1.0, 0.5)
 }

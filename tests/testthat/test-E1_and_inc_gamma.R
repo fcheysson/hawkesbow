@@ -88,31 +88,31 @@ test_that("Incomplete gamma function of imaginary argument", {
 
     # Can be checked using function gamma from R::base, Gradshteyn & Ryzhik, 2007,
     # and Barakat, 1960:
-    # inc_gamma_imag(b, r) = i^{-b} \Gamma(b) - r^b \gamma_1(b, ir)
+    # inc_gamma_imag(r, b) = i^{-b} \Gamma(b) - r^b \gamma_1(b, ir)
     # where first term from Gradshteyn & Ryzhik, 2007, by contour integration (3.381.7),
     # second term from Barakat, 1960, by Chebyshev polynomials
 
     b = .6
     r = 1.0
-    expect_equal(inc_gamma_imag(b, r),
+    expect_equal(inc_gamma_imag(r, b),
                  (-1i)^b * gamma(b) - (1.483209 - .580166i) * (r^b),
                  tolerance = 1e-5)
 
     b = .8
     r = .5
-    expect_equal(inc_gamma_imag(b, r),
+    expect_equal(inc_gamma_imag(r, b),
                  (-1i)^b * gamma(b) - (1.205896 - .272340i) * (r^b),
                  tolerance = 1e-5)
 
     b = .2
     r = 3.0
-    expect_equal(inc_gamma_imag(b, r),
+    expect_equal(inc_gamma_imag(r, b),
                  (-1i)^b * gamma(b) - (3.613147 - 1.428423i) * (r^b),
                  tolerance = 1e-5)
 
     b = .4
     r = 5.0
-    expect_equal(inc_gamma_imag(b, r),
+    expect_equal(inc_gamma_imag(r, b),
                  (-1i)^b * gamma(b) - (.750625 - .650291i) * (r^b),
                  tolerance = 1e-5)
 
