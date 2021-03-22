@@ -18,6 +18,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// inc_gamma_imag2
+arma::cx_double inc_gamma_imag2(double x, double alpha);
+RcppExport SEXP _hawkesbow_inc_gamma_imag2(SEXP xSEXP, SEXP alphaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    rcpp_result_gen = Rcpp::wrap(inc_gamma_imag2(x, alpha));
+    return rcpp_result_gen;
+END_RCPP
+}
 // inc_gamma_imag
 arma::cx_double inc_gamma_imag(double x, double alpha);
 RcppExport SEXP _hawkesbow_inc_gamma_imag(SEXP xSEXP, SEXP alphaSEXP) {
@@ -46,6 +58,7 @@ RcppExport SEXP _rcpp_module_boot_HawkesModule();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_hawkesbow_Etheta_imaginary", (DL_FUNC) &_hawkesbow_Etheta_imaginary, 2},
+    {"_hawkesbow_inc_gamma_imag2", (DL_FUNC) &_hawkesbow_inc_gamma_imag2, 2},
     {"_hawkesbow_inc_gamma_imag", (DL_FUNC) &_hawkesbow_inc_gamma_imag, 2},
     {"_hawkesbow_E1_imaginary", (DL_FUNC) &_hawkesbow_E1_imaginary, 1},
     {"_rcpp_module_boot_HawkesModule", (DL_FUNC) &_rcpp_module_boot_HawkesModule, 0},

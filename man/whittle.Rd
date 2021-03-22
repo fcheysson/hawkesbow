@@ -40,7 +40,7 @@ y = discrete(x, binsize = 1)
 whittle(y, "Exponential")
 
 # Simulate and fit a Hawkes process with power law kernel
-x = hawkes(100, fun = 1, repr= .3, family = "powerlaw", shape = 3.5, scale = 1.0)
+x = hawkes(1000, fun = 1, repr= .3, family = "powerlaw", shape = 3.5, scale = 1.0)
 y = discrete(x, binsize = 1)
-whittle(y, "powerlaw", 1.0, trunc = 2L, init = c(2.0, .5, 3.0, 1.5))
+whittle(y, "powerlaw")
 }

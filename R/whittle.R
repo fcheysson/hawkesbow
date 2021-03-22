@@ -28,9 +28,9 @@
 #' whittle(y, "Exponential")
 #'
 #' # Simulate and fit a Hawkes process with power law kernel
-#' x = hawkes(100, fun = 1, repr= .3, family = "powerlaw", shape = 3.5, scale = 1.0)
+#' x = hawkes(1000, fun = 1, repr= .3, family = "powerlaw", shape = 3.5, scale = 1.0)
 #' y = discrete(x, binsize = 1)
-#' whittle(y, "powerlaw", 1.0, trunc = 2L, init = c(2.0, .5, 3.0, 1.5))
+#' whittle(y, "powerlaw")
 whittle <- function(counts, kern, binsize = NULL, trunc = 5L, init = NULL, ...) {
 
     # Check that the argument 'kern' is either a string that matches of the kernels implemented
@@ -69,7 +69,7 @@ whittle <- function(counts, kern, binsize = NULL, trunc = 5L, init = NULL, ...) 
 
     # Sensible initialisation
     if (is.null(init)) {
-        ymean = mean(y)
+        ymean = mean(counts)
         # For PowerLaw
         if (is(kern, "Rcpp_PowerLaw")) {
             wmin = Inf
@@ -77,8 +77,8 @@ whittle <- function(counts, kern, binsize = NULL, trunc = 5L, init = NULL, ...) 
             shape = 1
             scale = 1
             for (mu_ in c(.25, .5, .75)) {
-                for (shape_ in 1:5) {
-                    for (scale_ in 1:5) {
+                for (shape_ in 1:10/2) {
+                    for (scale_ in 1:10/2) {
                         kern$param[1] = ymean * (1 - mu_)
                         kern$param[2] = mu_
                         kern$param[3] = shape_
@@ -143,7 +143,7 @@ whittle <- function(counts, kern, binsize = NULL, trunc = 5L, init = NULL, ...) 
     return( output )
 }
 
-# whittle <- function(counts, kern, binsize = 1.0, trunc = 5L, init = NULL, opts = NULL, ...) {
+# whittle2 <- function(counts, kern, binsize = NULL, trunc = 5L, init = NULL, opts = NULL, ...) {
 #
 #     # Check that the argument 'kern' is either a string that matches of the kernels implemented
 #     if (is.character(kern)) {
@@ -158,13 +158,14 @@ whittle <- function(counts, kern, binsize = NULL, trunc = 5L, init = NULL, ...) 
 #                pareto3 = {kern = new(Pareto3)},
 #                pareto2 = {kern = new(Pareto2)},
 #                pareto1 = {kern = new(Pareto1)})
-#         kern$binsize = binsize
 #     } else if ( # or that it refers to a valid hawkes kernel
 #         !any(sapply(
 #             paste0("Rcpp_", c("Exponential", "SymmetricExponential", "Gaussian", "PowerLaw", "Pareto3", "Pareto2", "Pareto1")),
 #             function(class_) {is(kern, class_)}
 #         ))
 #     ) stop("'kern' must be a valid kernel.")
+#
+#     if (!is.null(binsize)) kern$binsize = binsize
 #
 #     # Periodogram
 #     n <- length(counts)
@@ -179,10 +180,10 @@ whittle <- function(counts, kern, binsize = NULL, trunc = 5L, init = NULL, ...) 
 #     }
 #
 #     if (is.null(opts))
-#         opts <- list("algorithm" = "NLOPT_LD_LBFGS")
+#         opts <- list("algorithm" = "NLOPT_LN_COBYLA")
 #     else {
 #         if (is.null(opts[["algorithm"]]))
-#             opts <- c(opts, "algorithm" = "NLOPT_LD_LBFGS")
+#             opts <- c(opts, "algorithm" = "NLOPT_LN_COBYLA")
 #         if (is.null(opts[["xtol_rel"]]))
 #             opts <- c(opts, "xtol_rel" = 1e-04)
 #     }
@@ -190,7 +191,7 @@ whittle <- function(counts, kern, binsize = NULL, trunc = 5L, init = NULL, ...) 
 #     if (is.null(init))
 #         x0 = c(runif(1, 0, 2),
 #                runif(1, 0, 1),
-#                runif(length(kern$param)-2, 0, 2))
+#                runif(length(kern$param)-2, 0, 5))
 #     else x0 = init
 #
 #     optargs = list(lb = rep(.0001, length(kern$param)),

@@ -46,6 +46,11 @@ Etheta_imaginary <- function(theta, x) {
     .Call('_hawkesbow_Etheta_imaginary', PACKAGE = 'hawkesbow', theta, x)
 }
 
+#' @export
+inc_gamma_imag2 <- function(x, alpha) {
+    .Call('_hawkesbow_inc_gamma_imag2', PACKAGE = 'hawkesbow', x, alpha)
+}
+
 #' Incomplete gamma function of imaginary argument
 #'
 #' Calculates the value of

@@ -155,63 +155,134 @@ double Ci( double x, double alpha ) {
     double x2 = x * x;
     double xalpha = exp(alpha * log(x));
 
-    arma::vec summands_num = arma::cumprod(- x2 * arma::ones<arma::vec>(n));
-    arma::vec evens = 2 * arma::regspace(1, n);
-    arma::vec odds = 2 * arma::regspace(1, n) - 1;
-    arma::vec summands_den = (evens + alpha) % arma::cumprod(evens % odds);
+    arma::vec evens = 2.0 * arma::regspace(1, n);
+    arma::vec odds = 2.0 * arma::regspace(1, n) - 1.0;
+    arma::vec summands = arma::cumprod(-x2 / (evens % odds)) / (evens + alpha);
 
-    return xalpha * (1.0 / alpha + arma::accu(summands_num / summands_den));
+    return xalpha * (1.0 / alpha + arma::accu(summands));
 }
 
 double Si( double x, double alpha ) {
 
     if (x < 0.0)
-        Rcpp::stop("ERROR in Ci: 'x' cannot be negative.");
+        Rcpp::stop("ERROR in Si: 'x' cannot be negative.");
 
     if (x == 0.0)
         return 0.0;
 
     if (alpha <= 0.0 || alpha >= 1.0) {
-        Rcpp::stop("ERROR in Ci: 'alpha' must be between 0 and 1 strictly.");
+        Rcpp::stop("ERROR in Si: 'alpha' must be between 0 and 1 strictly.");
     }
 
     int n = std::ceil(7.0 + 1.36 * x); // Change constant term 'a' to get an approximation to order 10^{-a-1}
     double x2 = x * x;
     double xalpha = exp(alpha * log(x));
 
-    arma::vec summands_num = arma::cumprod(- x2 * arma::ones<arma::vec>(n));
-    arma::vec evens = 2 * arma::regspace(1, n);
-    arma::vec odds = 2 * arma::regspace(1, n) + 1;
-    arma::vec summands_den = (odds + alpha) % arma::cumprod(evens % odds);
+    arma::vec evens = 2.0 * arma::regspace(1, n);
+    arma::vec odds = 2.0 * arma::regspace(1, n) + 1.0;
+    arma::vec summands = arma::cumprod(-x2 / (evens % odds)) / (odds + alpha);
 
-    return x * xalpha * (1.0 / (1.0 + alpha) + arma::accu(summands_num / summands_den));
+    return x * xalpha * (1.0 / (1.0 + alpha) + arma::accu(summands));
+}
+
+double taylorf( double x, double alpha ) {
+
+    if (x < 20.0)
+        Rcpp::stop("ERROR in taylorf: 'x' must be above 20 for correct approximation.");
+
+    if (alpha <= 0.0 || alpha >= 1.0) {
+        Rcpp::stop("ERROR in taylorf: 'alpha' must be between 0 and 1 strictly.");
+    }
+
+    int n = 10;
+    double inv_x = 1.0 / x;
+    double inv_x2 = inv_x * inv_x;
+    double xalpha = exp(alpha * log(x));
+
+    arma::vec evens = alpha - 2.0 * arma::regspace(1, n);
+    arma::vec odds = alpha - 2.0 * arma::regspace(1, n) + 1.0;
+    arma::vec summands = arma::cumprod(- inv_x2 * evens % odds);
+
+    return (xalpha * inv_x) * (1.0 + arma::accu(summands));
+
+}
+
+double taylorg( double x, double alpha ) {
+
+    if (x < 20.0)
+        Rcpp::stop("ERROR in taylorg: 'x' must be above 20 for correct approximation.");
+
+    if (alpha <= 0.0 || alpha >= 1.0) {
+        Rcpp::stop("ERROR in taylorg: 'alpha' must be between 0 and 1 strictly.");
+    }
+
+    int n = 10;
+    double inv_x = 1.0 / x;
+    double inv_x2 = inv_x * inv_x;
+    double xalpha = exp(alpha * log(x));
+
+    arma::vec evens = alpha - 2.0 * arma::regspace(1, n-1);
+    arma::vec odds = alpha - 2.0 * arma::regspace(1, n-1) - 1.0;
+    arma::vec summands = arma::cumprod(- inv_x2 * evens % odds);
+
+    return (1.0 - alpha) * (xalpha * inv_x2) * (1.0 + arma::accu(summands));
+
+}
+
+arma::cx_double inc_gamma_imag2( double x, double alpha ) {
+
+    if (x < 0.0)
+        Rcpp::stop("ERROR in Si: 'x' cannot be negative.");
+
+    if (alpha <= 0.0 || alpha >= 1.0) {
+        Rcpp::stop("ERROR in taylorg: 'alpha' must be between 0 and 1 strictly.");
+    }
+
+    int n = 10;
+    double inv_x = 1.0 / x;
+    double inv_x2 = inv_x * inv_x;
+    double xalpha = exp(alpha * log(x));
+
+    arma::vec evens = alpha - 2.0 * arma::regspace(1, n);
+    arma::vec oddsf = alpha - 2.0 * arma::regspace(1, n) + 1.0;
+    arma::vec oddsg = alpha - 2.0 * arma::regspace(1, n-1) - 1.0;
+    arma::vec summands_f = arma::cumprod(- inv_x2 * evens % oddsf);
+    arma::vec summands_g = arma::cumprod(- inv_x2 * evens.subvec(0, n-2) % oddsg);
+
+    double taylorf = (xalpha * inv_x) * (1.0 + arma::accu(summands_f));
+    double taylorg = (1.0 - alpha) * (xalpha * inv_x2) * (1.0 + arma::accu(summands_g));
+
+    double Ci = taylorg * cos(x) - taylorf * sin(x);
+    double Si = taylorg * sin(x) + taylorf * cos(x);
+
+    return Ci - i*Si;
+
 }
 
 arma::cx_double inc_gamma_imag( double x, double alpha ) {
 
     if (x < 0.0)
-        Rcpp::stop("ERROR in Ci: 'x' cannot be negative.");
+        Rcpp::stop("ERROR in inc_gamma_imag: 'x' cannot be negative.");
 
     if (x == 0.0)
         return exp(-.5*i*arma::datum::pi*alpha) * boost::math::tgamma(alpha);
 
     if (alpha <= 0.0 || alpha >= 1.0) {
-        Rcpp::stop("ERROR in Ci: 'alpha' must be between 0 and 1 strictly.");
+        Rcpp::stop("ERROR in inc_gamma_imag: 'alpha' must be between 0 and 1 strictly.");
     }
 
     int n = std::ceil(7.0 + 1.36 * x); // Change constant term 'a' to get an approximation to order 10^{-a-1}
     double x2 = x * x;
     double xalpha = exp(alpha * log(x));
 
-    arma::vec summands_num = arma::cumprod(- x2 * arma::ones<arma::vec>(n));
     arma::vec evens = 2 * arma::regspace(1, n);
     arma::vec oddsm1 = 2 * arma::regspace(1, n) - 1;
     arma::vec oddsp1 = 2 * arma::regspace(1, n) + 1;
-    arma::vec Ci_summands_den = (evens + alpha) % arma::cumprod(evens % oddsm1);
-    arma::vec Si_summands_den = (oddsp1 + alpha) % arma::cumprod(evens % oddsp1);
+    arma::vec Ci_summands = arma::cumprod(-x2 / (evens % oddsm1)) / (evens + alpha);
+    arma::vec Si_summands = arma::cumprod(-x2 / (evens % oddsp1)) / (oddsp1 + alpha);
 
-    double Ci = xalpha * (1.0 / alpha + arma::accu(summands_num / Ci_summands_den));
-    double Si = x * xalpha * (1.0 / (1.0 + alpha) + arma::accu(summands_num / Si_summands_den));
+    double Ci = xalpha * (1.0 / alpha + arma::accu(Ci_summands));
+    double Si = x * xalpha * (1.0 / (1.0 + alpha) + arma::accu(Si_summands));
 
     return exp(-.5*i*arma::datum::pi*alpha) * boost::math::tgamma(alpha) - Ci + i*Si;
 
@@ -258,7 +329,8 @@ double padef( double x ) {
         inv_x2 * (4.20968180571076940208 * quick_pow10(12) +
         inv_x2 * (1.00795182980368574617 * quick_pow10(13) +
         inv_x2 * (4.94816688199951963482 * quick_pow10(12) +
-        inv_x2 * (- 4.94701168645415959931 * quick_pow10(11)))))))))));
+        inv_x2 * (- 4.94701168645415959931 * quick_pow10(11)
+    ))))))))));
 
     double denom = 1 +
         inv_x2 * (7.46437068161927678031 * quick_pow10(2) +
@@ -269,7 +341,8 @@ double padef( double x ) {
         inv_x2 * (7.08501308149515401563 * quick_pow10(11) +
         inv_x2 * (5.06084464593475076774 * quick_pow10(12) +
         inv_x2 * (1.43468549171581016479 * quick_pow10(13) +
-        inv_x2 * (1.11535493509914254097 * quick_pow10(13))))))))));
+        inv_x2 * (1.11535493509914254097 * quick_pow10(13)
+    )))))))));
 
     return inv_x * num / denom;
 }
@@ -288,7 +361,8 @@ double padeg( double x ) {
         inv_x2 * (7.57664583257834349 * quick_pow10(12) +
         inv_x2 * (1.81004487464664575 * quick_pow10(13) +
         inv_x2 * (6.43291613143049485 * quick_pow10(12) +
-        inv_x2 * (- 1.36517137670871689 * quick_pow10(12)))))))))));
+        inv_x2 * (- 1.36517137670871689 * quick_pow10(12)
+    ))))))))));
 
 
     double denom = 1 +
@@ -300,7 +374,8 @@ double padeg( double x ) {
         inv_x2 * (1.39866710696414565 * quick_pow10(12) +
         inv_x2 * (1.17164723371736605 * quick_pow10(13) +
         inv_x2 * (4.01839087307656620 * quick_pow10(13) +
-        inv_x2 * (3.99653257887490811 * quick_pow10(13))))))))));
+        inv_x2 * (3.99653257887490811 * quick_pow10(13)
+    )))))))));
 
     return inv_x2 * num / denom;
 }
@@ -319,7 +394,8 @@ double Ci( double x ) {
             x2 * (1.05297363846239184 * quick_negpow10(6) +
             x2 * (- 4.68889508144848019 * quick_negpow10(9) +
             x2 * (1.06480802891189243 * quick_negpow10(11) +
-            x2 * (- 9.93728488857585407 * quick_negpow10(15)))))));
+            x2 * (- 9.93728488857585407 * quick_negpow10(15)
+        ))))));
 
         double denom = 1 +
             x2 * (1.1592605689110735 * quick_negpow10(2) +
@@ -328,7 +404,8 @@ double Ci( double x ) {
             x2 * (6.97071295760958946 * quick_negpow10(10) +
             x2 * (1.38536352772778619 * quick_negpow10(12) +
             x2 * (1.89106054713059759 * quick_negpow10(15) +
-            x2 * (1.39759616731376855 * quick_negpow10(18))))))));
+            x2 * (1.39759616731376855 * quick_negpow10(18)
+        )))))));
 
         return arma::datum::euler + log(x) + x2 * num / denom;
     }
@@ -352,7 +429,8 @@ double Si( double x ) {
             x2 * (9.43280809438713025 * quick_negpow10(8) +
             x2 * (- 3.53201978997168357 * quick_negpow10(10) +
             x2 * (7.08240282274875911 * quick_negpow10(13) +
-            x2 * (- 6.05338212010422477 * quick_negpow10(16))))))));
+            x2 * (- 6.05338212010422477 * quick_negpow10(16)
+        )))))));
 
         double denom = 1 +
             x2 * (1.01162145739225565 * quick_negpow10(2) +
@@ -360,7 +438,8 @@ double Si( double x ) {
             x2 * (1.55654986308745614 * quick_negpow10(7) +
             x2 * (3.28067571055789734 * quick_negpow10(10) +
             x2 * (4.5049097575386581 * quick_negpow10(13) +
-            x2 * (3.21107051193712168 * quick_negpow10(16)))))));
+            x2 * (3.21107051193712168 * quick_negpow10(16)
+        ))))));
 
         return x * num / denom;
     }
