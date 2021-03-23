@@ -34,14 +34,11 @@ arma::vec _sinc( arma::vec x );
 // [[Rcpp::export]]
 arma::cx_vec Etheta_imaginary( double theta, arma::vec x );
 
-// Taylor approximants for the incomplete gamma function with imaginary argument
-double Ci( double x, double alpha );
-double Si( double x, double alpha );
-double taylorf( double x, double alpha );
-double taylorg( double x, double alpha );
-//' @export
-// [[Rcpp::export]]
-arma::cx_double inc_gamma_imag2( double x, double alpha );
+// // Taylor approximants for the incomplete gamma function with imaginary argument
+// double Ci( double x, double alpha );
+// double Si( double x, double alpha );
+// double taylorf( double x, double alpha );
+// double taylorg( double x, double alpha );
 
 //' Incomplete gamma function of imaginary argument
 //'

@@ -113,15 +113,15 @@ whittle <- function(counts, kern, binsize = NULL, trunc = 5L, init = NULL, ...) 
             }
             x0 = c(ymean * (1 - mu), mu, rate)
         } else {
-            x0 = c(runif(1, 0, 3),
-                   runif(1, 0, 1),
-                   runif(length(kern$param)-2, 0, 5))
+            x0 = c(ymean * 2,
+                   .5,
+                   runif(length(kern$param)-2, 0, 10))
         }
     } else x0 = init
 
     optargs = list(hessian = TRUE,
-                   lower = rep(.0001, length(kern$param)),
-                   upper = c(Inf, .9999, rep(Inf, length(kern$param)-2)),
+                   lower = rep(.01, length(kern$param)),
+                   upper = c(Inf, .99, rep(Inf, length(kern$param)-2)),
                    method = "L-BFGS-B")
 
     optargs = modifyList(optargs, list(...))
@@ -180,19 +180,67 @@ whittle <- function(counts, kern, binsize = NULL, trunc = 5L, init = NULL, ...) 
 #     }
 #
 #     if (is.null(opts))
-#         opts <- list("algorithm" = "NLOPT_LN_COBYLA")
+#         opts <- list("algorithm" = "NLOPT_LN_NELDERMEAD", "maxeval" = 1000)
 #     else {
 #         if (is.null(opts[["algorithm"]]))
-#             opts <- c(opts, "algorithm" = "NLOPT_LN_COBYLA")
+#             opts <- c(opts, "algorithm" = "NLOPT_LN_NELDERMEAD")
+#         if (is.null(opts[["maxeval"]]))
+#             opts <- c(opts, "maxeval" = 1000)
 #         if (is.null(opts[["xtol_rel"]]))
 #             opts <- c(opts, "xtol_rel" = 1e-04)
 #     }
 #
-#     if (is.null(init))
-#         x0 = c(runif(1, 0, 2),
-#                runif(1, 0, 1),
-#                runif(length(kern$param)-2, 0, 5))
-#     else x0 = init
+#     # Sensible initialisation
+#     if (is.null(init)) {
+#         ymean = mean(counts)
+#         # For PowerLaw
+#         if (is(kern, "Rcpp_PowerLaw")) {
+#             wmin = Inf
+#             mu = .25
+#             shape = 1
+#             scale = 1
+#             for (mu_ in c(.25, .5, .75)) {
+#                 for (shape_ in 1:10) {
+#                     for (scale_ in 1:10) {
+#                         kern$param[1] = ymean * (1 - mu_)
+#                         kern$param[2] = mu_
+#                         kern$param[3] = shape_
+#                         kern$param[4] = scale_
+#                         whit = kern$whittle(I, trunc = trunc)
+#                         if (whit < wmin) {
+#                             mu = mu_
+#                             shape = shape_
+#                             scale = scale_
+#                             wmin = whit
+#                         }
+#                     }
+#                 }
+#             }
+#             x0 = c(ymean * (1 - mu), mu, shape, scale)
+#         } else if (is(kern, "Rcpp_Exponential")) {
+#             wmin = Inf
+#             mu = .25
+#             rate = 1
+#             for (mu_ in c(.25, .5, .75)) {
+#                 for (rate_ in 1:10) {
+#                     kern$param[1] = ymean * (1 - mu_)
+#                     kern$param[2] = mu_
+#                     kern$param[3] = rate_
+#                     whit = kern$whittle(I, trunc = trunc)
+#                     if (whit < wmin) {
+#                         mu = mu_
+#                         rate = rate_
+#                         wmin = whit
+#                     }
+#                 }
+#             }
+#             x0 = c(ymean * (1 - mu), mu, rate)
+#         } else {
+#             x0 = c(ymean * 2,
+#                    .5,
+#                    runif(length(kern$param)-2, 0, 10))
+#         }
+#     } else x0 = init
 #
 #     optargs = list(lb = rep(.0001, length(kern$param)),
 #                    ub = c(Inf, .9999, rep(Inf, length(kern$param)-2)),

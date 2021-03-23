@@ -138,106 +138,131 @@ arma::cx_vec Etheta_imaginary( double theta, arma::vec x ) {
 
 }
 
-// Taylor approximants for the incomplete gamma function with imaginary argument
-double Ci( double x, double alpha ) {
+// // Taylor approximants for the incomplete gamma function with imaginary argument
+// double Ci( double x, double alpha ) {
+//
+//     if (x < 0.0)
+//         Rcpp::stop("ERROR in Ci: 'x' cannot be negative.");
+//
+//     if (x == 0.0)
+//         return 0.0;
+//
+//     if (alpha <= 0.0 || alpha >= 1.0) {
+//         Rcpp::stop("ERROR in Ci: 'alpha' must be between 0 and 1 strictly.");
+//     }
+//
+//     int n = std::ceil(7.0 + 1.36 * x); // Change constant term 'a' to get an approximation to order 10^{-a-1}
+//     double x2 = x * x;
+//     double xalpha = exp(alpha * log(x));
+//
+//     arma::vec evens = 2.0 * arma::regspace(1, n);
+//     arma::vec odds = 2.0 * arma::regspace(1, n) - 1.0;
+//     arma::vec summands = arma::cumprod(-x2 / (evens % odds)) / (evens + alpha);
+//
+//     return xalpha * (1.0 / alpha + arma::accu(summands));
+// }
+//
+// double Si( double x, double alpha ) {
+//
+//     if (x < 0.0)
+//         Rcpp::stop("ERROR in Si: 'x' cannot be negative.");
+//
+//     if (x == 0.0)
+//         return 0.0;
+//
+//     if (alpha <= 0.0 || alpha >= 1.0) {
+//         Rcpp::stop("ERROR in Si: 'alpha' must be between 0 and 1 strictly.");
+//     }
+//
+//     int n = std::ceil(7.0 + 1.36 * x); // Change constant term 'a' to get an approximation to order 10^{-a-1}
+//     double x2 = x * x;
+//     double xalpha = exp(alpha * log(x));
+//
+//     arma::vec evens = 2.0 * arma::regspace(1, n);
+//     arma::vec odds = 2.0 * arma::regspace(1, n) + 1.0;
+//     arma::vec summands = arma::cumprod(-x2 / (evens % odds)) / (odds + alpha);
+//
+//     return x * xalpha * (1.0 / (1.0 + alpha) + arma::accu(summands));
+// }
+//
+// double taylorf( double x, double alpha ) {
+//
+//     if (x < 20.0)
+//         Rcpp::stop("ERROR in taylorf: 'x' must be above 20 for correct approximation.");
+//
+//     if (alpha <= 0.0 || alpha >= 1.0) {
+//         Rcpp::stop("ERROR in taylorf: 'alpha' must be between 0 and 1 strictly.");
+//     }
+//
+//     int n = 10;
+//     double inv_x = 1.0 / x;
+//     double inv_x2 = inv_x * inv_x;
+//     double xalpha = exp(alpha * log(x));
+//
+//     arma::vec evens = alpha - 2.0 * arma::regspace(1, n);
+//     arma::vec odds = alpha - 2.0 * arma::regspace(1, n) + 1.0;
+//     arma::vec summands = arma::cumprod(- inv_x2 * evens % odds);
+//
+//     return (xalpha * inv_x) * (1.0 + arma::accu(summands));
+//
+// }
+//
+// double taylorg( double x, double alpha ) {
+//
+//     if (x < 20.0)
+//         Rcpp::stop("ERROR in taylorg: 'x' must be above 20 for correct approximation.");
+//
+//     if (alpha <= 0.0 || alpha >= 1.0) {
+//         Rcpp::stop("ERROR in taylorg: 'alpha' must be between 0 and 1 strictly.");
+//     }
+//
+//     int n = 10;
+//     double inv_x = 1.0 / x;
+//     double inv_x2 = inv_x * inv_x;
+//     double xalpha = exp(alpha * log(x));
+//
+//     arma::vec evens = alpha - 2.0 * arma::regspace(1, n-1);
+//     arma::vec odds = alpha - 2.0 * arma::regspace(1, n-1) - 1.0;
+//     arma::vec summands = arma::cumprod(- inv_x2 * evens % odds);
+//
+//     return (1.0 - alpha) * (xalpha * inv_x2) * (1.0 + arma::accu(summands));
+//
+// }
+
+arma::cx_double inc_gamma_imag( double x, double alpha ) {
 
     if (x < 0.0)
-        Rcpp::stop("ERROR in Ci: 'x' cannot be negative.");
+        Rcpp::stop("ERROR in inc_gamma_imag: 'x' cannot be negative.");
 
     if (x == 0.0)
-        return 0.0;
+        return exp(-.5*i*arma::datum::pi*alpha) * boost::math::tgamma(alpha);
 
     if (alpha <= 0.0 || alpha >= 1.0) {
-        Rcpp::stop("ERROR in Ci: 'alpha' must be between 0 and 1 strictly.");
+        Rcpp::stop("ERROR in inc_gamma_imag: 'alpha' must be between 0 and 1 strictly.");
     }
 
-    int n = std::ceil(7.0 + 1.36 * x); // Change constant term 'a' to get an approximation to order 10^{-a-1}
-    double x2 = x * x;
-    double xalpha = exp(alpha * log(x));
+    // Taylor expansion of Ci and Si around x = 0, up to 34 terms calculated for x = 20
+    // This approximation is of order 10^{-8}
+    if (x < 20.0) {
+        int n = std::ceil(7.0 + 1.36 * x); // Change constant term 'a' to get an approximation to order 10^{-a-1}
+        double x2 = x * x;
+        double xalpha = exp(alpha * log(x));
 
-    arma::vec evens = 2.0 * arma::regspace(1, n);
-    arma::vec odds = 2.0 * arma::regspace(1, n) - 1.0;
-    arma::vec summands = arma::cumprod(-x2 / (evens % odds)) / (evens + alpha);
+        arma::vec evens = 2 * arma::regspace(1, n);
+        arma::vec oddsm1 = 2 * arma::regspace(1, n) - 1;
+        arma::vec oddsp1 = 2 * arma::regspace(1, n) + 1;
+        arma::vec Ci_summands = arma::cumprod(-x2 / (evens % oddsm1)) / (evens + alpha);
+        arma::vec Si_summands = arma::cumprod(-x2 / (evens % oddsp1)) / (oddsp1 + alpha);
 
-    return xalpha * (1.0 / alpha + arma::accu(summands));
-}
+        double Ci = xalpha * (1.0 / alpha + arma::accu(Ci_summands));
+        double Si = x * xalpha * (1.0 / (1.0 + alpha) + arma::accu(Si_summands));
 
-double Si( double x, double alpha ) {
-
-    if (x < 0.0)
-        Rcpp::stop("ERROR in Si: 'x' cannot be negative.");
-
-    if (x == 0.0)
-        return 0.0;
-
-    if (alpha <= 0.0 || alpha >= 1.0) {
-        Rcpp::stop("ERROR in Si: 'alpha' must be between 0 and 1 strictly.");
+        return exp(-.5*i*arma::datum::pi*alpha) * boost::math::tgamma(alpha) - Ci + i*Si;
     }
 
-    int n = std::ceil(7.0 + 1.36 * x); // Change constant term 'a' to get an approximation to order 10^{-a-1}
-    double x2 = x * x;
-    double xalpha = exp(alpha * log(x));
-
-    arma::vec evens = 2.0 * arma::regspace(1, n);
-    arma::vec odds = 2.0 * arma::regspace(1, n) + 1.0;
-    arma::vec summands = arma::cumprod(-x2 / (evens % odds)) / (odds + alpha);
-
-    return x * xalpha * (1.0 / (1.0 + alpha) + arma::accu(summands));
-}
-
-double taylorf( double x, double alpha ) {
-
-    if (x < 20.0)
-        Rcpp::stop("ERROR in taylorf: 'x' must be above 20 for correct approximation.");
-
-    if (alpha <= 0.0 || alpha >= 1.0) {
-        Rcpp::stop("ERROR in taylorf: 'alpha' must be between 0 and 1 strictly.");
-    }
-
-    int n = 10;
-    double inv_x = 1.0 / x;
-    double inv_x2 = inv_x * inv_x;
-    double xalpha = exp(alpha * log(x));
-
-    arma::vec evens = alpha - 2.0 * arma::regspace(1, n);
-    arma::vec odds = alpha - 2.0 * arma::regspace(1, n) + 1.0;
-    arma::vec summands = arma::cumprod(- inv_x2 * evens % odds);
-
-    return (xalpha * inv_x) * (1.0 + arma::accu(summands));
-
-}
-
-double taylorg( double x, double alpha ) {
-
-    if (x < 20.0)
-        Rcpp::stop("ERROR in taylorg: 'x' must be above 20 for correct approximation.");
-
-    if (alpha <= 0.0 || alpha >= 1.0) {
-        Rcpp::stop("ERROR in taylorg: 'alpha' must be between 0 and 1 strictly.");
-    }
-
-    int n = 10;
-    double inv_x = 1.0 / x;
-    double inv_x2 = inv_x * inv_x;
-    double xalpha = exp(alpha * log(x));
-
-    arma::vec evens = alpha - 2.0 * arma::regspace(1, n-1);
-    arma::vec odds = alpha - 2.0 * arma::regspace(1, n-1) - 1.0;
-    arma::vec summands = arma::cumprod(- inv_x2 * evens % odds);
-
-    return (1.0 - alpha) * (xalpha * inv_x2) * (1.0 + arma::accu(summands));
-
-}
-
-arma::cx_double inc_gamma_imag2( double x, double alpha ) {
-
-    if (x < 0.0)
-        Rcpp::stop("ERROR in Si: 'x' cannot be negative.");
-
-    if (alpha <= 0.0 || alpha >= 1.0) {
-        Rcpp::stop("ERROR in taylorg: 'alpha' must be between 0 and 1 strictly.");
-    }
-
+    // Taylor expansion of f and g around x -> infty, only 10 terms calculated
+    // This approximation is at most of order 10^{-8}
+    // Can't be used for x < 20 because then it is of lower order
     int n = 10;
     double inv_x = 1.0 / x;
     double inv_x2 = inv_x * inv_x;
@@ -256,35 +281,6 @@ arma::cx_double inc_gamma_imag2( double x, double alpha ) {
     double Si = taylorg * sin(x) + taylorf * cos(x);
 
     return Ci - i*Si;
-
-}
-
-arma::cx_double inc_gamma_imag( double x, double alpha ) {
-
-    if (x < 0.0)
-        Rcpp::stop("ERROR in inc_gamma_imag: 'x' cannot be negative.");
-
-    if (x == 0.0)
-        return exp(-.5*i*arma::datum::pi*alpha) * boost::math::tgamma(alpha);
-
-    if (alpha <= 0.0 || alpha >= 1.0) {
-        Rcpp::stop("ERROR in inc_gamma_imag: 'alpha' must be between 0 and 1 strictly.");
-    }
-
-    int n = std::ceil(7.0 + 1.36 * x); // Change constant term 'a' to get an approximation to order 10^{-a-1}
-    double x2 = x * x;
-    double xalpha = exp(alpha * log(x));
-
-    arma::vec evens = 2 * arma::regspace(1, n);
-    arma::vec oddsm1 = 2 * arma::regspace(1, n) - 1;
-    arma::vec oddsp1 = 2 * arma::regspace(1, n) + 1;
-    arma::vec Ci_summands = arma::cumprod(-x2 / (evens % oddsm1)) / (evens + alpha);
-    arma::vec Si_summands = arma::cumprod(-x2 / (evens % oddsp1)) / (oddsp1 + alpha);
-
-    double Ci = xalpha * (1.0 / alpha + arma::accu(Ci_summands));
-    double Si = x * xalpha * (1.0 / (1.0 + alpha) + arma::accu(Si_summands));
-
-    return exp(-.5*i*arma::datum::pi*alpha) * boost::math::tgamma(alpha) - Ci + i*Si;
 
 }
 

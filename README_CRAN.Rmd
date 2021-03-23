@@ -48,6 +48,9 @@ Finally, the process resulting from the superposition of all these branching pro
 
 ![Realisation of an exponential Hawkes process](man/figures/hawkes.png)
 
+This package also supports non-causal Hawkes processes, for which the reproduction kernel $h^\ast$ may take non-negative values on $\mathbb R_{\le 0}$.
+Such processes are not defined through their conditional intensity functions, but ...
+
 ## Usage
 
 
