@@ -1,21 +1,22 @@
 ---
 title: "hawkesbow"
 author: "Felix Cheysson"
-date: "23/03/2021"
 output: 
   pdf_document:
     fig_caption: yes
     number_sections: true
+vignette: >
+  %\VignetteIndexEntry{hawkesbow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 bibliography: references.bib
 ---
-
-<!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "man/figures/README-",
+  fig.path = "",
   out.width = "100%"
 )
 ```
@@ -24,9 +25,6 @@ knitr::opts_chunk$set(
 \setcounter{secnumdepth}{3}
 <!-- % entries down to \subsubsections in the TOC -->
 \setcounter{tocdepth}{3}    
-
-<!-- badges: start -->
-<!-- badges: end -->
 
 This package implements a spectral approach to the parametric estimation of Hawkes processes from Binned Observations through Whittle likelihood (HawkesBOW).
 It is based on the results of the article [@Cheysson2020].
@@ -70,8 +68,8 @@ These in turn independently generate children according to the same process, and
 The processes consisting of an immigrant and all its descendants are therefore branching processes, and are independent of each other.
 Finally, the process resulting from the superposition of all these branching processes is a Hawkes process of conditional intensity $\lambda(\cdot)$ (see Figure \ref{fig:hawkes}).
 
-```{r hawkes, fig.align="center", out.width="80%", fig.cap="Realisation of an exponential Hawkes process, with $\\eta = 1$, $\\mu = 0.5$ and $h^\\ast(t) = 2e^{-2t}$. The crosses represent the arrival times of the process. (Top) Representation of the conditional intensity of the process: each event increases the probability of occurrence of future events, according to the reproduction function $h = \\mu h^\\ast$. (Bottom) Representation of the process as a poisson cluster process: each immigrant (black squares, of generation 0) can generate children (red dots, of generation 1), which can in turn generate children, and so on."}
-knitr::include_graphics("man/figures/hawkes.eps")
+```{r hawkes, fig.align="center", out.width="90%", fig.cap="Realisation of an exponential Hawkes process, with $\\eta = 1$, $\\mu = 0.5$ and $h^\\ast(t) = 2e^{-2t}$. The crosses represent the arrival times of the process. (Top) Representation of the conditional intensity of the process: each event increases the probability of occurrence of future events, according to the reproduction function $h = \\mu h^\\ast$. (Bottom) Representation of the process as a poisson cluster process: each immigrant (black squares, of generation 0) can generate children (red dots, of generation 1), which can in turn generate children, and so on."}
+knitr::include_graphics("hawkes.eps")
 ```
 
 This package also supports non-causal Hawkes processes, for which the reproduction kernel $h^\ast$ may take non-negative values on $\mathbb R_{\le 0}$.

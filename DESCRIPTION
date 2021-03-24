@@ -20,8 +20,11 @@ Imports:
     nloptr,
     PtProcess
 Suggests: 
-    testthat (>= 2.1.0)
+    testthat (>= 2.1.0),
+    knitr,
+    rmarkdown
 LinkingTo:
     Rcpp,
     RcppArmadillo,
     BH
+VignetteBuilder: knitr
