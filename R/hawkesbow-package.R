@@ -1,6 +1,5 @@
 #' @details
 #' To be implemented later:
-#' - Add derivatives dH to accelerate Whittle's estimation method
 #' - Variance and confidence interval for the estimated parameters
 #' - Spectral density based goodness-of-fit tests
 #' - Custom built-kernels

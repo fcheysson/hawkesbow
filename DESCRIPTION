@@ -5,7 +5,7 @@ Authors@R:
     person(given = "Felix",
            family = "Cheysson",
            role = c("aut", "cre"),
-           email = "felix.cheysson@agroparistech.com",
+           email = "felix@cheysson.fr",
            comment = c(ORCID = "0000-0002-9095-2878"))
 Description: This package estimating Hawkes processes when count data are only observed in discrete time, using a spectral approach derived from the Bartlett spectrum. Some general use functions for Hawkes processes are also included: simulation of (in)homogeneous Hawkes process, maximum likelihood estimation, residual analysis, etc.
 License: MIT + file LICENSE

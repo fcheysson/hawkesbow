@@ -89,7 +89,8 @@ hawkes_ogata <- function(T, lambda, alpha, beta, lambda0=NULL) {
 
 #' Plot of a simulated Hawkes process
 #'
-#' Plots a simulated Hawkes process, highlighting the steps used in Ogata's thinning algorithm.
+#' Plots a Hawkes process simulated by the function `hawkes_ogata`,
+#' highlighting the steps used in Ogata's thinning algorithm.
 #'
 #' @param x A simulated Hawkes process from `hawkes_ogata`.
 #' @param precision (default = 1e3) Number of points to plot.
@@ -130,23 +131,23 @@ plot.hawkes_ogata <- function(x, precision=1e3, ...) {
 		lty=c(1,1,NA,NA), col=c("black", "blue", "green", "red"), lwd=c(1,4,NA,NA), pch=c(NA, NA, 1, 3))
 }
 
-#' Intensity of a simulated Hawkes process
-#'
-#' Outputs the intensity of a simulated Hawkes process.
-#'
-#' @param hawkes A simulated Hawkes process from `hawkes_ogata`.
-#' @param t A numeric or vector.
-#'
-#' @return The intensity at time t.
-#'
-#' @export
-#'
-#' @examples
-#' # Simulate an exponential Hawkes process with baseline intensity 1 and
-#' # excitation function 1*exp(-2t)
-#' x <- hawkes_ogata(10, 1, 1, 2)
-#' plot(x)
-#' intensity_ogata(x, 0:10)
+# #' Intensity of a simulated Hawkes process
+# #'
+# #' Outputs the intensity of a simulated Hawkes process.
+# #'
+# #' @param hawkes A simulated Hawkes process from `hawkes_ogata`.
+# #' @param t A numeric or vector.
+# #'
+# #' @return The intensity at time t.
+# #'
+# #' @export
+# #'
+# #' @examples
+# #' # Simulate an exponential Hawkes process with baseline intensity 1 and
+# #' # excitation function 1*exp(-2t)
+# #' x <- hawkes_ogata(10, 1, 1, 2)
+# #' plot(x)
+# #' intensity_ogata(x, 0:10)
 intensity_ogata <- function(hawkes, t) {
 	# If outside of bounds, return error
 	if (any(t < 0) || any(t > hawkes$T))
@@ -165,63 +166,63 @@ intensity_ogata <- function(hawkes, t) {
 	return( int )
 }
 
-#' Compensator of a simulated Hawkes process
-#'
-#' Outputs the compensator (integrated intensity) of a simulated Hawkes process.
-#'
-#' @param hawkes A simulated Hawkes process from `hawkes_ogata`.
-#' @param t A numeric or vector.
-#'
-#' @return The compensator at time t.
-#'
-#' @export
-#'
-#' @examples
-#' # Simulate an exponential Hawkes process with baseline intensity 1 and
-#' # excitation function 1*exp(-2t)
-#' x <- hawkes_ogata(10, 1, 1, 2)
-#' plot(x)
-#' compensator_ogata(x, 0:10)
-compensator_ogata <- function(hawkes, t) {
-	# If outside of bounds, return error
-	if (any(t < 0) || any(t > hawkes$T))
-		stop("t is out of bound.")
-	# Create vector of past closest points of hawkes
-	index <- sapply(t, function(j) {
-		Position(function(p) p >= j, hawkes$p, nomatch=hawkes$n+1)-1
-	})
-	int <- hawkes$lambda * t
-	pind <- (index > 0)
-	int[!pind] <- int[!pind] +
-		(hawkes$lambda0 - hawkes$lambda) / hawkes$beta * (1 - exp(-hawkes$beta * t[!pind]))
-	int[pind] <- int[pind] + (hawkes$lambda0 - hawkes$lambda) / hawkes$beta +
-		hawkes$alpha / hawkes$beta *
-		(index[pind] -
-		exp(-hawkes$beta * (t[pind] - hawkes$p[index[pind]])) * (hawkes$A[index[pind]] + 1))
-	return( int )
-}
+# #' Compensator of a simulated Hawkes process
+# #'
+# #' Outputs the compensator (integrated intensity) of a simulated Hawkes process.
+# #'
+# #' @param hawkes A simulated Hawkes process from `hawkes_ogata`.
+# #' @param t A numeric or vector.
+# #'
+# #' @return The compensator at time t.
+# #'
+# #' @export
+# #'
+# #' @examples
+# #' # Simulate an exponential Hawkes process with baseline intensity 1 and
+# #' # excitation function 1*exp(-2t)
+# #' x <- hawkes_ogata(10, 1, 1, 2)
+# #' plot(x)
+# #' compensator_ogata(x, 0:10)
+# compensator_ogata <- function(hawkes, t) {
+# 	# If outside of bounds, return error
+# 	if (any(t < 0) || any(t > hawkes$T))
+# 		stop("t is out of bound.")
+# 	# Create vector of past closest points of hawkes
+# 	index <- sapply(t, function(j) {
+# 		Position(function(p) p >= j, hawkes$p, nomatch=hawkes$n+1)-1
+# 	})
+# 	int <- hawkes$lambda * t
+# 	pind <- (index > 0)
+# 	int[!pind] <- int[!pind] +
+# 		(hawkes$lambda0 - hawkes$lambda) / hawkes$beta * (1 - exp(-hawkes$beta * t[!pind]))
+# 	int[pind] <- int[pind] + (hawkes$lambda0 - hawkes$lambda) / hawkes$beta +
+# 		hawkes$alpha / hawkes$beta *
+# 		(index[pind] -
+# 		exp(-hawkes$beta * (t[pind] - hawkes$p[index[pind]])) * (hawkes$A[index[pind]] + 1))
+# 	return( int )
+# }
 
-#' Residuals of a simulated Hawkes process
-#'
-#' Outputs the residuals (values of the compensator at the times of arrival) of a simulated Hawkes process.
-#' Useful function for diagnosis through the random time change theorem: the residuals should follow
-#' a unit rate Poisson process.
-#'
-#' @param hawkes A simulated Hawkes process from `hawkes_ogata`.
-#'
-#' @return The intensity at time t.
-#'
-#' @export
-#'
-#' @examples
-#' # Simulate an exponential Hawkes process with baseline intensity 1 and
-#' # excitation function 1*exp(-2t)
-#' x <- hawkes_ogata(10, 1, 1, 2)
-#' plot(x)
-#' z = residuals_ogata(x)
-#' plot(z)
-#' abline(0, 1)
-residuals_ogata <- function(hawkes) {
-	return( hawkes$lambda * hawkes$p + (hawkes$lambda0 - hawkes$lambda) / hawkes$beta +
-		hawkes$alpha / hawkes$beta * (1:hawkes$n - 1 - hawkes$A) )
-}
+# #' Residuals of a simulated Hawkes process
+# #'
+# #' Outputs the residuals (values of the compensator at the times of arrival) of a simulated Hawkes process.
+# #' Useful function for diagnosis through the random time change theorem: the residuals should follow
+# #' a unit rate Poisson process.
+# #'
+# #' @param hawkes A simulated Hawkes process from `hawkes_ogata`.
+# #'
+# #' @return The intensity at time t.
+# #'
+# #' @export
+# #'
+# #' @examples
+# #' # Simulate an exponential Hawkes process with baseline intensity 1 and
+# #' # excitation function 1*exp(-2t)
+# #' x <- hawkes_ogata(10, 1, 1, 2)
+# #' plot(x)
+# #' z = residuals_ogata(x)
+# #' plot(z)
+# #' abline(0, 1)
+# residuals_ogata <- function(hawkes) {
+# 	return( hawkes$lambda * hawkes$p + (hawkes$lambda0 - hawkes$lambda) / hawkes$beta +
+# 		hawkes$alpha / hawkes$beta * (1:hawkes$n - 1 - hawkes$A) )
+# }

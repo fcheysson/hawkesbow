@@ -17,7 +17,8 @@
 None
 }
 \description{
-Plots a simulated Hawkes process, highlighting the steps used in Ogata's thinning algorithm.
+Plots a Hawkes process simulated by the function \code{hawkes_ogata},
+highlighting the steps used in Ogata's thinning algorithm.
 }
 \examples{
 # Simulate an exponential Hawkes process with baseline intensity 1 and
