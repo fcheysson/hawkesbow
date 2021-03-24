@@ -17,20 +17,27 @@
 #' \eqn{O(n \log n)}, using function `fft`.
 #'
 #' @return
-#' eturns a list containing the solution of the optimisation procedure, the object Model
+#' Returns a list containing the solution of the optimisation procedure, the object Model
 #' with its parameters updated to the solution, and the output produced by `optim`.
 #' @export
+#'
+#' @seealso [hawkes()] for the simulation of Hawkes processes,
+#' [discrete()] for the discretisation of simulated Hawkes processes,
+#' [Model] for the abstract class, and [Exponential] for the specific
+#' reproduction kernels.
 #'
 #' @examples
 #' # Simulate and fit a Hawkes process with exponential kernel
 #' x = hawkes(1000, fun = 1, repr = .5, family = "exp", rate = 1)
 #' y = discrete(x, binsize = 1)
-#' whittle(y, "Exponential")
+#' opt = whittle(y, "Exponential")
+#' opt$par      # Estimated parameters
 #'
 #' # Simulate and fit a Hawkes process with power law kernel
 #' x = hawkes(1000, fun = 1, repr= .3, family = "powerlaw", shape = 3.5, scale = 1.0)
 #' y = discrete(x, binsize = 1)
-#' whittle(y, "powerlaw")
+#' opt = whittle(y, "powerlaw")
+#' opt$par      # Estimated parameters
 whittle <- function(counts, kern, binsize = NULL, trunc = 5L, init = NULL, ...) {
 
     # Check that the argument 'kern' is either a string that matches of the kernels implemented

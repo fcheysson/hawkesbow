@@ -6,7 +6,7 @@
 \alias{hawkesbow-package}
 \title{hawkesbow: Estimation of Hawkes processes from Binned Observations using Whittle likelihood}
 \description{
-This package estimating Hawkes processes when count data are only observed in discrete time, using a spectral approach derived from the Bartlett spectrum. Some general use functions for Hawkes processes are also included: simulation of (in)homogeneous Hawkes process, maximum likelihood estimation, residual analysis, etc.
+This package implements an estimation method for Hawkes processes when count data are only observed in discrete time, using a spectral approach derived from the Bartlett spectrum. Some general use functions for Hawkes processes are also included: simulation of (in)homogeneous Hawkes process, maximum likelihood estimation, residual analysis, etc.
 }
 \details{
 To be implemented later:
@@ -15,6 +15,28 @@ To be implemented later:
 \item Spectral density based goodness-of-fit tests
 \item Custom built-kernels
 }
+}
+\examples{
+# Simulate an exponential Hawkes process with baseline intensity 1,
+# reproduction mean 0.5 and exponential fertility function with rate 2.
+x <- hawkes(10, fun=1, repr=0.5, family="exp", rate=2)
+
+# Plot its conditional intensity function
+par(mfrow = c(2, 1), mar = c(4.1, 4.1, 1.1, 2.1))
+plot(x, intensity = TRUE)
+# and its poisson cluster representation
+plot(x, intensity = FALSE)
+
+# Estimate the parameters from the arrival times of `x`
+# using maximum likelihood estimation
+opt = mle(x$p, "Exponential", x$T)
+opt$par                          # Estimated parameters
+opt$model$ddloglik(x$p, x$T)     # Hessian matrix of the log-likelihood
+
+# Estimate the parameters from count data using Whittle's method
+y = discrete(x, binsize = 1)
+opt = whittle(y, "Exponential", binsize = 1)
+opt$par                          # Estimated parameters
 }
 \author{
 \strong{Maintainer}: Felix Cheysson \email{felix@cheysson.fr} (\href{https://orcid.org/0000-0002-9095-2878}{ORCID})

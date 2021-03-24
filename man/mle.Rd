@@ -37,6 +37,16 @@ vol. 31, no. 1, pp. 145–155, Dec. 1979).
 For the power law kernel, the complexity is \eqn{O(n^2)}.
 }
 \examples{
+# Simulate an exponential Hawkes process with baseline intensity 1,
+# reproduction mean 0.5 and exponential fertility function with rate 2.
 x = hawkes(100, fun = 1, repr = .5, family = "exp", rate = 1)
-mle(x$p, "Exponential", x$T)
+# Estimate the parameters from the arrival times of `x` using MLE
+opt = mle(x$p, "Exponential", x$T)
+opt$par                          # Estimated parameters
+opt$model$ddloglik(x$p, x$T)     # Hessian matrix of the log-likelihood
+}
+\seealso{
+\code{\link[=hawkes]{hawkes()}} for the simulation of Hawkes processes,
+\link{Model} for the abstract class, and \link{Exponential} for the specific
+reproduction kernels.
 }

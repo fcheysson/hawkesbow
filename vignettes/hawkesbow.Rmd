@@ -68,7 +68,7 @@ These in turn independently generate children according to the same process, and
 The processes consisting of an immigrant and all its descendants are therefore branching processes, and are independent of each other.
 Finally, the process resulting from the superposition of all these branching processes is a Hawkes process of conditional intensity $\lambda(\cdot)$ (see Figure \ref{fig:hawkes}).
 
-```{r hawkes, fig.align="center", out.width="90%", fig.cap="Realisation of an exponential Hawkes process, with $\\eta = 1$, $\\mu = 0.5$ and $h^\\ast(t) = 2e^{-2t}$. The crosses represent the arrival times of the process. (Top) Representation of the conditional intensity of the process: each event increases the probability of occurrence of future events, according to the reproduction function $h = \\mu h^\\ast$. (Bottom) Representation of the process as a poisson cluster process: each immigrant (black squares, of generation 0) can generate children (red dots, of generation 1), which can in turn generate children, and so on."}
+```{r hawkes, echo=FALSE, fig.align="center", out.width="90%", fig.cap="Realisation of an exponential Hawkes process, with $\\eta = 1$, $\\mu = 0.5$ and $h^\\ast(t) = 2e^{-2t}$. The crosses represent the arrival times of the process. (Top) Representation of the conditional intensity of the process: each event increases the probability of occurrence of future events, according to the reproduction function $h = \\mu h^\\ast$. (Bottom) Representation of the process as a poisson cluster process: each immigrant (black squares, of generation 0) can generate children (red dots, of generation 1), which can in turn generate children, and so on."}
 knitr::include_graphics("hawkes.eps")
 ```
 
@@ -202,8 +202,8 @@ Note that `discrete` is a useful function to create the count sequence $(X_k)$ a
 
 ## Other functions
 
-Other functions play a minor role in the package.
-However if needed, they are all are well documented and with examples.
+Other functions are all well documented and with examples.
+This subsection will be expanded in the future.
 
 # Reproduction kernels
 
@@ -222,6 +222,17 @@ $$\widetilde {h^\ast}(\omega) = \beta \frac{1}{\beta + i\omega} = \beta \frac{\b
 The exponential kernel can be specified with the string `Exponential` and the parameter $\beta$ with the usual argument `rate`.
 Both maximum and Whittle likelihood methods are fully implemented for exponential kernels.
 Moreover, the likelihood function is implemented in complexity $\mathcal O(n)$, using the relations in [@Ozaki1979].
+
+## The symmetric exponential kernel
+
+This is a symmetrised version of the exponential density function with parameter $\beta > 0$:
+$$h^\ast(t) = \frac 1 2 \beta e^{-\beta |t|}.$$
+Its Fourier transform is 
+$$\widetilde {h^\ast}(\omega) = \frac{\beta^2}{\beta^2 + \omega^2}.$$
+
+The symmetric exponential kernel can be specified with the string `SymmetricExponential` and the parameter $\beta$ with the argument `rate`.
+Only the Whittle likelihood method is implemented for symmetric exponential kernels.
+Note that it is a non-causal kernel, as $h^\ast(t) \ne 0$ for $t < 0$.
 
 ## The gaussian kernel
 
@@ -269,6 +280,8 @@ Only the Whittle method is available for Pareto kernels.
 # To be implemented
 
 - Improve this vignette: it is currently too sparse and functions of the package could need some better description.
+
+- Add some real datasets to the package: real life case-studies with good datasets help understand the functionalities of a package.
 
 - Variance and confidence intervals for the estimation with function `whittle`: note that currently, the variance-covariance matrix returned by the optimisation method in function `whittle` is not accurate, as it ignores the dependence within the count sequence $(X_k)$.
 

@@ -24,9 +24,17 @@
 #' with its parameters updated to the solution, and the output produced by `nloptr`.
 #' @export
 #'
+#' @seealso [hawkes()] for the simulation of Hawkes processes,
+#' [Model] for the abstract class, and [Exponential] for the specific
+#' reproduction kernels.
 #' @examples
+#' # Simulate an exponential Hawkes process with baseline intensity 1,
+#' # reproduction mean 0.5 and exponential fertility function with rate 2.
 #' x = hawkes(100, fun = 1, repr = .5, family = "exp", rate = 1)
-#' mle(x$p, "Exponential", x$T)
+#' # Estimate the parameters from the arrival times of `x` using MLE
+#' opt = mle(x$p, "Exponential", x$T)
+#' opt$par                          # Estimated parameters
+#' opt$model$ddloglik(x$p, x$T)     # Hessian matrix of the log-likelihood
 mle <- function(events, kern, end, init = NULL, opts = NULL, ...) {
 
     # Check that the argument 'kern' is either a string that matches of the kernels implemented

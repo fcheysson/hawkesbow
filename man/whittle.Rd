@@ -20,7 +20,7 @@ whittle(counts, kern, binsize = NULL, trunc = 5L, init = NULL, ...)
 \item{...}{Additional arguments passed to \code{optim}}
 }
 \value{
-eturns a list containing the solution of the optimisation procedure, the object Model
+Returns a list containing the solution of the optimisation procedure, the object Model
 with its parameters updated to the solution, and the output produced by \code{optim}.
 }
 \description{
@@ -37,10 +37,18 @@ The periodogram used in the optimisation procedure is computed in complexity
 # Simulate and fit a Hawkes process with exponential kernel
 x = hawkes(1000, fun = 1, repr = .5, family = "exp", rate = 1)
 y = discrete(x, binsize = 1)
-whittle(y, "Exponential")
+opt = whittle(y, "Exponential")
+opt$par      # Estimated parameters
 
 # Simulate and fit a Hawkes process with power law kernel
 x = hawkes(1000, fun = 1, repr= .3, family = "powerlaw", shape = 3.5, scale = 1.0)
 y = discrete(x, binsize = 1)
-whittle(y, "powerlaw")
+opt = whittle(y, "powerlaw")
+opt$par      # Estimated parameters
+}
+\seealso{
+\code{\link[=hawkes]{hawkes()}} for the simulation of Hawkes processes,
+\code{\link[=discrete]{discrete()}} for the discretisation of simulated Hawkes processes,
+\link{Model} for the abstract class, and \link{Exponential} for the specific
+reproduction kernels.
 }
