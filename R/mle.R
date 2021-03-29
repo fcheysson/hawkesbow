@@ -1,7 +1,7 @@
 #' Fitting Hawkes processes from continuous data
 #'
 #' This function fits a Hawkes process to continuous data by minimizing the likelihood
-#' on the interval \eqn{[0,T]}.
+#' on the interval \eqn{[0,\mathrm{end}]}.
 #'
 #' @param events The locations of events (sorted in ascending order)
 #' @param kern Either a string (partially) matching one of the kernels implemented (see Details), or an object of class Model
@@ -32,9 +32,9 @@
 #' # reproduction mean 0.5 and exponential fertility function with rate 2.
 #' x = hawkes(100, fun = 1, repr = .5, family = "exp", rate = 1)
 #' # Estimate the parameters from the arrival times of `x` using MLE
-#' opt = mle(x$p, "Exponential", x$T)
+#' opt = mle(x$p, "Exponential", x$end)
 #' opt$par                          # Estimated parameters
-#' opt$model$ddloglik(x$p, x$T)     # Hessian matrix of the log-likelihood
+#' opt$model$ddloglik(x$p, x$end)     # Hessian matrix of the log-likelihood
 mle <- function(events, kern, end, init = NULL, opts = NULL, ...) {
 
     # Check that the argument 'kern' is either a string that matches of the kernels implemented

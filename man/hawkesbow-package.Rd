@@ -4,9 +4,9 @@
 \name{hawkesbow-package}
 \alias{hawkesbow}
 \alias{hawkesbow-package}
-\title{hawkesbow: Estimation of Hawkes processes from Binned Observations using Whittle likelihood}
+\title{hawkesbow: Estimation of Hawkes Processes from Binned Observations}
 \description{
-This package implements an estimation method for Hawkes processes when count data are only observed in discrete time, using a spectral approach derived from the Bartlett spectrum. Some general use functions for Hawkes processes are also included: simulation of (in)homogeneous Hawkes process, maximum likelihood estimation, residual analysis, etc.
+Implements an estimation method for Hawkes processes when count data are only observed in discrete time, using a spectral approach derived from the Bartlett spectrum, see Cheysson and Lang (2020) <arXiv:2003.04314>. Some general use functions for Hawkes processes are also included: simulation of (in)homogeneous Hawkes process, maximum likelihood estimation, residual analysis, etc.
 }
 \details{
 To be implemented later:
@@ -22,16 +22,18 @@ To be implemented later:
 x <- hawkes(10, fun=1, repr=0.5, family="exp", rate=2)
 
 # Plot its conditional intensity function
+oldpar = par()
 par(mfrow = c(2, 1), mar = c(4.1, 4.1, 1.1, 2.1))
 plot(x, intensity = TRUE)
 # and its poisson cluster representation
 plot(x, intensity = FALSE)
+par(oldpar)
 
 # Estimate the parameters from the arrival times of `x`
 # using maximum likelihood estimation
-opt = mle(x$p, "Exponential", x$T)
+opt = mle(x$p, "Exponential", x$end)
 opt$par                          # Estimated parameters
-opt$model$ddloglik(x$p, x$T)     # Hessian matrix of the log-likelihood
+opt$model$ddloglik(x$p, x$end)     # Hessian matrix of the log-likelihood
 
 # Estimate the parameters from count data using Whittle's method
 y = discrete(x, binsize = 1)

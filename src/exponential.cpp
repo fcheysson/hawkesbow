@@ -43,7 +43,7 @@ arma::cx_cube Exponential::ddH( arma::vec xi ) {
 ////////////////////////////////////////////
 // Methods for maximum likelihood estimation
 
-double Exponential::loglik( const arma::vec& events, double T ) {
+double Exponential::loglik( const arma::vec& events, double end ) {
 
     // Constants
     const arma::uword n = events.n_elem;
@@ -60,12 +60,12 @@ double Exponential::loglik( const arma::vec& events, double T ) {
     }
 
     // Int \lambda* dt
-    double part2 = eta * T + mu * ((double)n - exp(-beta * (T - events(n-1))) * (1.0 + A));
+    double part2 = eta * end + mu * ((double)n - exp(-beta * (end - events(n-1))) * (1.0 + A));
 
     return part1 - part2;
 }
 
-arma::vec Exponential::dloglik( const arma::vec& events, double T ) {
+arma::vec Exponential::dloglik( const arma::vec& events, double end ) {
 
     // Constants
     const arma::uword n = events.n_elem;
@@ -92,18 +92,18 @@ arma::vec Exponential::dloglik( const arma::vec& events, double T ) {
         grad(2) += (mu * A - mu * beta * B) * denom;
     }
 
-    expint = exp(- beta * (T - events(n-1)));
+    expint = exp(- beta * (end - events(n-1)));
     A = expint * (1.0 + A);
     C = expint * (events(n-1) + C);
-    B = T * A - C;
-    grad(0) -= T;
+    B = end * A - C;
+    grad(0) -= end;
     grad(1) -= ( (double)n - A );
     grad(2) -= mu * B;
 
     return grad;
 }
 
-arma::mat Exponential::ddloglik( const arma::vec& events, double T ) {
+arma::mat Exponential::ddloglik( const arma::vec& events, double end ) {
 
     // Constants
     const arma::uword n = events.n_elem;
@@ -142,12 +142,12 @@ arma::mat Exponential::ddloglik( const arma::vec& events, double T ) {
         hess(2,2) += (eta * mu * (beta * D - 2 * B) + mu2 * (beta2 * (A * E - C * C) - A * A)) * denom2;
     }
 
-    expint = exp(- beta * (T - events(n-1)));
+    expint = exp(- beta * (end - events(n-1)));
     A = expint * (1.0 + A);
     C = expint * (events(n-1) + C);
-    B = T * A - C;
+    B = end * A - C;
     E = expint * (events(n-1) * events(n-1) + E);
-    D = T * T * A + E - 2.0 * T * C;
+    D = end * end * A + E - 2.0 * end * C;
     hess(1,2) -= B;
     hess(2,2) += mu * D;
 
@@ -159,7 +159,7 @@ arma::mat Exponential::ddloglik( const arma::vec& events, double T ) {
     return hess;
 }
 
-Rcpp::List Exponential::loglikngrad( const arma::vec& events, double T ) {
+Rcpp::List Exponential::loglikngrad( const arma::vec& events, double end ) {
 
     // Constants
     const arma::uword n = events.n_elem;
@@ -189,12 +189,12 @@ Rcpp::List Exponential::loglikngrad( const arma::vec& events, double T ) {
     }
 
     // Likelihood of non occurrence
-    expint = exp(- beta * (T - events(n-1)));
+    expint = exp(- beta * (end - events(n-1)));
     A = expint * (1.0 + A);
     C = expint * (events(n-1) + C);
-    B = T * A - C;
-    lik -= eta * T + mu * ((double)n - A);
-    grad(0) -= T;
+    B = end * A - C;
+    lik -= eta * end + mu * ((double)n - A);
+    grad(0) -= end;
     grad(1) -= ( (double)n - A );
     grad(2) -= mu * B;
 

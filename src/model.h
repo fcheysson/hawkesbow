@@ -30,10 +30,10 @@ public:
     virtual arma::cx_cube ddH( arma::vec xi ) { return arma::zeros<arma::cx_cube>(param.n_elem, param.n_elem, xi.n_elem); };
 
     // Likelihood estimation methods
-    virtual double loglik( const arma::vec& events, double T ) { return 0.0; };
-    virtual arma::vec dloglik( const arma::vec& events, double T ) { return arma::zeros<arma::vec>(param.n_elem); };
-    virtual arma::mat ddloglik( const arma::vec& events, double T ) { return arma::zeros<arma::mat>(param.n_elem, param.n_elem); };
-    virtual Rcpp::List loglikngrad( const arma::vec& events, double T ) { return Rcpp::List::create(); };
+    virtual double loglik( const arma::vec& events, double end ) { return 0.0; };
+    virtual arma::vec dloglik( const arma::vec& events, double end ) { return arma::zeros<arma::vec>(param.n_elem); };
+    virtual arma::mat ddloglik( const arma::vec& events, double end ) { return arma::zeros<arma::mat>(param.n_elem, param.n_elem); };
+    virtual Rcpp::List loglikngrad( const arma::vec& events, double end ) { return Rcpp::List::create(); };
 
     // Methods for continuous- and discretized-time spectral densities
     arma::vec G( arma::vec xi );    // G(w) = |1-H(w)|^{-2}
@@ -80,10 +80,10 @@ public:
     arma::cx_cube ddH( arma::vec xi );
 
     // Likelihood methods
-    double loglik( const arma::vec& events, double T );
-    arma::vec dloglik( const arma::vec& events, double T );
-    arma::mat ddloglik( const arma::vec& events, double T );
-    Rcpp::List loglikngrad( const arma::vec& events, double T );
+    double loglik( const arma::vec& events, double end );
+    arma::vec dloglik( const arma::vec& events, double end );
+    arma::mat ddloglik( const arma::vec& events, double end );
+    Rcpp::List loglikngrad( const arma::vec& events, double end );
 
 };
 
@@ -106,10 +106,10 @@ public:
     // arma::cx_cube ddH( arma::vec xi );
 
     // Likelihood methods
-    // double loglik( const arma::vec& events, double T );
-    // arma::vec dloglik( const arma::vec& events, double T );
-    // arma::mat ddloglik( const arma::vec& events, double T );
-    // Rcpp::List loglikngrad( const arma::vec& events, double T );
+    // double loglik( const arma::vec& events, double end );
+    // arma::vec dloglik( const arma::vec& events, double end );
+    // arma::mat ddloglik( const arma::vec& events, double end );
+    // Rcpp::List loglikngrad( const arma::vec& events, double end );
 
 };
 
@@ -131,9 +131,9 @@ public:
     arma::cx_mat dH( arma::vec xi );
 
     // Likelihood methods
-    double loglik( const arma::vec& events, double T );
-    arma::vec dloglik( const arma::vec& events, double T );
-    Rcpp::List loglikngrad( const arma::vec& events, double T );
+    double loglik( const arma::vec& events, double end );
+    arma::vec dloglik( const arma::vec& events, double end );
+    Rcpp::List loglikngrad( const arma::vec& events, double end );
 
 };
 

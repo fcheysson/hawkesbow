@@ -4,10 +4,10 @@
 \alias{hawkes}
 \title{Simulation of a Hawkes process}
 \usage{
-hawkes(T, fun, repr, family, M = NULL, ...)
+hawkes(end, fun, repr, family, M = NULL, ...)
 }
 \arguments{
-\item{T}{A non-negative numeric value - right bound of the interval \eqn{[0,T]}.}
+\item{end}{A non-negative numeric value - right bound of the interval \eqn{[0,\mathrm{end}]}.}
 
 \item{fun}{A non-negative function or numeric value - intensity (function) of the immigrant process.}
 

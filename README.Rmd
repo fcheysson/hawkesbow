@@ -83,9 +83,9 @@ This package supports both Hawkes processes and their count sequences.
 
 Hawkes processes can be simulated by the function `hawkes`:
 ```{r eval= FALSE}
-hawkes(T, fun, repr, family, M=null, ...)
+hawkes(end, fun, repr, family, M=null, ...)
 ```
-where $T$ denotes the end of the interval $[0,T]$.
+where `end` denotes the end of the interval $[0,T]$.
 This function uses the cluster representation:
 
 - First, the immigrants are drawn according to a (potentially inhomogeneous) Poisson process with intensity measure `fun`.
@@ -147,7 +147,7 @@ However, both the arguments `opts` and `...` are passed on to `nloptr`, so the a
 Example of use:
 ```{r eval=FALSE}
 x = hawkes(100, fun = 1, repr = .5, family = "exp", rate = 1)
-mle(x$p, "Exponential", x$T)
+mle(x$p, "Exponential", x$end)
 ```
 
 #### By minimisation of the Whittle likelihood

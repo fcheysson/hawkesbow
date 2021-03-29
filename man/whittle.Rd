@@ -40,11 +40,14 @@ y = discrete(x, binsize = 1)
 opt = whittle(y, "Exponential")
 opt$par      # Estimated parameters
 
+\donttest{
+# May take up to 20 seconds
 # Simulate and fit a Hawkes process with power law kernel
 x = hawkes(1000, fun = 1, repr= .3, family = "powerlaw", shape = 3.5, scale = 1.0)
 y = discrete(x, binsize = 1)
 opt = whittle(y, "powerlaw")
 opt$par      # Estimated parameters
+}
 }
 \seealso{
 \code{\link[=hawkes]{hawkes()}} for the simulation of Hawkes processes,

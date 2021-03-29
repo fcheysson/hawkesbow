@@ -27,11 +27,11 @@ Alternatively, \code{param} and/or \code{binsize} can be specified.
 \item{\code{new(DerivedClass,(param),(binsize))}}{Constructor for derived classes; \code{param} and/or \code{binsize}
 can be safely ignored.}
 
-\item{\code{mean()}}{Returns the expected value on \eqn{[0,T]}.}
+\item{\code{mean()}}{Returns the expected value on \eqn{[0,\mathrm{end}]}.}
 
-\item{\code{dmean()}}{Returns the Jacobian matrix of the expected value on \eqn{[0,T]}.}
+\item{\code{dmean()}}{Returns the Jacobian matrix of the expected value on \eqn{[0,\mathrm{end}]}.}
 
-\item{\code{ddmean()}}{Returns the Hessian matrix of the expected value on \eqn{[0,T]}.}
+\item{\code{ddmean()}}{Returns the Hessian matrix of the expected value on \eqn{[0,\mathrm{end}]}.}
 
 \item{\code{f(xi)}}{Returns the spectral density function of the time-continuous count sequence. \itemize{
 \item \code{xi} A numeric vector of frequencies.
@@ -47,19 +47,19 @@ can be safely ignored.}
 \item \code{trunc} The number of foldings to take into account for the aliasing.
 }}
 
-\item{\code{loglik(events,T)}}{Returns the log-likelihood of a sequence of arrival times. \itemize{
+\item{\code{loglik(events,end)}}{Returns the log-likelihood of a sequence of arrival times. \itemize{
 \item \code{events} The sequence of arrival times.
-\item \code{T} The endpoint of the observation window \eqn{[0,T]}.
+\item \code{end} The endpoint of the observation window \eqn{[0,\mathrm{end}]}.
 }}
 
-\item{\code{dloglik(events,T)}}{Returns the Jacobian matrix of the log-likelihood of a sequence of arrival times. \itemize{
+\item{\code{dloglik(events,end)}}{Returns the Jacobian matrix of the log-likelihood of a sequence of arrival times. \itemize{
 \item \code{events} The sequence of arrival times.
-\item \code{T} The endpoint of the observation window \eqn{[0,T]}.
+\item \code{end} The endpoint of the observation window \eqn{[0,\mathrm{end}]}.
 }}
 
-\item{\code{ddloglik(events,T)}}{Returns the Hessian matrix of the log-likelihood of a sequence of arrival times. \itemize{
+\item{\code{ddloglik(events,end)}}{Returns the Hessian matrix of the log-likelihood of a sequence of arrival times. \itemize{
 \item \code{events} The sequence of arrival times.
-\item \code{T} The endpoint of the observation window \eqn{[0,T]}.
+\item \code{end} The endpoint of the observation window \eqn{[0,\mathrm{end}]}.
 }}
 }}
 

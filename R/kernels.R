@@ -8,9 +8,9 @@
 #' @field binsize Bin size for the count sequences.
 #' @field new(DerivedClass,(param),(binsize)) Constructor for derived classes; `param` and/or `binsize`
 #' can be safely ignored.
-#' @field mean() Returns the expected value on \eqn{[0,T]}.
-#' @field dmean() Returns the Jacobian matrix of the expected value on \eqn{[0,T]}.
-#' @field ddmean() Returns the Hessian matrix of the expected value on \eqn{[0,T]}.
+#' @field mean() Returns the expected value on \eqn{[0,\mathrm{end}]}.
+#' @field dmean() Returns the Jacobian matrix of the expected value on \eqn{[0,\mathrm{end}]}.
+#' @field ddmean() Returns the Hessian matrix of the expected value on \eqn{[0,\mathrm{end}]}.
 #' @field f(xi) Returns the spectral density function of the time-continuous count sequence. \itemize{
 #' \item `xi` A numeric vector of frequencies.
 #' }
@@ -22,17 +22,17 @@
 #' \item `I` The periodogram of the count sequence.
 #' \item `trunc` The number of foldings to take into account for the aliasing.
 #' }
-#' @field loglik(events,T) Returns the log-likelihood of a sequence of arrival times. \itemize{
+#' @field loglik(events,end) Returns the log-likelihood of a sequence of arrival times. \itemize{
 #' \item `events` The sequence of arrival times.
-#' \item `T` The endpoint of the observation window \eqn{[0,T]}.
+#' \item `end` The endpoint of the observation window \eqn{[0,\mathrm{end}]}.
 #' }
-#' @field dloglik(events,T) Returns the Jacobian matrix of the log-likelihood of a sequence of arrival times. \itemize{
+#' @field dloglik(events,end) Returns the Jacobian matrix of the log-likelihood of a sequence of arrival times. \itemize{
 #' \item `events` The sequence of arrival times.
-#' \item `T` The endpoint of the observation window \eqn{[0,T]}.
+#' \item `end` The endpoint of the observation window \eqn{[0,\mathrm{end}]}.
 #' }
-#' @field ddloglik(events,T) Returns the Hessian matrix of the log-likelihood of a sequence of arrival times. \itemize{
+#' @field ddloglik(events,end) Returns the Hessian matrix of the log-likelihood of a sequence of arrival times. \itemize{
 #' \item `events` The sequence of arrival times.
-#' \item `T` The endpoint of the observation window \eqn{[0,T]}.
+#' \item `end` The endpoint of the observation window \eqn{[0,\mathrm{end}]}.
 #' }
 #'
 #' @details This serves as a basis for the Hawkes model and its count sequence,

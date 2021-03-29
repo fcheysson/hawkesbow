@@ -21,6 +21,6 @@ Plots a simulated inhomogeneous Poisson process, highlighting the steps used in 
 }
 \examples{
 # Simulate an inhomogeneous Poisson process with function intensity 1 + sin(x)
-x <- inhpois(T=10, fun=function(y) {1 + sin(y)}, M=2)
+x <- inhpois(end=10, fun=function(y) {1 + sin(y)}, M=2)
 plot(x)
 }

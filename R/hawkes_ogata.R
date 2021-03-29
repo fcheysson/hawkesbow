@@ -6,10 +6,10 @@
 
 #' Simulation of a Hawkes process
 #'
-#' Simulates a Hawkes process via Ogata's modified thinning algorithm on \eqn{[0,T]}.
+#' Simulates a Hawkes process via Ogata's modified thinning algorithm on \eqn{[0,\mathrm{end}]}.
 #' This is less efficient than function `hawkes`, but can be useful for pedagogical reasons.
 #'
-#' @param T Right bound on time.
+#' @param end Right bound on time.
 #' @param lambda Baseline intensity.
 #' @param alpha Parameter for the amplitude of the spike.
 #' @param beta Parameter for the speed of exponential decay.
@@ -25,7 +25,7 @@
 #' # excitation function 1*exp(-2t)
 #' x <- hawkes_ogata(10, 1, 1, 2)
 #' plot(x)
-hawkes_ogata <- function(T, lambda, alpha, beta, lambda0=NULL) {
+hawkes_ogata <- function(end, lambda, alpha, beta, lambda0=NULL) {
 
 	# If no lambda0 specified, take lambda
 	# NOTE: in the future, find the correct distribution for lambda0
@@ -37,7 +37,7 @@ hawkes_ogata <- function(T, lambda, alpha, beta, lambda0=NULL) {
 		stop("For Ogata's algorithm, lambda0 must be higher than lambda.")
 
 	# Object to return
-	sim <- list(p=numeric(0), T=T,
+	sim <- list(p=numeric(0), end=end,
 			lambda=lambda, alpha=alpha, beta=beta, lambda0=lambda0,
 			n=0, A=numeric(0), M=lambda,
 			t=numeric(0), e=numeric(0), U=numeric(0), m=0)
@@ -58,13 +58,13 @@ hawkes_ogata <- function(T, lambda, alpha, beta, lambda0=NULL) {
 	M[2] <- lambda0
 
 	# Ogata's modified thinning algorithm
-	while (t[n] < T) {
+	while (t[n] < end) {
 		n <- n + 1
 		e[n] <- rexp(1, rate=M[n])
 		t[n] <- t[n-1] + e[n]
 		U[n] <- runif(1, min=0, max=M[n])
 
-		if (t[n] < T && U[n] < (lambda + alpha * (A[i]+1) * exp(-beta*(t[n]-p[i])))) {
+		if (t[n] < end && U[n] < (lambda + alpha * (A[i]+1) * exp(-beta*(t[n]-p[i])))) {
 			A[i+1] <- exp(-beta*(t[n]-p[i]))*(1+A[i])
 			p[i+1] <- t[n]
 			M[n+1] <- lambda + alpha*(A[i+1]+1)
@@ -107,12 +107,12 @@ hawkes_ogata <- function(T, lambda, alpha, beta, lambda0=NULL) {
 #' plot(x)
 plot.hawkes_ogata <- function(x, precision=1e3, ...) {
 	# Conditional intensity
-	matplot(z <- seq(0, x$T, by=x$T / precision),
+	matplot(z <- seq(0, x$end, by=x$end / precision),
 		intensity_ogata(x, z),
 		type="l", ylim=c(0, max(x$M)),
 		xlab=expression(italic(t)), ylab=expression(italic(U)))
 	# Upper bound M of Ogata's modified thinning algorithm
-	segments(x0=c(0, x$t[-x$m]), x1=c(x$t[-x$m], x$T),
+	segments(x0=c(0, x$t[-x$m]), x1=c(x$t[-x$m], x$end),
 		y0=x$M[-1-x$m],
 		lwd=4, col="blue")
 	# All points considered and the corresponding value for U
@@ -150,7 +150,7 @@ plot.hawkes_ogata <- function(x, precision=1e3, ...) {
 # #' intensity_ogata(x, 0:10)
 intensity_ogata <- function(hawkes, t) {
 	# If outside of bounds, return error
-	if (any(t < 0) || any(t > hawkes$T))
+	if (any(t < 0) || any(t > hawkes$end))
 		stop("t is out of bound.")
 	# Create vector of past closest points of hawkes
 	index <- sapply(t, function(j) {
@@ -185,7 +185,7 @@ intensity_ogata <- function(hawkes, t) {
 # #' compensator_ogata(x, 0:10)
 # compensator_ogata <- function(hawkes, t) {
 # 	# If outside of bounds, return error
-# 	if (any(t < 0) || any(t > hawkes$T))
+# 	if (any(t < 0) || any(t > hawkes$end))
 # 		stop("t is out of bound.")
 # 	# Create vector of past closest points of hawkes
 # 	index <- sapply(t, function(j) {

@@ -158,11 +158,10 @@ This package supports both Hawkes processes and their count sequences.
 Hawkes processes can be simulated by the function `hawkes`:
 
 ``` r
-hawkes(T, fun, repr, family, M=null, ...)
+hawkes(end, fun, repr, family, M=null, ...)
 ```
 
-where ![T](https://latex.codecogs.com/png.latex?T "T") denotes the end
-of the interval
+where `end` denotes the end of the interval
 ![\[0,T\]](https://latex.codecogs.com/png.latex?%5B0%2CT%5D "[0,T]").
 This function uses the cluster representation:
 
@@ -286,7 +285,7 @@ Example of use:
 
 ``` r
 x = hawkes(100, fun = 1, repr = .5, family = "exp", rate = 1)
-mle(x$p, "Exponential", x$T)
+mle(x$p, "Exponential", x$end)
 ```
 
 #### By minimisation of the Whittle likelihood
@@ -533,7 +532,7 @@ available for Pareto kernels.
 
 Cheysson, Felix, and Gabriel Lang. 2020. “Strong mixing condition for
 Hawkes processes and application to Whittle estimation from count data.”
-*arXiv*, March. <http://arxiv.org/abs/2003.04314>.
+*arXiv*, March. <https://arxiv.org/abs/2003.04314>.
 
 </div>
 

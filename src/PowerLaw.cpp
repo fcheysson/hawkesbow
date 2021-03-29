@@ -84,7 +84,7 @@ arma::cx_mat PowerLaw::dH( arma::vec xi ) {
 ////////////////////////////////////////////
 // Methods for maximum likelihood estimation
 
-double PowerLaw::loglik( const arma::vec& events, double T ) {
+double PowerLaw::loglik( const arma::vec& events, double end ) {
 
     // Constants
     const arma::uword n = events.n_elem;
@@ -104,13 +104,13 @@ double PowerLaw::loglik( const arma::vec& events, double T ) {
     }
 
     // Int \lambda* dt
-    hsum = arma::accu(arma::exp(- theta * arma::log(a + T - events)));
-    double part2 = eta * T + mu * (double)n - mu * atheta * hsum;
+    hsum = arma::accu(arma::exp(- theta * arma::log(a + end - events)));
+    double part2 = eta * end + mu * (double)n - mu * atheta * hsum;
 
     return part1 - part2;
 }
 
-arma::vec PowerLaw::dloglik( const arma::vec& events, double T ) {
+arma::vec PowerLaw::dloglik( const arma::vec& events, double end ) {
 
     // Constants
     const arma::uword n = events.n_elem;
@@ -148,20 +148,20 @@ arma::vec PowerLaw::dloglik( const arma::vec& events, double T ) {
             );
     }
 
-    arma::vec log_diffs = arma::log(a + T - events);
-    grad(0) -= T;
+    arma::vec log_diffs = arma::log(a + end - events);
+    grad(0) -= end;
     grad(1) -= n - atheta * arma::accu(arma::exp(- theta * log_diffs));
     grad(2) += mu * atheta * arma::accu(
         (log_a - log_diffs) % arma::exp(-theta * log_diffs)
     );
     grad(3) += mu * theta * exp((theta - 1.0) * log_a) * arma::accu(
-        (T - events) % arma::exp(-(theta + 1.0) * log_diffs)
+        (end - events) % arma::exp(-(theta + 1.0) * log_diffs)
     );
 
     return grad;
 }
 
-Rcpp::List PowerLaw::loglikngrad( const arma::vec& events, double T ) {
+Rcpp::List PowerLaw::loglikngrad( const arma::vec& events, double end ) {
 
     // Constants
     const arma::uword n = events.n_elem;
@@ -203,18 +203,18 @@ Rcpp::List PowerLaw::loglikngrad( const arma::vec& events, double T ) {
     }
 
     // Compensator part
-    arma::vec log_diffs = arma::log(a + T - events);
+    arma::vec log_diffs = arma::log(a + end - events);
     hsum = arma::accu(arma::exp(- theta * log_diffs));
 
-    lik -= eta * T + mu * (double)n - mu * atheta * hsum;
+    lik -= eta * end + mu * (double)n - mu * atheta * hsum;
 
-    grad(0) -= T;
+    grad(0) -= end;
     grad(1) -= n - atheta * arma::accu(arma::exp(- theta * log_diffs));
     grad(2) += mu * atheta * arma::accu(
         (log_a - log_diffs) % arma::exp(-theta * log_diffs)
     );
     grad(3) += mu * theta * exp((theta - 1.0) * log_a) * arma::accu(
-        (T - events) % arma::exp(-(theta + 1.0) * log_diffs)
+        (end - events) % arma::exp(-(theta + 1.0) * log_diffs)
     );
 
     return Rcpp::List::create(Rcpp::Named("objective") = lik, Rcpp::Named("gradient") = grad);

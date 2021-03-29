@@ -6,10 +6,10 @@
 
 #' Simulation of an inhomogeneous Poisson process by thinning
 #'
-#' Simulates an inhomogeneous Poisson process via Ogata's modified thinning algorithm on \eqn{[0,T]}.
-#' An homogeneous Poisson process with intensity `M` is first generated on \eqn{[0,T]}, then thinned using the specified intensity function `fun`.
+#' Simulates an inhomogeneous Poisson process via Ogata's modified thinning algorithm on \eqn{[0,\mathrm{end}]}.
+#' An homogeneous Poisson process with intensity `M` is first generated on \eqn{[0,\mathrm{end}]}, then thinned using the specified intensity function `fun`.
 #'
-#' @param T A non-negative numeric value - right bound of the interval \eqn{[0,T]}.
+#' @param end A non-negative numeric value - right bound of the interval \eqn{[0,\mathrm{end}]}.
 #' @param fun A non-negative function or numeric value - intensity (function) of the Poisson process.
 #' @param M (default = NULL) A non-negative numeric value - upper bound on `fun` (ignored if `fun` is a numeric value).
 #'
@@ -20,17 +20,17 @@
 #'
 #' @examples
 #' # Simulate an inhomogeneous Poisson process with function intensity 1 + sin(x) (bounded by 2)
-#' x <- inhpois(T=10, fun=function(y) {1 + sin(y)}, M=2)
+#' x <- inhpois(end=10, fun=function(y) {1 + sin(y)}, M=2)
 #' # Simulate a homogeneous Poisson process with intensity 3
-#' x <- inhpois(T=10, fun=3)
-inhpois <- function(T, fun, M=NULL) {
+#' x <- inhpois(end=10, fun=3)
+inhpois <- function(end, fun, M=NULL) {
 
     if (is.numeric(fun)) {
-        m = rpois(1, lambda = fun*T)
-        p <- sort(runif(m, min = 0, max = T))
+        m = rpois(1, lambda = fun*end)
+        p <- sort(runif(m, min = 0, max = end))
 
         # Object to return
-        sim = list(p = p, T = T, fun = fun, n = m, call=match.call())
+        sim = list(p = p, end = end, fun = fun, n = m, call=match.call())
         return(sim)
     }
 
@@ -38,12 +38,12 @@ inhpois <- function(T, fun, M=NULL) {
 
     if (is.null(M)) {
         warning("M is computed approximately and should be user-specified.")
-        M = max( sapply(seq(0, T, length.out = 1e3), fun) )
+        M = max( sapply(seq(0, end, length.out = 1e3), fun) )
     }
 
-    # Simulate an homonogeous Poisson on [0,T]x[0,M]
-    m <- rpois(1, lambda=M*T)
-    x <- runif(m, min=0, max=T)
+    # Simulate an homonogeous Poisson on [0,end]x[0,M]
+    m <- rpois(1, lambda=M*end)
+    x <- runif(m, min=0, max=end)
     y <- runif(m, min=0, max=M)
 
     # Ogata's thinning algorithm
@@ -51,7 +51,7 @@ inhpois <- function(T, fun, M=NULL) {
     p <- sort(x[accepted])
 
     # Object to return
-    sim <- list(p=p, T=T, fun=fun, M=M, n=length(p),
+    sim <- list(p=p, end=end, fun=fun, M=M, n=length(p),
                 x=x, y=y, accepted=accepted, m=m, call=match.call())
     class(sim) <- "inhpois"
     return(sim)
@@ -72,15 +72,15 @@ inhpois <- function(T, fun, M=NULL) {
 #'
 #' @examples
 #' # Simulate an inhomogeneous Poisson process with function intensity 1 + sin(x)
-#' x <- inhpois(T=10, fun=function(y) {1 + sin(y)}, M=2)
+#' x <- inhpois(end=10, fun=function(y) {1 + sin(y)}, M=2)
 #' plot(x)
 plot.inhpois <- function(x, precision=1e3, ...) {
     # Conditional intensity
-    matplot(z <- seq(0, x$T, length.out=precision), sapply(z, x$fun),
+    matplot(z <- seq(0, x$end, length.out=precision), sapply(z, x$fun),
             type="l", ylim=c(0, x$M),
             xlab=expression(italic(t)), ylab=expression(italic(U)))
     # Upper bound M of Ogata's modified thinning algorithm
-    segments(x0=0, x1=x$T,
+    segments(x0=0, x1=x$end,
              y0=x$M,
              lwd=4, col="blue")
     # All points considered and the corresponding value for U
@@ -106,7 +106,7 @@ plot.inhpois <- function(x, precision=1e3, ...) {
 #' - Third, these offsprings are distributed according to the `family` distribution.
 #' - Then, generate further offsprings according to the last two steps.
 #'
-#' @param T A non-negative numeric value - right bound of the interval \eqn{[0,T]}.
+#' @param end A non-negative numeric value - right bound of the interval \eqn{[0,\mathrm{end}]}.
 #' @param fun A non-negative function or numeric value - intensity (function) of the immigrant process.
 #' @param repr A non-negative numeric value - mean number of offsprings.
 #' @param family A character string "name" naming a distribution with corresponding random generation function `rname`, or directly the random generation function.
@@ -126,7 +126,7 @@ plot.inhpois <- function(x, precision=1e3, ...) {
 #' # reproduction mean 0.5 and custom [0,1]-triangular fertility function.
 #' x <- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5,
 #'             family=function(n) {1 - sqrt(1 - runif(n))})
-hawkes <- function(T, fun, repr, family, M=NULL, ...) {
+hawkes <- function(end, fun, repr, family, M=NULL, ...) {
 
     # Check if fertility distribution function is user specified or chosen amongst R "r___" functions
     if (is.character(family))
@@ -136,7 +136,7 @@ hawkes <- function(T, fun, repr, family, M=NULL, ...) {
     else distfun = family
 
     # Get immigrants distributed as inhpois
-    immigrants <- inhpois(T, fun, M)
+    immigrants <- inhpois(end, fun, M)
 
     # Initialize
     gen <- list(gen0=immigrants$p)
@@ -166,11 +166,11 @@ hawkes <- function(T, fun, repr, family, M=NULL, ...) {
     # Add immigrants and sort
     if (length(gen) > 0) {
         p <- sort(unlist(gen, use.names=FALSE))
-        p <- p[p < T & p > 0]
+        p <- p[p < end & p > 0]
     } else p <- numeric(0)
 
     # Return object
-    sim <- list(p=p, T=T, repr=repr, distfun=distfun, family=family, distargs=list(...), n=length(p),
+    sim <- list(p=p, end=end, repr=repr, distfun=distfun, family=family, distargs=list(...), n=length(p),
                 immigrants=immigrants, gen=gen, ancestors=ancestors, call=match.call())
     class(sim) <- "hawkes"
     return( sim )
@@ -208,7 +208,7 @@ plot.hawkes <- function(x, intensity = FALSE, precision = 1e3, fun = NULL, repr 
     if (intensity==FALSE) {
         if (!is(x, "hawkes")) stop("'intensity==FALSE' is only compatible with Hawkes processes simulated from function 'hawkes'.")
         # Draw a convenient empty plot
-        plot(x=NULL, xlim=c(0, x$T), ylim=c(-1, length(x$gen)-.5), yaxt="n",
+        plot(x=NULL, xlim=c(0, x$end), ylim=c(-1, length(x$gen)-.5), yaxt="n",
              ylab="Generations", xlab="Time")
         axis(2, at=1:length(x$gen)-1)
         # Add generation 0 (i.e. immigrants)
@@ -223,7 +223,7 @@ plot.hawkes <- function(x, intensity = FALSE, precision = 1e3, fun = NULL, repr 
         }
         # Add full process
         points(x=x$p, y=rep(-0.5, x$n), pch=4)
-        segments(x0=0, x1=x$T, y0=-.5, col="grey")
+        segments(x0=0, x1=x$end, y0=-.5, col="grey")
     }
     if (intensity==TRUE) {
         # Define pattern
@@ -232,16 +232,16 @@ plot.hawkes <- function(x, intensity = FALSE, precision = 1e3, fun = NULL, repr 
         else stop("Argument 'x' must either be of class 'hawkes' or a numeric vector.")
 
         # Define end point
-        if (is(x, "hawkes")) T = x$T
-        else T = tail(x, 1)
+        if (is(x, "hawkes")) end = x$end
+        else end = tail(x, 1)
 
         # Conditional intensity
-        matplot(z <- seq(0, T, by=T / precision),
+        matplot(z <- seq(0, end, by=end / precision),
                 zt <- intensity(x = x, t = z, fun = fun, M = M, repr = repr, family = family, ...),
                 type="l", ylim=c(0, max(zt)),
                 xlab=expression(italic(t)), ylab=expression("Conditional intensity"))
         # Hawkes process
-        segments(x0=0, x1=T, y0=0, col="grey")
+        segments(x0=0, x1=end, y0=0, col="grey")
         points(x=p, y=rep(0, length(p)), pch=4)
     }
 }
