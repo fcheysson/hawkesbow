@@ -3,6 +3,8 @@
 #include <iostream>
 #include <boost/math/special_functions/gamma.hpp>
 
+#define BOOST_DISABLE_ASSERTS
+
 // Powers of i
 arma::cx_double pow_i(int x) {
     int rem = x % 4;

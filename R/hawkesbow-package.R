@@ -34,7 +34,7 @@
 ## usethis namespace: start
 #' @useDynLib hawkesbow
 #' @importFrom Rcpp sourceCpp loadModule
-#' @importFrom graphics arrows axis legend matplot points segments
+#' @importFrom graphics plot arrows axis legend matplot points segments
 #' @importFrom methods is new
 #' @importFrom stats fft integrate optim rexp rpois runif
 #' @importFrom utils modifyList tail

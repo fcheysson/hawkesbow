@@ -1,6 +1,6 @@
 Package: hawkesbow
 Title: Estimation of Hawkes Processes from Binned Observations
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: 
     person(given = "Felix",
            family = "Cheysson",
