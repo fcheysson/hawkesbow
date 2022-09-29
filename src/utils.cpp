@@ -246,7 +246,7 @@ arma::cx_double inc_gamma_imag( double x, double alpha ) {
     // Taylor expansion of Ci and Si around x = 0, up to 34 terms calculated for x = 20
     // This approximation is of order 10^{-8}
     if (x < 20.0) {
-        int n = std::ceil(7.0 + 1.36 * x); // Change constant term 'a' to get an approximation to order 10^{-a-1}
+        int n = std::ceil(8.0 + 1.36 * x); // Change constant term 'a' to get an approximation to order 10^{-a-1}
         double x2 = x * x;
         double xalpha = exp(alpha * log(x));
 
@@ -263,7 +263,7 @@ arma::cx_double inc_gamma_imag( double x, double alpha ) {
     }
 
     // Taylor expansion of f and g around x -> infty, only 10 terms calculated
-    // This approximation is at most of order 10^{-8}
+    // This approximation is at worst of order 10^{-8}
     // Can't be used for x < 20 because then it is of lower order
     int n = 10;
     double inv_x = 1.0 / x;

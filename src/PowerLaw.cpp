@@ -181,7 +181,7 @@ Rcpp::List PowerLaw::loglikngrad( const arma::vec& events, double end ) {
     for (arma::uword i = 1; i < n; i++) {
         arma::vec diffs = a + events(i) - events.subvec(0, i-1);
         arma::vec log_diffs = arma::log(diffs);
-        arma::vec diffsmthetam1 = arma::exp(-theta * log_diffs) / diffs;
+        arma::vec diffsmthetam1 = arma::exp(-(theta+1.0) * log_diffs);
         hsum = arma::accu(diffsmthetam1);
         inv_lambda = 1.0 / (eta + mu * theta * atheta * hsum);
 
