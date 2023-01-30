@@ -31,8 +31,7 @@ dpowerlaw = function(x, shape = 1.0, scale = 1.0) {
          stop("Both shape and scale must be positive.")
 
     return(
-        shape * exp(shape * log(scale)) *
-               exp(-(shape + 1) * log(scale + x))
+        shape * exp(shape * log(scale) - (shape + 1) * log(scale + x))
     )
 }
 
