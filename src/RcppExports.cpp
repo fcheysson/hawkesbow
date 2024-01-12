@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // Etheta_imaginary
 arma::cx_vec Etheta_imaginary(double theta, arma::vec x);
 RcppExport SEXP _hawkesbow_Etheta_imaginary(SEXP thetaSEXP, SEXP xSEXP) {
