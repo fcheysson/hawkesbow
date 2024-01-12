@@ -15,7 +15,13 @@ Lang 2020).
 
 # Installation
 
-You can install the released version of hawkesbow from
+You can install the released version from CRAN with:
+
+```r
+install.packages("hawkesbow")
+```
+
+You can install the development version of hawkesbow from
 [GitHub](https://github.com/fcheysson/hawkesbow) with:
 
 ``` r
